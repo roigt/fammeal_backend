@@ -2,11 +2,9 @@ package org.univartois.resource;
 
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -27,18 +25,14 @@ public class UserAuthResource {
 
     @POST
     public RestResponse<ApiResponse<UserRegisterResponseDto>> registerUser(@Valid UserRegisterRequestDto userRegisterRequestDto) {
-        UserRegisterResponseDto userRegisterResponseDto = UserRegisterResponseDto.builder()
-                .message("you have been registered successfully, please check your email")
-                .build();
-        return RestResponse.status(RestResponse.Status.CREATED, ResponseUtil.success(userRegisterResponseDto, "you have been registered successfully, please check your email", RestResponse.Status.CREATED, uriInfo.getPath()));
+        UserRegisterResponseDto userRegisterResponseDto = userAuthService.registerUser(userRegisterRequestDto);
+        return RestResponse.status(RestResponse.Status.CREATED, ResponseUtil.success(userRegisterResponseDto, userRegisterResponseDto.getMessage(), RestResponse.Status.CREATED, uriInfo.getPath()));
     }
-
-
 
 
     @Path("/me")
     @POST
-    public void throwException(){
+    public void throwException() {
         throw new NotFoundException("a problem occured");
     }
 }

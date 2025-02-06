@@ -12,7 +12,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter @Setter
 @Builder
 public class UserEntity {
@@ -40,8 +39,23 @@ public class UserEntity {
 
     private boolean isVerified = false;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<TokenEntity> tokens = new HashSet<>();
 
 
+    public UserEntity() {
+        tokens = new HashSet<>();
+    }
+
+
+    public void addToken(TokenEntity token){
+        tokens.add(token);
+        token.setUser(this);
+    }
+
+    public void removeToken(TokenEntity token){
+        tokens.remove(token);
+        token.setUser(null);
+    }
 }

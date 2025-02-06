@@ -12,6 +12,4 @@ public interface UserMapper {
 
     UserEntity toEntity(UserRegisterRequestDto userRegisterRequestDto);
 
-    UserRegisterResponseDto toResponseDto(UserRegisterResponseDto userRegisterResponseDto);
-
 }
