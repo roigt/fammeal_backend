@@ -1,4 +1,4 @@
-package org.univartois.exception;
+package org.univartois.exception.handler;
 
 
 import jakarta.validation.ConstraintViolationException;

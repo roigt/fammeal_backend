@@ -20,7 +20,7 @@ public class UserCreatedEventHandler {
 
     @ConsumeEvent(value = Constants.USER_CREATED_EVENT)
     public void sendVerificationMail(UserCreatedEvent userCreatedEvent) {
-        String verificationLink = String.format("https://localhost:8080/api/verify?token=%s", userCreatedEvent.getVerificationToken());
+        String verificationLink = String.format("http://localhost:8080/api/users/verify?token=%s", userCreatedEvent.getVerificationToken());
 
         String htmlContent = "<h1>Bienvenue " + userCreatedEvent.getFirstname() + " " + userCreatedEvent.getLastname() + " au FamMeal !</h1>"
                 + "<p>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour activer votre compte :</p>"

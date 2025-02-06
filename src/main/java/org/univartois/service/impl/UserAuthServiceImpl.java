@@ -5,11 +5,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.univartois.dto.request.UserRegisterRequestDto;
+import org.univartois.dto.response.TokenRepository;
 import org.univartois.dto.response.UserRegisterResponseDto;
+import org.univartois.dto.response.VerificationAccountResponseDto;
 import org.univartois.entity.TokenEntity;
 import org.univartois.entity.UserEntity;
 import org.univartois.enums.TokenType;
 import org.univartois.event.UserCreatedEvent;
+import org.univartois.exception.TokenInvalidException;
 import org.univartois.exception.UserAlreadyExistsException;
 import org.univartois.mapper.UserMapper;
 import org.univartois.repository.UserRepository;
@@ -24,6 +27,9 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Inject
     UserRepository userRepository;
+
+    @Inject
+    TokenRepository tokenRepository;
 
     @Inject
     EventBus eventBus;
@@ -61,5 +67,17 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .expiresAt(LocalDateTime.now().plusHours(1))
                 .tokenType(TokenType.VERIFICATION_TOKEN)
                 .build();
+    }
+
+
+    @Override
+    @Transactional
+    public VerificationAccountResponseDto verifyAccount(String token) {
+        TokenEntity tokenEntity = tokenRepository.findByTokenAndNotUsedAndNotExpired(token).orElseThrow(() -> new TokenInvalidException("Token invalide, expiiré ou déjà utilisé"));
+
+        final UserEntity user = tokenEntity.getUser();
+        user.setVerified(true);
+        tokenEntity.setUsed(true);
+        return VerificationAccountResponseDto.builder().message("votre compte est désormais activé !").build();
     }
 }
