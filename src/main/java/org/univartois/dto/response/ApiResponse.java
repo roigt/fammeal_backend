@@ -1,5 +1,6 @@
 package org.univartois.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.jboss.resteasy.reactive.RestResponse;
 
@@ -16,6 +17,7 @@ public class ApiResponse<T> {
     @Getter @Setter
     public static class Error {
         private String message;
+
         private String field;
 
         public Error(String message){
