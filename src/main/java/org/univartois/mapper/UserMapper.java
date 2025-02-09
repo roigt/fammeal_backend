@@ -15,4 +15,5 @@ public interface UserMapper {
 
 
     void updateEntity(@MappingTarget UserEntity user, UserRegisterRequestDto userRegisterRequestDto);
+    
 }

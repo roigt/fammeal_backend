@@ -4,6 +4,7 @@ import io.vertx.mutiny.core.eventbus.EventBus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import org.univartois.dto.request.UserRegisterRequestDto;
 import org.univartois.dto.response.UserRegisterResponseDto;
 import org.univartois.dto.response.VerificationAccountResponseDto;
@@ -42,20 +43,18 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     @Transactional
     public UserRegisterResponseDto registerUser(UserRegisterRequestDto userRegisterRequestDto) {
-        final Optional<UserEntity> optionalUserEntity = userRepository.findByEmailOrUsername(userRegisterRequestDto.getEmail(), userRegisterRequestDto.getUsername());
+        final Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(userRegisterRequestDto.getEmail());
 
         if (optionalUserEntity.isPresent()) {
             final UserEntity user = optionalUserEntity.get();
             if (
-                    user.isVerified() || !user.getEmail().equals(userRegisterRequestDto.getEmail()) || !user.getUsername().equals(userRegisterRequestDto.getUsername())
+                    user.isVerified()
             ) {
                 throw new UserAlreadyExistsException("Un utilisateur avec cet email ou nom d'utilisateur existe déjà.");
             } else {
-//                update user entity and send verification mail again
-                userMapper.updateEntity(user, userRegisterRequestDto);
+//                send verification mail again
                 final TokenEntity verificationToken = generateVerificationToken();
                 user.addToken(verificationToken);
-
                 final UserCreatedEvent userCreatedEvent = UserCreatedEvent.builder()
                         .email(user.getEmail())
                         .firstname(user.getFirstname())
@@ -68,6 +67,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         final UserEntity user = userMapper.toEntity(userRegisterRequestDto);
+        user.setUsername(generateUsername(user.getFirstname(), user.getLastname()));
         final TokenEntity verificationToken = generateVerificationToken();
         user.addToken(verificationToken);
         userRepository.persist(user);
@@ -89,9 +89,13 @@ public class UserAuthServiceImpl implements UserAuthService {
         return TokenEntity.builder()
                 .token(UUID.randomUUID().toString())
                 .used(false)
-                .expiresAt(LocalDateTime.now().plusHours(1))
+                .expiresAt(LocalDateTime.now().plusHours(24))
                 .tokenType(TokenType.VERIFICATION_TOKEN)
                 .build();
+    }
+
+    private String generateUsername(String firstname, String lastname){
+        return String.format("%s_%s_%s", firstname, lastname, UUID.randomUUID().toString());
     }
 
 
