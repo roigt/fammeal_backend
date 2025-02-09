@@ -19,8 +19,10 @@ public class UserEntity {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(unique = true)
     private String username;
 
+    @Column(unique = true)
     private String email;
 
     private String firstname;
@@ -40,7 +42,7 @@ public class UserEntity {
     private boolean isVerified = false;
 
     @Builder.Default
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<TokenEntity> tokens = new HashSet<>();
 
 

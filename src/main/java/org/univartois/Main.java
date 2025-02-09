@@ -6,6 +6,7 @@ import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.univartois.utils.GenerateToken;
 
 @OpenAPIDefinition(
         tags = {
@@ -17,14 +18,15 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
                 version = "1.0.0-SNAPSHOT",
                 contact = @Contact(
                         name = "fammeal API Support",
-                        url = "http://univartois.net/contact",
-                        email = "uniartois@artois.com")
+                        url = "http://fammeal.net/contact",
+                        email = "contact@fammeal.com")
         )
 )
 @QuarkusMain
 public class Main {
 
     public static void main(String[] args) {
+        System.out.println("jwt token:  "+ GenerateToken.generateToken());
         Quarkus.run(args);
     }
 

@@ -10,6 +10,8 @@ import java.util.Optional;
 public class UserRepository implements PanacheRepository<UserEntity> {
 
     public Optional<UserEntity> findByEmailOrUsername(String email, String username){
-        return find("email = ?1 or username = ?2",email, username).firstResultOptional();
+        return find("email = ?1 OR username = ?2",email, username).firstResultOptional();
     }
+
+
 }
