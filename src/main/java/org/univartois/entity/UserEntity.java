@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,15 +32,16 @@ public class UserEntity {
 
     private String password;
 
-    private String salt;
-
     private String imageUrl;
 
     private boolean isVegetarian = false;
 
-    private boolean isDarkModeEnabled = false;
-
     private boolean isVerified = false;
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.PERSIST)
+    private Set<HomeRoleEntity> roles = new HashSet<>();
+
 
     @Builder.Default
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)

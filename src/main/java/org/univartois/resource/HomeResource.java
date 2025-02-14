@@ -1,31 +1,38 @@
 package org.univartois.resource;
 
-import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
+import io.quarkus.security.Authenticated;
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
-import org.eclipse.microprofile.jwt.Claim;
-import org.eclipse.microprofile.jwt.ClaimValue;
-import org.eclipse.microprofile.jwt.Claims;
+import jakarta.ws.rs.core.UriInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.resteasy.reactive.RestResponse;
+import org.univartois.dto.request.CreateHomeRequestDto;
+import org.univartois.dto.response.ApiResponse;
+import org.univartois.dto.response.HomeResponseDto;
+import org.univartois.service.HomeService;
+import org.univartois.utils.ResponseUtil;
 
+import java.util.UUID;
+
+@Slf4j
 @Path("/api/homes")
 public class HomeResource {
 
     @Inject
-    JsonWebToken jwt;
+    HomeService homeService;
 
     @Inject
-    @Claim(standard = Claims.birthdate)
-    ClaimValue<String> birthdate;
+    JsonWebToken jwt;
 
-    private String getResponseString(SecurityContext ctx) {
+
+    @Inject
+    UriInfo uriInfo;
+
+    private String getResponseString(SecurityContext ctx, SecurityIdentity securityIdentity) {
         String name;
         if (ctx.getUserPrincipal() == null) {
             name = "anonymous";
@@ -34,11 +41,15 @@ public class HomeResource {
         } else {
             name = ctx.getUserPrincipal().getName();
         }
+
+        log.info("security identity: {}", securityIdentity.getAttributes().toString());
+
         return String.format("hello %s,"
                         + " isHttps: %s,"
                         + " authScheme: %s,"
-                        + " hasJWT: %s",
-                name, ctx.isSecure(), ctx.getAuthenticationScheme(), hasJwt());
+                        + " hasJWT: %s,"+
+                "permission: %s",
+                name, ctx.isSecure(), ctx.getAuthenticationScheme(), hasJwt(), securityIdentity.getAttributes().get("permissions").toString());
     }
 
     private boolean hasJwt() {
@@ -46,25 +57,25 @@ public class HomeResource {
     }
 
     @GET
-    @PermitAll
-    public String getHomes(@Context SecurityContext securityContext) {
-        return getResponseString(securityContext);
-    }
-
-
-    @GET
-    @Path("roles-allowed")
-    @RolesAllowed({"User", "Admin"})
-    @Produces(MediaType.TEXT_PLAIN)
-    public String helloRolesAllowed(@Context SecurityContext ctx) {
-        return getResponseString(ctx) + ", birthdate: " + jwt.getClaim("birthdate").toString();
+    @Authenticated
+    public String getHomes(@Context SecurityContext securityContext,  @Context SecurityIdentity securityIdentity) {
+        return getResponseString(securityContext, securityIdentity);
     }
 
     @GET
-    @Path("roles-allowed-admin")
-    @RolesAllowed("Admin")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String helloRolesAllowedAdmin(@Context SecurityContext ctx) {
-        return getResponseString(ctx) + ", birthdate: " + birthdate.getValue();
+    @Authenticated
+    @Path("/{homeId}")
+    public RestResponse<ApiResponse<HomeResponseDto>> getHome(@PathParam("homeId") UUID homeId){
+        final HomeResponseDto home = homeService.getHomeById(homeId);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(home, "Détails de la maison récupérés.", RestResponse.Status.OK,uriInfo.getPath()));
     }
+
+    @POST
+    @Authenticated
+    public RestResponse<ApiResponse<HomeResponseDto>> createHome(CreateHomeRequestDto createHomeRequestDto){
+        final HomeResponseDto home = homeService.createHome(createHomeRequestDto);
+
+        return RestResponse.status(RestResponse.Status.CREATED, ResponseUtil.success(home, "La maison a été créée avec succès", RestResponse.Status.CREATED,uriInfo.getPath()));
+    }
+
 }

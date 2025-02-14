@@ -6,7 +6,6 @@ import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.univartois.utils.GenerateToken;
 
 @OpenAPIDefinition(
         tags = {
@@ -26,7 +25,6 @@ import org.univartois.utils.GenerateToken;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("jwt token:  "+ GenerateToken.generateToken());
         Quarkus.run(args);
     }
 

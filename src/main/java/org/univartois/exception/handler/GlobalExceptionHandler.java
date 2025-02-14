@@ -1,6 +1,8 @@
 package org.univartois.exception.handler;
 
 
+import io.quarkus.security.ForbiddenException;
+import io.quarkus.security.UnauthorizedException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
 import jakarta.ws.rs.WebApplicationException;
@@ -21,7 +23,7 @@ public class GlobalExceptionHandler {
     @Context
     UriInfo uriInfo;
 
-    @ServerExceptionMapper
+    @ServerExceptionMapper(value = {ValidationException.class})
     public RestResponse<ApiResponse<Object>> handleValidationException(ValidationException exception) {
 //        String message = exception.getMessage();
         String message = "Validation failed";
@@ -45,16 +47,32 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ServerExceptionMapper
+    @ServerExceptionMapper(value = {UnauthorizedException.class, ForbiddenException.class, SecurityException.class})
+    public RestResponse<ApiResponse<Object>> handleSecurityException(SecurityException exception) {
+        log.error("security exception at {}: {}", uriInfo.getPath(), exception.getMessage(), exception);
+        ApiResponse<Object> response;
+        response = ResponseUtil.errorFromStrings(
+                new ArrayList<String>(),
+                exception.getMessage(),
+                RestResponse.Status.fromStatusCode(401),
+                uriInfo.getPath()
+        );
+        if (exception instanceof ForbiddenException forbiddenException) {
+            response.setStatusCode(RestResponse.Status.FORBIDDEN.getStatusCode());
+        }
+        return RestResponse.status(RestResponse.Status.fromStatusCode(response.getStatusCode()), response);
+    }
+
+    @ServerExceptionMapper(value = {RuntimeException.class})
     public RestResponse<ApiResponse<Object>> handleOtherException(RuntimeException exception) {
         log.error("Unhandled exception at {}: {}", uriInfo.getPath(), exception.getMessage(), exception);
         ApiResponse<Object> response;
         if (exception instanceof WebApplicationException webApplicationException) {
             response = ResponseUtil.errorFromStrings(
-              new ArrayList<String>(),
-              webApplicationException.getMessage(),
+                    new ArrayList<String>(),
+                    webApplicationException.getMessage(),
                     RestResponse.Status.fromStatusCode(webApplicationException.getResponse().getStatus()),
-              uriInfo.getPath()
+                    uriInfo.getPath()
             );
         } else {
 
@@ -66,7 +84,7 @@ public class GlobalExceptionHandler {
 
             );
         }
-        return RestResponse.status(response.getStatusCode(), response);
+        return RestResponse.status(RestResponse.Status.fromStatusCode(response.getStatusCode()), response);
     }
 
 
