@@ -15,6 +15,13 @@ public enum HomeRoleType implements Role {
         PROPOSITION_REPAS.children.add(MEMBER);
     }
 
+    public static class Constants {
+        public static final String ADMIN_ROLE = "ADMIN";
+        public static final String CHEF_REPAS_ROLE = "CHEF_REPAS";
+        public static final String GARDE_MANGER_ROLE = "GARDE_MANGER";
+        public static final String PROPOSITION_REPAS_ROLE = "PROPOSITION_REPAS";
+        public static final String MEMBER_ROLE = "MEMBER";
+    }
 
     @Override
     public boolean includes(Role role) {

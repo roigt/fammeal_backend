@@ -20,14 +20,13 @@ public class JwtTokenUtil {
 
 
     public String generateJwtToken(final UserEntity user){
-        final Map<String, List<String>> permissions = new HashMap<>();
+        final Map<String, Set<String>> permissions = new HashMap<>();
         user.getRoles().forEach(homeRole -> {
-            final List<String> homeRoles = permissions.getOrDefault(homeRole.getId().getHomeId().toString(), new ArrayList<>());
+            final Set<String> homeRoles = permissions.getOrDefault(homeRole.getId().getHomeId().toString(), new HashSet<>());
             homeRoles.add(homeRole.getRole().name());
             permissions.put(homeRole.getId().getHomeId().toString(), homeRoles);
         });
 
-        permissions.put(UUID.randomUUID().toString(), List.of("ADMIN"));
 
         return Jwt.issuer(issuer)
                 .upn(user.getEmail())

@@ -8,7 +8,7 @@ import org.univartois.enums.HomeRoleType;
 import java.util.Objects;
 import java.util.Set;
 
-@NoArgsConstructor
+
 @AllArgsConstructor
 @Builder
 @Getter @Setter
@@ -16,7 +16,8 @@ import java.util.Set;
 @Table(name = "permissions")
 public class HomeRoleEntity {
     @EmbeddedId
-    private HomeRoleId id;
+    @Builder.Default
+    private HomeRoleId id = new HomeRoleId();
 
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,6 +30,9 @@ public class HomeRoleEntity {
     @Enumerated(EnumType.STRING)
     private HomeRoleType role;
 
+    public HomeRoleEntity() {
+        this.id = new HomeRoleId();
+    }
 
     @Override
     public final boolean equals(Object o) {

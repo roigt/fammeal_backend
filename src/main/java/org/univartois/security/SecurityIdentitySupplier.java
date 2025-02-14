@@ -32,7 +32,7 @@ public class SecurityIdentitySupplier implements Supplier<SecurityIdentity> {
 
         JsonWebToken user = (JsonWebToken) identity.getPrincipal();
 
-        final Map<String, List<String>> permissions = roleService.getRolesByUserId(UUID.fromString(user.getSubject()));
+        final Map<String, Set<String>> permissions = roleService.getRolesByUserId(UUID.fromString(user.getSubject()));
 
         builder.addAttributes(Collections.singletonMap("permissions", permissions));
         return builder.build();

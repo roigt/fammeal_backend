@@ -10,9 +10,11 @@ import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.univartois.annotation.HomePermissionsAllowed;
 import org.univartois.dto.request.CreateHomeRequestDto;
 import org.univartois.dto.response.ApiResponse;
 import org.univartois.dto.response.HomeResponseDto;
+import org.univartois.enums.HomeRoleType;
 import org.univartois.service.HomeService;
 import org.univartois.utils.ResponseUtil;
 
@@ -64,6 +66,7 @@ public class HomeResource {
 
     @GET
     @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
     @Path("/{homeId}")
     public RestResponse<ApiResponse<HomeResponseDto>> getHome(@PathParam("homeId") UUID homeId){
         final HomeResponseDto home = homeService.getHomeById(homeId);
