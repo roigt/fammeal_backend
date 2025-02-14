@@ -61,7 +61,7 @@ public class HomePermissionInterceptor {
 
         boolean hasPermission = roleService.hasAnyRoleByHomeId(homeId, homeRoleTypes);
         if (!hasPermission) {
-            throw new ForbiddenException("Vous n'avez pas les permissions requises pour accèder à cette resource : " + Arrays.toString(allowedPermissions));
+            throw new ForbiddenException("Vous n'avez pas les permissions requises pour accéder à cette resource : " + Arrays.toString(allowedPermissions));
         }
 
         return invocationContext.proceed();

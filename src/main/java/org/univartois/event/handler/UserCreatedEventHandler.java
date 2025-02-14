@@ -6,6 +6,7 @@ import io.quarkus.vertx.ConsumeEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.univartois.event.UserCreatedEvent;
 import org.univartois.utils.Constants;
 
@@ -18,9 +19,12 @@ public class UserCreatedEventHandler {
     @Inject
     ReactiveMailer reactiveMailer;
 
+    @ConfigProperty(name = "api.base-path")
+    String apiBasePath;
+
     @ConsumeEvent(value = Constants.USER_CREATED_EVENT)
     public void sendVerificationMail(UserCreatedEvent userCreatedEvent) {
-        String verificationLink = String.format("http://localhost:8080/api/users/verify?token=%s", userCreatedEvent.getVerificationToken());
+        String verificationLink = String.format("%s/api/users/verify?token=%s", apiBasePath, userCreatedEvent.getVerificationToken());
 
         String htmlContent = "<h1>Bienvenue " + userCreatedEvent.getFirstname() + " " + userCreatedEvent.getLastname() + " au FamMeal !</h1>"
                 + "<p>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour activer votre compte :</p>"

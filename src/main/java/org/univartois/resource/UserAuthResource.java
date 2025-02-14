@@ -5,19 +5,14 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.univartois.dto.request.ForgotPasswordRequestDto;
 import org.univartois.dto.request.UserAuthRequestDto;
 import org.univartois.dto.request.UserRegisterRequestDto;
-import org.univartois.dto.response.ApiResponse;
-import org.univartois.dto.response.UserAuthResponseDto;
-import org.univartois.dto.response.UserRegisterResponseDto;
-import org.univartois.dto.response.VerificationAccountResponseDto;
+import org.univartois.dto.response.*;
 import org.univartois.service.UserAuthService;
 import org.univartois.utils.ResponseUtil;
 
@@ -57,10 +52,21 @@ public class UserAuthResource {
         ));
     }
 
-    @Authenticated
-    @Path("/me")
-    @POST
-    public void throwException() {
-        throw new UnsupportedOperationException("a problem occured");
+    @PermitAll
+    @PUT
+    @Path("/forgottenPassword")
+    public RestResponse<ApiResponse<ForgotPasswordResponseDto>> forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) {
+        final ForgotPasswordResponseDto forgotPasswordResponse = userAuthService.forgotPassword(forgotPasswordRequestDto);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(forgotPasswordResponse, forgotPasswordResponse.getMessage(), RestResponse.Status.OK, uriInfo.getPath()));
     }
+
+    @PermitAll
+    @GET
+    @Path("/resetPassword")
+    public RestResponse<ApiResponse<Object>> resetPassword(@QueryParam("token") @NotBlank String token) {
+        userAuthService.resetPassword(token);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, "votre nouveau mot de passe est réinitialisé. Veuillez vérifier votre adresse mail", RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+
 }
