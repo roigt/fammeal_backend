@@ -143,13 +143,14 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Transactional(dontRollbackOn = UserNotVerifiedException.class)
     public UserAuthResponseDto auth(UserAuthRequestDto userAuthRequestDto) {
         UserEntity user = userRepository.findByEmail(userAuthRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(EMAIL_INVALID_MSG));
-        if (!user.isVerified()) {
-            handleUnverifiedUser(user);
-            throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
-        }
 
         if (!BcryptUtil.matches(userAuthRequestDto.getPassword(), user.getPassword())) {
             throw new UnauthorizedException(PASSWORD_INVALID_MSG);
+        }
+
+        else if (!user.isVerified()) {
+            handleUnverifiedUser(user);
+            throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
         }
 
         String accessToken = jwtTokenUtil.generateJwtToken(user);
