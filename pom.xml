@@ -61,6 +61,11 @@
             <artifactId>quarkus-hibernate-validator</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkiverse.ngrok</groupId>
+            <artifactId>quarkus-ngrok</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-mailer</artifactId>
         </dependency>
