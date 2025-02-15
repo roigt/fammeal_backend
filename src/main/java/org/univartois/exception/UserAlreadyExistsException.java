@@ -1,13 +1,16 @@
 package org.univartois.exception;
 
-import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
-public class UserAlreadyExistsException extends  BadRequestException {
-    public UserAlreadyExistsException(String message) {
-        super(message);
+public class UserAlreadyExistsException extends WebApplicationException {
+
+    public UserAlreadyExistsException(final String message) {
+        super(message, Response.Status.CONFLICT);
     }
 
-    public UserAlreadyExistsException(String message, Throwable cause) {
-        super(message, cause);
+    public UserAlreadyExistsException(final String message, final Throwable cause) {
+        super(message, cause, Response.Status.CONFLICT);
     }
+
 }
