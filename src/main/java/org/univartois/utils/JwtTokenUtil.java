@@ -34,7 +34,7 @@ public class JwtTokenUtil {
                 .claim(Claims.full_name.name(), user.getFirstname() + " " + user.getLastname())
                 .claim(Claims.given_name.name(), user.getFirstname())
                 .claim(Claims.family_name.name(), user.getLastname())
-                .claim("permissions", permissions)
+                .claim("roles", permissions)
                 .groups(Set.of())
                 .issuedAt(System.currentTimeMillis())
                 .expiresIn(3600)

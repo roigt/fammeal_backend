@@ -34,7 +34,7 @@ public class SecurityIdentitySupplier implements Supplier<SecurityIdentity> {
 
         final Map<String, Set<String>> permissions = roleService.getRolesByUserId(UUID.fromString(user.getSubject()));
 
-        builder.addAttributes(Collections.singletonMap("permissions", permissions));
+        builder.addAttributes(Collections.singletonMap("roles", permissions));
         return builder.build();
     }
 }
