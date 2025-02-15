@@ -29,6 +29,7 @@ import org.univartois.repository.UserRepository;
 import org.univartois.service.UserAuthService;
 import org.univartois.utils.Constants;
 import org.univartois.utils.JwtTokenUtil;
+import org.univartois.utils.PasswordGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -191,7 +192,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     public void resetPassword(String token) {
         TokenEntity tokenEntity = tokenRepository.findValidToken(token, TokenType.RESET_PASSWORD_TOKEN).orElseThrow(() -> new TokenInvalidException("Token invalide, expiré ou déjà utilisé"));
         final UserEntity user = tokenEntity.getUser();
-        String newPassword = "artois123";
+        String newPassword = PasswordGenerator.generateRandomPassword(10);
         user.setPassword(BcryptUtil.bcryptHash(newPassword));
         tokenRepository.markUserTokensAsUsed(user.getId(), TokenType.RESET_PASSWORD_TOKEN);
         publishResetPasswordEvent(user, newPassword);

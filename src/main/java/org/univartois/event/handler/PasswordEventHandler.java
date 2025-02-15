@@ -51,6 +51,9 @@ public class PasswordEventHandler {
         String htmlContent = "<h1>Votre mot de passe a été réinitialisé</h1>"
                 + "<p>Bonjour " + passwordResetEvent.getFirstname() + " " + passwordResetEvent.getLastname() + ",</p>"
                 + "<p>Votre mot de passe a bien été réinitialisé avec succès.</p>"
+                + "<p>Voici votre nouveau mot de passe :</p>"
+                + "<p style=\"font-size:18px;color:#4CAF50;font-weight:bold;\">" + passwordResetEvent.getNewPassword() + "</p>"
+                + "<p>Nous vous recommandons de le modifier dès que possible pour plus de sécurité.</p>"
                 + "<p>Si vous n'êtes pas à l'origine de cette modification, veuillez nous contacter immédiatement.</p>"
                 + "<p>Merci de faire confiance à FamMeal.</p>";
 
