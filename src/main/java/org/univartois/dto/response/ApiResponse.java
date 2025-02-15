@@ -29,7 +29,7 @@ public class ApiResponse<T> {
     private String message;
     private T data;
     private List<Error> errors;
-    private RestResponse.Status statusCode;
+    private int statusCode;
     private long timestamp;
     private String path;
 

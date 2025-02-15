@@ -2,7 +2,10 @@ package org.univartois.entity;
 
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,16 +15,19 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
-@NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 public class UserEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(unique = true)
     private String username;
 
+    @Column(unique = true)
     private String email;
 
     private String firstname;
@@ -30,18 +36,34 @@ public class UserEntity {
 
     private String password;
 
-    private String salt;
-
     private String imageUrl;
 
-    private boolean isVegetarian = false;
+    private boolean vegetarian = false;
 
-    private boolean isDarkModeEnabled = false;
+    private boolean verified = false;
 
-    private boolean isVerified = false;
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.PERSIST)
+    private Set<HomeRoleEntity> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<TokenEntity> tokens = new HashSet<>();
 
 
+    public UserEntity() {
+        tokens = new HashSet<>();
+    }
+
+
+    public void addToken(TokenEntity token) {
+        tokens.add(token);
+        token.setUser(this);
+    }
+
+    public void removeToken(TokenEntity token) {
+        tokens.remove(token);
+        token.setUser(null);
+    }
 }

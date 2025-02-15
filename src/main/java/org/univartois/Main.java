@@ -17,8 +17,8 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
                 version = "1.0.0-SNAPSHOT",
                 contact = @Contact(
                         name = "fammeal API Support",
-                        url = "http://univartois.net/contact",
-                        email = "uniartois@artois.com")
+                        url = "http://fammeal.net/contact",
+                        email = "contact@fammeal.com")
         )
 )
 @QuarkusMain
