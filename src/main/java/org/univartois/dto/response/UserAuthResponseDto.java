@@ -6,10 +6,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 import org.univartois.entity.HomeRoleEntity;
+import org.univartois.enums.HomeRoleType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,8 +28,11 @@ public class UserAuthResponseDto {
 
     private String lastname;
 
-    private boolean isVegetarian = false;
+    private boolean vegetarian = false;
 
-    private boolean isVerified = false;
+    private boolean verified = false;
+
+    @Builder.Default
+    private Map<String, Set<String>> roles = new HashMap<>();
 
 }

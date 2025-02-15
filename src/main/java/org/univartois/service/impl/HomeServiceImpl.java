@@ -18,6 +18,7 @@ import org.univartois.repository.HomeRoleRepository;
 import org.univartois.repository.UserRepository;
 import org.univartois.service.HomeService;
 
+import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -50,7 +51,12 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public HomeResponseDto getHomeById(UUID homeId) {
-        final HomeEntity home = homeRepository.findHomeById(homeId).orElseThrow(() -> new ResourceNotFoundException("Une maison avec cet id n'existe pas."));
+        final HomeEntity home = homeRepository.findById(homeId).orElseThrow(() -> new ResourceNotFoundException("Une maison avec cet id n'existe pas."));
         return homeMapper.toHomeResponseDto(home);
+    }
+
+    @Override
+    public List<HomeResponseDto> getUserHomes(UUID uuid) {
+        return homeRepository.findHomesByUserId(uuid).stream().map(homeMapper::toHomeResponseDto).toList();
     }
 }

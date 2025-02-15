@@ -26,15 +26,17 @@ import org.univartois.exception.UserNotVerifiedException;
 import org.univartois.mapper.UserMapper;
 import org.univartois.repository.TokenRepository;
 import org.univartois.repository.UserRepository;
+import org.univartois.service.RoleService;
 import org.univartois.service.UserAuthService;
 import org.univartois.utils.Constants;
 import org.univartois.utils.JwtTokenUtil;
 import org.univartois.utils.PasswordGenerator;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TransferQueue;
 
 @ApplicationScoped
 public class UserAuthServiceImpl implements UserAuthService {
@@ -62,6 +64,9 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Inject
     JwtTokenUtil jwtTokenUtil;
 
+    @Inject
+    RoleService roleService;
+
 
     private void handleUnverifiedUser(UserEntity user) {
 //            send verification mail again
@@ -71,7 +76,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    @Transactional
+    @Transactional(dontRollbackOn = UserNotVerifiedException.class)
     public UserRegisterResponseDto registerUser(UserRegisterRequestDto userRegisterRequestDto) {
         final Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(userRegisterRequestDto.getEmail());
 
@@ -135,7 +140,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    @Transactional
+    @Transactional(dontRollbackOn = UserNotVerifiedException.class)
     public UserAuthResponseDto auth(UserAuthRequestDto userAuthRequestDto) {
         UserEntity user = userRepository.findByEmail(userAuthRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(EMAIL_INVALID_MSG));
         if (!user.isVerified()) {
@@ -148,7 +153,9 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         String accessToken = jwtTokenUtil.generateJwtToken(user);
-        return userMapper.toAuthResponseDto(user, accessToken);
+        Map<String, Set<String>> roles = roleService.getRolesByUserId(user.getId());
+
+         return userMapper.toAuthResponseDto(user, accessToken, roles);
     }
 
     private void publishForgotPasswordEvent(UserEntity user, TokenEntity resetPasswordToken) {
@@ -172,7 +179,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
 
-    @Transactional
+    @Transactional(dontRollbackOn = UserNotVerifiedException.class)
     @Override
     public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) {
         final UserEntity user = userRepository.findByEmail(forgotPasswordRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException("adresse mail invalide."));
@@ -186,7 +193,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         return ForgotPasswordResponseDto.builder().message("Veuillez svp vérifier votre boite mail pour réinitialiser votre mot de passe.").build();
     }
 
-//     @TODO: add a password generator
+
     @Transactional
     @Override
     public void resetPassword(String token) {
@@ -196,5 +203,12 @@ public class UserAuthServiceImpl implements UserAuthService {
         user.setPassword(BcryptUtil.bcryptHash(newPassword));
         tokenRepository.markUserTokensAsUsed(user.getId(), TokenType.RESET_PASSWORD_TOKEN);
         publishResetPasswordEvent(user, newPassword);
+    }
+
+
+    @Override
+    public UserAuthResponseDto getUserById(UUID userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("cet utilisateur n'existe pas"));
+        return userMapper.toAuthResponseDto(user, null, roleService.getRolesByUserId(user.getId()));
     }
 }

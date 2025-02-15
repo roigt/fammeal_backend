@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.univartois.dto.request.ForgotPasswordRequestDto;
 import org.univartois.dto.request.UserAuthRequestDto;
@@ -16,6 +17,8 @@ import org.univartois.dto.response.*;
 import org.univartois.service.UserAuthService;
 import org.univartois.utils.ResponseUtil;
 
+import java.util.UUID;
+
 @Path("/api/users")
 public class UserAuthResource {
     @Context
@@ -23,6 +26,9 @@ public class UserAuthResource {
 
     @Inject
     UserAuthService userAuthService;
+
+    @Inject
+    JsonWebToken jwt;
 
 
     @PermitAll
@@ -67,6 +73,16 @@ public class UserAuthResource {
         userAuthService.resetPassword(token);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, "votre nouveau mot de passe est réinitialisé. Veuillez vérifier votre adresse mail", RestResponse.Status.OK, uriInfo.getPath()));
     }
+
+    @Authenticated
+    @GET
+    @Path("/me")
+    public RestResponse<ApiResponse<UserAuthResponseDto>> getCurrentAuthenticatedUser(){
+        UUID userId = UUID.fromString(jwt.getSubject());
+        UserAuthResponseDto userAuthResponseDto = userAuthService.getUserById(userId);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userAuthResponseDto, "informations de votre compte", RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
 
 
 }

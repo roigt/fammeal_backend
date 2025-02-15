@@ -2,10 +2,12 @@ package org.univartois.entity;
 
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,11 +15,13 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 public class UserEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(unique = true)
@@ -34,9 +38,9 @@ public class UserEntity {
 
     private String imageUrl;
 
-    private boolean isVegetarian = false;
+    private boolean vegetarian = false;
 
-    private boolean isVerified = false;
+    private boolean verified = false;
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.PERSIST)
@@ -53,12 +57,12 @@ public class UserEntity {
     }
 
 
-    public void addToken(TokenEntity token){
+    public void addToken(TokenEntity token) {
         tokens.add(token);
         token.setUser(this);
     }
 
-    public void removeToken(TokenEntity token){
+    public void removeToken(TokenEntity token) {
         tokens.remove(token);
         token.setUser(null);
     }

@@ -9,6 +9,8 @@ import org.univartois.dto.response.UserAuthResponseDto;
 import org.univartois.dto.response.UserRegisterResponseDto;
 import org.univartois.dto.response.VerificationAccountResponseDto;
 
+import java.util.UUID;
+
 public interface UserAuthService {
     UserRegisterResponseDto registerUser(UserRegisterRequestDto userRegisterRequestDto);
     VerificationAccountResponseDto verifyAccount(String token);
@@ -18,4 +20,6 @@ public interface UserAuthService {
     ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto);
 
     void resetPassword(@NotBlank String token);
+
+    UserAuthResponseDto getUserById(UUID userId);
 }
