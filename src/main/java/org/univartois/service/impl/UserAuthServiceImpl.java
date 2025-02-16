@@ -163,9 +163,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) {
         final UserEntity user = userRepository.findByEmail(forgotPasswordRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException("adresse mail invalide."));
-        if (!user.isVerified()) {
-            throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
-        }
+
         final TokenEntity resetPasswordToken = createToken(TokenType.RESET_PASSWORD_TOKEN);
         user.addToken(resetPasswordToken);
         publishForgotPasswordEvent(user, resetPasswordToken);
