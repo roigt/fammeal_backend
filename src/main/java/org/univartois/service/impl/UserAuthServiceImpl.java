@@ -173,7 +173,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     @Transactional
-    public UserVerificationResponseDto sendVerificationToken(UserVerificationRequestDto userVerificationRequestDto) {
+    public UserVerificationResponseDto userVerification(UserVerificationRequestDto userVerificationRequestDto) {
         final UserEntity user = userRepository.findByEmail(userVerificationRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException("adresse mail invalide."));
         if(user.isVerified()) {
             throw new UserAlreadyVerifiedException(ACCOUNT_ALREADY_VERIFIED_MSG);

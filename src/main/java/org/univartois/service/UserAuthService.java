@@ -17,7 +17,7 @@ public interface UserAuthService {
 
     ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto);
 
-    UserVerificationResponseDto sendVerificationToken(UserVerificationRequestDto userVerificationRequestDto);
+    UserVerificationResponseDto userVerification(UserVerificationRequestDto userVerificationRequestDto);
 
     void resetPassword(@NotBlank String token);
 

@@ -62,8 +62,8 @@ public class UserAuthResource {
     @PermitAll
     @PUT
     @Path("/userVerification")
-    public RestResponse<ApiResponse<UserVerificationResponseDto>> sendVerificationToken(UserVerificationRequestDto userVerificationRequestDto) {
-        final UserVerificationResponseDto userVerificationResponse = userAuthService.sendVerificationToken(userVerificationRequestDto);
+    public RestResponse<ApiResponse<UserVerificationResponseDto>> userVerification(UserVerificationRequestDto userVerificationRequestDto) {
+        final UserVerificationResponseDto userVerificationResponse = userAuthService.userVerification(userVerificationRequestDto);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userVerificationResponse, userVerificationResponse.getMessage(), RestResponse.Status.OK, uriInfo.getPath()));
     }
 
