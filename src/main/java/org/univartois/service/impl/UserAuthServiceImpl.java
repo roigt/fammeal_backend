@@ -123,12 +123,13 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Transactional
     public UserAuthResponseDto auth(UserAuthRequestDto userAuthRequestDto) {
         UserEntity user = userRepository.findByEmail(userAuthRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(EMAIL_INVALID_MSG));
-        if (!user.isVerified()) {
-            throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
-        }
 
         if (!BcryptUtil.matches(userAuthRequestDto.getPassword(), user.getPassword())) {
             throw new UnauthorizedException(PASSWORD_INVALID_MSG);
+        }
+
+        else if (!user.isVerified()) {
+            throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
         }
 
         String accessToken = jwtTokenUtil.generateJwtToken(user);
