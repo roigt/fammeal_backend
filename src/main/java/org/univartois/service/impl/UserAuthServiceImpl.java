@@ -64,7 +64,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     RoleService roleService;
 
     @Override
-    @Transactional(dontRollbackOn = UserNotVerifiedException.class)
+    @Transactional
     public UserRegisterResponseDto registerUser(UserRegisterRequestDto userRegisterRequestDto) {
         final Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(userRegisterRequestDto.getEmail());
 
@@ -120,7 +120,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    @Transactional(dontRollbackOn = UserNotVerifiedException.class)
+    @Transactional
     public UserAuthResponseDto auth(UserAuthRequestDto userAuthRequestDto) {
         UserEntity user = userRepository.findByEmail(userAuthRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(EMAIL_INVALID_MSG));
         if (!user.isVerified()) {
@@ -158,7 +158,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
 
-    @Transactional(dontRollbackOn = UserNotVerifiedException.class)
+    @Transactional
     @Override
     public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) {
         final UserEntity user = userRepository.findByEmail(forgotPasswordRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException("adresse mail invalide."));
