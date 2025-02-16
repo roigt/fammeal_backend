@@ -4,10 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import org.univartois.dto.request.ForgotPasswordRequestDto;
 import org.univartois.dto.request.UserAuthRequestDto;
 import org.univartois.dto.request.UserRegisterRequestDto;
-import org.univartois.dto.response.ForgotPasswordResponseDto;
-import org.univartois.dto.response.UserAuthResponseDto;
-import org.univartois.dto.response.UserRegisterResponseDto;
-import org.univartois.dto.response.VerificationAccountResponseDto;
+import org.univartois.dto.request.UserVerificationRequestDto;
+import org.univartois.dto.response.*;
 
 import java.util.UUID;
 
@@ -18,6 +16,8 @@ public interface UserAuthService {
     UserAuthResponseDto auth(UserAuthRequestDto userAuthRequestDto);
 
     ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto);
+
+    UserVerificationResponseDto sendVerificationToken(UserVerificationRequestDto userVerificationRequestDto);
 
     void resetPassword(@NotBlank String token);
 

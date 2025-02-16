@@ -9,20 +9,15 @@ import jakarta.transaction.Transactional;
 import org.univartois.dto.request.ForgotPasswordRequestDto;
 import org.univartois.dto.request.UserAuthRequestDto;
 import org.univartois.dto.request.UserRegisterRequestDto;
-import org.univartois.dto.response.ForgotPasswordResponseDto;
-import org.univartois.dto.response.UserAuthResponseDto;
-import org.univartois.dto.response.UserRegisterResponseDto;
-import org.univartois.dto.response.VerificationAccountResponseDto;
+import org.univartois.dto.request.UserVerificationRequestDto;
+import org.univartois.dto.response.*;
 import org.univartois.entity.TokenEntity;
 import org.univartois.entity.UserEntity;
 import org.univartois.enums.TokenType;
 import org.univartois.event.ForgotPasswordEvent;
 import org.univartois.event.PasswordResetEvent;
 import org.univartois.event.UserCreatedEvent;
-import org.univartois.exception.ResourceNotFoundException;
-import org.univartois.exception.TokenInvalidException;
-import org.univartois.exception.UserAlreadyExistsException;
-import org.univartois.exception.UserNotVerifiedException;
+import org.univartois.exception.*;
 import org.univartois.mapper.UserMapper;
 import org.univartois.repository.TokenRepository;
 import org.univartois.repository.UserRepository;
@@ -43,6 +38,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     private static final String EMAIL_ALREADY_EXISTS_MSG = "Un utilisateur avec cet email ou nom d'utilisateur existe déjà.";
     private static final String ACCOUNT_NOT_VERIFIED_MSG = "Votre compte n'a pas été encore vérifié. Veuillez vérifier votre e-mail pour activer votre compte.";
+    private static final String ACCOUNT_ALREADY_VERIFIED_MSG = "Ce compte a déjà été vérifié.";
     private static final String EMAIL_INVALID_MSG = "adresse mail invalide. Veuillez svp créer un compte.";
     private static final String PASSWORD_INVALID_MSG = "mot de passe invalide !";
 
@@ -67,14 +63,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Inject
     RoleService roleService;
 
-
-    private void handleUnverifiedUser(UserEntity user) {
-//            send verification mail again
-        final TokenEntity verificationToken = createToken(TokenType.VERIFICATION_TOKEN);
-        user.addToken(verificationToken);
-        publishUserCreatedEvent(user, verificationToken);
-    }
-
     @Override
     @Transactional(dontRollbackOn = UserNotVerifiedException.class)
     public UserRegisterResponseDto registerUser(UserRegisterRequestDto userRegisterRequestDto) {
@@ -85,23 +73,15 @@ public class UserAuthServiceImpl implements UserAuthService {
             if (user.isVerified()) {
                 throw new UserAlreadyExistsException(EMAIL_ALREADY_EXISTS_MSG);
             } else {
-//                send verification mail again
-                handleUnverifiedUser(user);
                 throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
             }
         }
 
         final UserEntity user = userMapper.toEntity(userRegisterRequestDto);
         user.setUsername(generateUsername(user.getFirstname(), user.getLastname()));
-        final TokenEntity verificationToken = createToken(TokenType.VERIFICATION_TOKEN);
-        user.addToken(verificationToken);
         userRepository.persist(user);
 
-//        publish user created event so that the listener send verification mail
-        publishUserCreatedEvent(user, verificationToken);
-
-
-        return UserRegisterResponseDto.builder().message("Votre compte a été créé avec succès. Veuillez vérifier votre e-mail pour activer votre compte.").build();
+        return UserRegisterResponseDto.builder().message("Votre compte a été créé avec succès.").build();
     }
 
     private void publishUserCreatedEvent(UserEntity user, TokenEntity verificationToken) {
@@ -144,7 +124,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     public UserAuthResponseDto auth(UserAuthRequestDto userAuthRequestDto) {
         UserEntity user = userRepository.findByEmail(userAuthRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(EMAIL_INVALID_MSG));
         if (!user.isVerified()) {
-            handleUnverifiedUser(user);
             throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
         }
 
@@ -184,13 +163,25 @@ public class UserAuthServiceImpl implements UserAuthService {
     public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) {
         final UserEntity user = userRepository.findByEmail(forgotPasswordRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException("adresse mail invalide."));
         if (!user.isVerified()) {
-            handleUnverifiedUser(user);
             throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
         }
         final TokenEntity resetPasswordToken = createToken(TokenType.RESET_PASSWORD_TOKEN);
         user.addToken(resetPasswordToken);
         publishForgotPasswordEvent(user, resetPasswordToken);
         return ForgotPasswordResponseDto.builder().message("Veuillez svp vérifier votre boite mail pour réinitialiser votre mot de passe.").build();
+    }
+
+    @Override
+    @Transactional
+    public UserVerificationResponseDto sendVerificationToken(UserVerificationRequestDto userVerificationRequestDto) {
+        final UserEntity user = userRepository.findByEmail(userVerificationRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException("adresse mail invalide."));
+        if(user.isVerified()) {
+            throw new UserAlreadyVerifiedException(ACCOUNT_ALREADY_VERIFIED_MSG);
+        }
+        final TokenEntity verificationToken = createToken(TokenType.VERIFICATION_TOKEN);
+        user.addToken(verificationToken);
+        publishUserCreatedEvent(user, verificationToken);
+        return UserVerificationResponseDto.builder().message("Veuillez vérifier votre boite mail pour valider votre adresse mail.").build();
     }
 
 

@@ -13,6 +13,7 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.univartois.dto.request.ForgotPasswordRequestDto;
 import org.univartois.dto.request.UserAuthRequestDto;
 import org.univartois.dto.request.UserRegisterRequestDto;
+import org.univartois.dto.request.UserVerificationRequestDto;
 import org.univartois.dto.response.*;
 import org.univartois.service.UserAuthService;
 import org.univartois.utils.ResponseUtil;
@@ -56,6 +57,14 @@ public class UserAuthResource {
                 RestResponse.Status.OK,
                 uriInfo.getPath()
         ));
+    }
+
+    @PermitAll
+    @PUT
+    @Path("/userVerification")
+    public RestResponse<ApiResponse<UserVerificationResponseDto>> sendVerificationToken(UserVerificationRequestDto userVerificationRequestDto) {
+        final UserVerificationResponseDto userVerificationResponse = userAuthService.sendVerificationToken(userVerificationRequestDto);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userVerificationResponse, userVerificationResponse.getMessage(), RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @PermitAll
