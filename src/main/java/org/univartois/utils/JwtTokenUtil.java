@@ -6,6 +6,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.Claims;
 import org.univartois.entity.UserEntity;
 
+import java.time.Instant;
 import java.util.*;
 
 @ApplicationScoped
@@ -13,6 +14,8 @@ public class JwtTokenUtil {
 
 
     private final String issuer;
+
+    private final static int DEFAULT_JWT_EXPIRES_DURATION = 3600; //    in secs (1 hour)
 
     public JwtTokenUtil(@ConfigProperty(name = "mp.jwt.verify.issuer") String issuer) {
         this.issuer = issuer;
@@ -36,8 +39,8 @@ public class JwtTokenUtil {
                 .claim(Claims.family_name.name(), user.getLastname())
                 .claim("roles", permissions)
                 .groups(Set.of())
-                .issuedAt(System.currentTimeMillis())
-                .expiresIn(3600)
+                .issuedAt(Instant.now())
+                .expiresIn(DEFAULT_JWT_EXPIRES_DURATION)
                 .claim(Claims.email.name(), user.getEmail())
                 .sign();
 

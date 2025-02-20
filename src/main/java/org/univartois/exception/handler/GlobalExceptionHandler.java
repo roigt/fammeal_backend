@@ -1,10 +1,12 @@
 package org.univartois.exception.handler;
 
 
+import io.quarkus.security.AuthenticationFailedException;
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
+import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
@@ -47,7 +49,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ServerExceptionMapper(value = {UnauthorizedException.class, ForbiddenException.class, SecurityException.class})
+    @ServerExceptionMapper(value = {UnauthorizedException.class, ForbiddenException.class, AuthenticationFailedException.class, SecurityException.class}, priority = Priorities.AUTHENTICATION - 1)
     public RestResponse<ApiResponse<Object>> handleSecurityException(SecurityException exception) {
         log.error("security exception at {}: {}", uriInfo.getPath(), exception.getMessage(), exception);
         ApiResponse<Object> response;
