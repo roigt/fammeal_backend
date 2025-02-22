@@ -33,6 +33,7 @@ public interface UserMapper {
     @Mapping(source = "user.lastname", target = "lastname")
     @Mapping(source = "user.vegetarian", target = "vegetarian")
     @Mapping(source = "user.verified", target = "verified")
+    @Mapping(source = "user.profilePictureUrl", target = "profilePictureUrl")
     @Mapping(source = "accessToken", target = "accessToken")
     @Mapping(source = "roles", target = "roles")
     UserAuthResponseDto toAuthResponseDto(UserEntity user, String accessToken, Map<String, Set<String>> roles);

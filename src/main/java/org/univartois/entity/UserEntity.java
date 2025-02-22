@@ -51,7 +51,7 @@ public class UserEntity {
 
     private String password;
 
-    private String imageUrl;
+    private String profilePictureUrl;
 
     private boolean vegetarian = false;
 

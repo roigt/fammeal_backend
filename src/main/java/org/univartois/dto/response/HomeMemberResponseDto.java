@@ -20,6 +20,8 @@ public class HomeMemberResponseDto {
 
     private String firstname;
 
+    private String profilePictureUrl;
+
     private String lastname;
 
     private boolean vegetarian;

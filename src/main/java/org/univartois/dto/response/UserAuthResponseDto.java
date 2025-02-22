@@ -26,6 +26,8 @@ public class UserAuthResponseDto {
 
     private String firstname;
 
+    private String profilePictureUrl;
+
     private String lastname;
 
     private boolean vegetarian = false;

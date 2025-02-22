@@ -3,12 +3,15 @@ package org.univartois.resource;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
+import jakarta.servlet.http.Part;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.univartois.dto.request.ForgotPasswordRequestDto;
 import org.univartois.dto.request.UserAuthRequestDto;
@@ -17,8 +20,11 @@ import org.univartois.dto.request.UserVerificationRequestDto;
 import org.univartois.dto.response.*;
 import org.univartois.service.HomeService;
 import org.univartois.service.UserAuthService;
+import org.univartois.utils.Constants;
 import org.univartois.utils.ResponseUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -88,10 +94,21 @@ public class UserAuthResource {
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, "votre nouveau mot de passe est réinitialisé. Veuillez vérifier votre adresse mail", RestResponse.Status.OK, uriInfo.getPath()));
     }
 
+    @PUT
+    @Path("/me/profilePicture")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Authenticated
+    public RestResponse<ApiResponse<UpdateProfilePictureResponseDto>> updateProfilePicture(@RestForm("file") InputStream file) throws IOException {
+        byte[] fileBytes = file.readAllBytes();
+        final UpdateProfilePictureResponseDto profilePictureResponseDto = userAuthService.updateProfilePicture(fileBytes);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(profilePictureResponseDto, Constants.USER_PROFILE_PICTURE_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+
+    }
+
     @Authenticated
     @GET
     @Path("/me")
-    public RestResponse<ApiResponse<UserAuthResponseDto>> getCurrentAuthenticatedUser(){
+    public RestResponse<ApiResponse<UserAuthResponseDto>> getCurrentAuthenticatedUser() {
         UUID userId = UUID.fromString(jwt.getSubject());
         UserAuthResponseDto userAuthResponseDto = userAuthService.getUserById(userId);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userAuthResponseDto, "informations de votre compte", RestResponse.Status.OK, uriInfo.getPath()));

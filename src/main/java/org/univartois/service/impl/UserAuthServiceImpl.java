@@ -5,7 +5,9 @@ import io.quarkus.security.UnauthorizedException;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.servlet.http.Part;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.univartois.dto.request.ForgotPasswordRequestDto;
 import org.univartois.dto.request.UserAuthRequestDto;
 import org.univartois.dto.request.UserRegisterRequestDto;
@@ -21,12 +23,14 @@ import org.univartois.exception.*;
 import org.univartois.mapper.UserMapper;
 import org.univartois.repository.TokenRepository;
 import org.univartois.repository.UserRepository;
+import org.univartois.service.ImageService;
 import org.univartois.service.RoleService;
 import org.univartois.service.UserAuthService;
 import org.univartois.utils.Constants;
 import org.univartois.utils.JwtTokenUtil;
 import org.univartois.utils.PasswordGenerator;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -46,6 +50,9 @@ public class UserAuthServiceImpl implements UserAuthService {
     TokenRepository tokenRepository;
 
     @Inject
+    JsonWebToken jsonWebToken;
+
+    @Inject
     EventBus eventBus;
 
     @Inject
@@ -56,6 +63,9 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Inject
     RoleService roleService;
+
+    @Inject
+    ImageService imageService;
 
     @Override
     @Transactional
@@ -120,16 +130,14 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         if (!BcryptUtil.matches(userAuthRequestDto.getPassword(), user.getPassword())) {
             throw new UnauthorizedException(Constants.PASSWORD_INVALID_MSG);
-        }
-
-        else if (!user.isVerified()) {
+        } else if (!user.isVerified()) {
             throw new UserNotVerifiedException(Constants.ACCOUNT_NOT_VERIFIED_MSG);
         }
 
         String accessToken = jwtTokenUtil.generateJwtToken(user);
         Map<String, Set<String>> roles = roleService.getRolesByUserId(user.getId());
 
-         return userMapper.toAuthResponseDto(user, accessToken, roles);
+        return userMapper.toAuthResponseDto(user, accessToken, roles);
     }
 
     private void publishForgotPasswordEvent(UserEntity user, TokenEntity resetPasswordToken) {
@@ -168,7 +176,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Transactional
     public UserVerificationResponseDto userVerification(UserVerificationRequestDto userVerificationRequestDto) {
         final UserEntity user = userRepository.findByEmail(userVerificationRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(Constants.EMAIL_INVALID_MSG));
-        if(user.isVerified()) {
+        if (user.isVerified()) {
             throw new UserAlreadyVerifiedException(Constants.ACCOUNT_ALREADY_VERIFIED_MSG);
         }
         final TokenEntity verificationToken = createToken(TokenType.VERIFICATION_TOKEN);
@@ -194,5 +202,19 @@ public class UserAuthServiceImpl implements UserAuthService {
     public UserAuthResponseDto getUserById(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
         return userMapper.toAuthResponseDto(user, null, roleService.getRolesByUserId(user.getId()));
+    }
+
+    @Transactional
+    @Override
+    public UpdateProfilePictureResponseDto updateProfilePicture(byte[] image) {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        final UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+        try {
+            final String imageUrl = imageService.uploadFile(image);
+            user.setProfilePictureUrl(imageUrl);
+            return UpdateProfilePictureResponseDto.builder().profilePicture(imageUrl).build();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception.getMessage());
+        }
     }
 }

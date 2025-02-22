@@ -16,6 +16,7 @@ public class Constants {
     public static final String RESET_PASSWORD_EMAIL_SENT_MSG = "Veuillez vérifier votre boîte mail pour réinitialiser votre mot de passe.";
     public static final String EMAIL_VERIFICATION_MSG = "Veuillez vérifier votre boîte mail pour valider votre adresse mail.";
     public static final String USER_NOT_FOUND_MSG = "Cet utilisateur n'existe pas.";
+    public static final String USER_PROFILE_PICTURE_UPDATED_MSG = "votre photo de profile est mise à jour.";
 
     /**
      * messages for homes operations
@@ -33,6 +34,7 @@ public class Constants {
     public static final String HOME_ADMIN_SELF_UPDATE_ROLE_CONSTRAINT_MSG = "Un administrateur ne peut pas modifier son propre rôle dans la maison.";
     public static final String HOME_ADMIN_SELF_DELETE_FROM_HOME_CONSTRAINT_MSG = "Un administrateur ne peut pas se supprimer lui-même de la maison. Utilisez plutôt l'option 'Quitter une maison'.";
     public static final String HOME_MEMBER_DELETED_MSG = "Ce membre est supprimé de cette maison avec succès.";
+
 
 
 //    Validation messages
