@@ -27,7 +27,7 @@ public class RoleServiceImpl implements RoleService {
 //    @SuppressWarnings("unchecked")
     @Override
     public boolean hasAnyRoleByHomeId(UUID homeId, Role... roles) {
-        Set<HomeRoleType> homeRoles = ((Map<String, Set<String>>)securityIdentity.getAttributes().get("rolesst")).getOrDefault(homeId.toString(), Set.of()).stream().map(HomeRoleType::valueOf).collect(Collectors.toUnmodifiableSet());
+        Set<HomeRoleType> homeRoles = ((Map<String, Set<String>>)securityIdentity.getAttributes().get("roles")).getOrDefault(homeId.toString(), Set.of()).stream().map(HomeRoleType::valueOf).collect(Collectors.toUnmodifiableSet());
 
         for (Role role : roles) {
             if (homeRoles.stream().anyMatch(homeRole -> homeRole.includes(role))){
@@ -41,7 +41,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Map<String, Set<String>> getRolesByUserId(UUID userId) {
-        final List<HomeRoleEntity> roles = homeRoleRepository.findHomeRolesByUserId(userId);
+        final List<HomeRoleEntity> roles = homeRoleRepository.findByUserId(userId);
 
         final Map<String, Set<String>> permissions = new HashMap<>();
         roles.forEach(homeRole -> {

@@ -15,8 +15,8 @@ import java.util.UUID;
 @NamedQueries({
         @NamedQuery(
                 name = Constants.QUERY_FIND_HOMES_BY_USER_ID,
-                query = "SELECT home FROM HomeEntity home " +
-                        "JOIN HomeRoleEntity homeRole ON home.id = homeRole.id.homeId " +
+                query = "SELECT home FROM HomeRoleEntity homeRole " +
+                        "RIGHT JOIN homeRole.home home " +
                         "WHERE homeRole.id.userId = :userId"
         )
 })

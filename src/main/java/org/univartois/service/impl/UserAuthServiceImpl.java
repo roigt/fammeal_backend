@@ -36,12 +36,6 @@ import java.util.UUID;
 @ApplicationScoped
 public class UserAuthServiceImpl implements UserAuthService {
 
-    private static final String EMAIL_ALREADY_EXISTS_MSG = "Un utilisateur avec cet email ou nom d'utilisateur existe déjà.";
-    private static final String ACCOUNT_NOT_VERIFIED_MSG = "Votre compte n'a pas été encore vérifié. Veuillez vérifier votre e-mail pour activer votre compte.";
-    private static final String ACCOUNT_ALREADY_VERIFIED_MSG = "Ce compte a déjà été vérifié.";
-    private static final String EMAIL_INVALID_MSG = "adresse mail invalide. Veuillez svp créer un compte.";
-    private static final String PASSWORD_INVALID_MSG = "mot de passe invalide !";
-
     private static final int DEFAULT_TOKEN_EXPIRATION_HOURS = 24;
 
 
@@ -71,9 +65,9 @@ public class UserAuthServiceImpl implements UserAuthService {
         if (optionalUserEntity.isPresent()) {
             final UserEntity user = optionalUserEntity.get();
             if (user.isVerified()) {
-                throw new UserAlreadyExistsException(EMAIL_ALREADY_EXISTS_MSG);
+                throw new UserAlreadyExistsException(Constants.EMAIL_ALREADY_EXISTS_MSG);
             } else {
-                throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
+                throw new UserNotVerifiedException(Constants.ACCOUNT_NOT_VERIFIED_MSG);
             }
         }
 
@@ -81,7 +75,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         user.setUsername(generateUsername(user.getFirstname(), user.getLastname()));
         userRepository.persist(user);
 
-        return UserRegisterResponseDto.builder().message("Votre compte a été créé avec succès.").build();
+        return UserRegisterResponseDto.builder().message(Constants.ACCOUNT_CREATED_MSG).build();
     }
 
     private void publishUserCreatedEvent(UserEntity user, TokenEntity verificationToken) {
@@ -111,25 +105,25 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     @Transactional
     public VerificationAccountResponseDto verifyAccount(String token) {
-        TokenEntity tokenEntity = tokenRepository.findValidToken(token, TokenType.VERIFICATION_TOKEN).orElseThrow(() -> new TokenInvalidException("Token invalide, expiré ou déjà utilisé"));
+        TokenEntity tokenEntity = tokenRepository.findValidToken(token, TokenType.VERIFICATION_TOKEN).orElseThrow(() -> new TokenInvalidException(Constants.TOKEN_INVALID_MSG));
 
         final UserEntity user = tokenEntity.getUser();
         user.setVerified(true);
         tokenRepository.markUserTokensAsUsed(user.getId(), TokenType.VERIFICATION_TOKEN);
-        return VerificationAccountResponseDto.builder().message("votre compte est désormais activé !").build();
+        return VerificationAccountResponseDto.builder().message(Constants.ACCOUNT_ACTIVATED_MSG).build();
     }
 
     @Override
     @Transactional
     public UserAuthResponseDto auth(UserAuthRequestDto userAuthRequestDto) {
-        UserEntity user = userRepository.findByEmail(userAuthRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(EMAIL_INVALID_MSG));
+        UserEntity user = userRepository.findByEmail(userAuthRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(Constants.EMAIL_INVALID_MSG));
 
         if (!BcryptUtil.matches(userAuthRequestDto.getPassword(), user.getPassword())) {
-            throw new UnauthorizedException(PASSWORD_INVALID_MSG);
+            throw new UnauthorizedException(Constants.PASSWORD_INVALID_MSG);
         }
 
         else if (!user.isVerified()) {
-            throw new UserNotVerifiedException(ACCOUNT_NOT_VERIFIED_MSG);
+            throw new UserNotVerifiedException(Constants.ACCOUNT_NOT_VERIFIED_MSG);
         }
 
         String accessToken = jwtTokenUtil.generateJwtToken(user);
@@ -162,32 +156,32 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Transactional
     @Override
     public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) {
-        final UserEntity user = userRepository.findByEmail(forgotPasswordRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException("adresse mail invalide."));
+        final UserEntity user = userRepository.findByEmail(forgotPasswordRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(Constants.EMAIL_INVALID_MSG));
 
         final TokenEntity resetPasswordToken = createToken(TokenType.RESET_PASSWORD_TOKEN);
         user.addToken(resetPasswordToken);
         publishForgotPasswordEvent(user, resetPasswordToken);
-        return ForgotPasswordResponseDto.builder().message("Veuillez svp vérifier votre boite mail pour réinitialiser votre mot de passe.").build();
+        return ForgotPasswordResponseDto.builder().message(Constants.RESET_PASSWORD_EMAIL_SENT_MSG).build();
     }
 
     @Override
     @Transactional
     public UserVerificationResponseDto userVerification(UserVerificationRequestDto userVerificationRequestDto) {
-        final UserEntity user = userRepository.findByEmail(userVerificationRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException("adresse mail invalide."));
+        final UserEntity user = userRepository.findByEmail(userVerificationRequestDto.getEmail()).orElseThrow(() -> new ResourceNotFoundException(Constants.EMAIL_INVALID_MSG));
         if(user.isVerified()) {
-            throw new UserAlreadyVerifiedException(ACCOUNT_ALREADY_VERIFIED_MSG);
+            throw new UserAlreadyVerifiedException(Constants.ACCOUNT_ALREADY_VERIFIED_MSG);
         }
         final TokenEntity verificationToken = createToken(TokenType.VERIFICATION_TOKEN);
         user.addToken(verificationToken);
         publishUserCreatedEvent(user, verificationToken);
-        return UserVerificationResponseDto.builder().message("Veuillez vérifier votre boite mail pour valider votre adresse mail.").build();
+        return UserVerificationResponseDto.builder().message(Constants.EMAIL_VERIFICATION_MSG).build();
     }
 
 
     @Transactional
     @Override
     public void resetPassword(String token) {
-        TokenEntity tokenEntity = tokenRepository.findValidToken(token, TokenType.RESET_PASSWORD_TOKEN).orElseThrow(() -> new TokenInvalidException("Token invalide, expiré ou déjà utilisé"));
+        TokenEntity tokenEntity = tokenRepository.findValidToken(token, TokenType.RESET_PASSWORD_TOKEN).orElseThrow(() -> new TokenInvalidException(Constants.TOKEN_INVALID_MSG));
         final UserEntity user = tokenEntity.getUser();
         String newPassword = PasswordGenerator.generateRandomPassword(10);
         user.setPassword(BcryptUtil.bcryptHash(newPassword));
@@ -198,7 +192,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public UserAuthResponseDto getUserById(UUID userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("cet utilisateur n'existe pas"));
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
         return userMapper.toAuthResponseDto(user, null, roleService.getRolesByUserId(user.getId()));
     }
 }

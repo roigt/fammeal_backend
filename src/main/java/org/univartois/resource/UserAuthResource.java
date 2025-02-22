@@ -15,9 +15,11 @@ import org.univartois.dto.request.UserAuthRequestDto;
 import org.univartois.dto.request.UserRegisterRequestDto;
 import org.univartois.dto.request.UserVerificationRequestDto;
 import org.univartois.dto.response.*;
+import org.univartois.service.HomeService;
 import org.univartois.service.UserAuthService;
 import org.univartois.utils.ResponseUtil;
 
+import java.util.List;
 import java.util.UUID;
 
 @Path("/api/users")
@@ -30,6 +32,9 @@ public class UserAuthResource {
 
     @Inject
     JsonWebToken jwt;
+
+    @Inject
+    HomeService homeService;
 
 
     @PermitAll
@@ -92,6 +97,14 @@ public class UserAuthResource {
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userAuthResponseDto, "informations de votre compte", RestResponse.Status.OK, uriInfo.getPath()));
     }
 
+    @GET
+    @Path("/me/homes")
+    @Authenticated
+    public RestResponse<ApiResponse<List<HomeResponseDto>>> getHomes() {
+        UUID userUuid = UUID.fromString(jwt.getSubject());
+        List<HomeResponseDto> homeList = homeService.getUserHomes(userUuid);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeList, "La liste de vos maisons a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
+    }
 
 
 }

@@ -1,4 +1,4 @@
-package org.univartois.annotation;
+package org.univartois.annotation.security;
 
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.interceptor.InterceptorBinding;

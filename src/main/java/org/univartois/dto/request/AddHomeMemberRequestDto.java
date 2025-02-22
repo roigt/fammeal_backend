@@ -1,9 +1,9 @@
 package org.univartois.dto.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.univartois.enums.HomeRoleType;
 import org.univartois.utils.Constants;
 
 @AllArgsConstructor
@@ -11,19 +11,11 @@ import org.univartois.utils.Constants;
 @Getter
 @Setter
 @Builder
-public class UserRegisterRequestDto {
+public class AddHomeMemberRequestDto {
 
     @Email(message = Constants.EMAIL_FORMAT_INVALID)
     @NotBlank(message = Constants.EMAIL_NOT_BLANK)
     private String email;
 
-    @NotBlank(message = Constants.PASSWORD_NOT_BLANK)
-    private String password;
-
-    @NotBlank(message = Constants.FIRSTNAME_NOT_BLANK)
-    private String firstname;
-
-    @NotBlank(message = Constants.LASTNAME_NOT_BLANK)
-    private String lastname;
-
+    private HomeRoleType role;
 }

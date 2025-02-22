@@ -7,7 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
-import org.univartois.annotation.HomePermissionsAllowed;
+import org.univartois.annotation.security.HomePermissionsAllowed;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.service.RoleService;
 

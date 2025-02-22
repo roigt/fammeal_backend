@@ -2,6 +2,7 @@ package org.univartois.dto.response;
 
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -19,5 +20,7 @@ public class HomeResponseDto {
     private boolean lunchAutomaticGeneration;
 
     private boolean dinerAutomaticGeneration;
+
+    private Set<String> roles;
 
 }

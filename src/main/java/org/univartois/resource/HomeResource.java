@@ -2,20 +2,22 @@ package org.univartois.resource;
 
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestResponse;
-import org.univartois.annotation.HomePermissionsAllowed;
+import org.univartois.annotation.security.HomePermissionsAllowed;
+import org.univartois.dto.request.AddHomeMemberRequestDto;
 import org.univartois.dto.request.CreateHomeRequestDto;
+import org.univartois.dto.request.UpdateHomeMemberRequestDto;
 import org.univartois.dto.response.ApiResponse;
+import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.HomeResponseDto;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.service.HomeService;
+import org.univartois.utils.Constants;
 import org.univartois.utils.ResponseUtil;
 
 import java.util.List;
@@ -38,19 +40,11 @@ public class HomeResource {
 
     @GET
     @Authenticated
-    public RestResponse<ApiResponse<List<HomeResponseDto>>> getHomes() {
-        UUID userUuid = UUID.fromString(jwt.getSubject());
-        List<HomeResponseDto> homeList = homeService.getUserHomes(userUuid); //
-        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeList, "La liste de vos maisons a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
-    }
-
-    @GET
-    @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
     @Path("/{homeId}")
     public RestResponse<ApiResponse<HomeResponseDto>> getHome(@PathParam("homeId") UUID homeId) {
         final HomeResponseDto home = homeService.getHomeById(homeId);
-        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(home, "Détails de la maison récupérés.", RestResponse.Status.OK, uriInfo.getPath()));
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(home, Constants.HOME_DETAILS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @POST
@@ -58,7 +52,60 @@ public class HomeResource {
     public RestResponse<ApiResponse<HomeResponseDto>> createHome(CreateHomeRequestDto createHomeRequestDto) {
         final HomeResponseDto home = homeService.createHome(createHomeRequestDto);
 
-        return RestResponse.status(RestResponse.Status.CREATED, ResponseUtil.success(home, "La maison a été créée avec succès", RestResponse.Status.CREATED, uriInfo.getPath()));
+        return RestResponse.status(RestResponse.Status.CREATED, ResponseUtil.success(home, Constants.HOME_CREATED_MSG, RestResponse.Status.CREATED, uriInfo.getPath()));
     }
 
+    @DELETE
+    @Path("/{homeId}/leave")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<Object>> leaveHome(@PathParam("homeId") UUID homeId) {
+        homeService.leaveHome(homeId);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.HOME_LEFT_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @POST
+    @Path("/{homeId}/members")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<Object>> addHomeMember(@PathParam("homeId") UUID homeId, @Valid AddHomeMemberRequestDto addHomeMemberRequestDto) {
+        homeService.addHomeMember(homeId, addHomeMemberRequestDto);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_ADDED_TO_HOME_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @GET
+    @Path("/{homeId}/members")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<List<HomeMemberResponseDto>>> getHomeMembers(@PathParam("homeId") UUID homeId) {
+        final List<HomeMemberResponseDto> homeMembers = homeService.getHomeMembers(homeId);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeMembers, Constants.HOME_MEMBERS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @GET
+    @Path("/{homeId}/members/{userId}")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<HomeMemberResponseDto>> getHomeMembers(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId) {
+        final HomeMemberResponseDto homeMember = homeService.getHomeMember(homeId, userId);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeMember, Constants.HOME_MEMBER_DETAILS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @PUT
+    @Path("/{homeId}/members/{userId}")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<HomeMemberResponseDto>> updateHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto){
+        HomeMemberResponseDto updatedHomeMember = homeService.updateHomeMember(homeId, userId, updateHomeMemberRequestDto);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(updatedHomeMember, Constants.HOME_MEMBER_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @DELETE
+    @Path("/{homeId}/members/{userId}")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<Object>> deleteHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId){
+        homeService.deleteHomeMember(homeId, userId);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.HOME_MEMBER_DELETED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
 }
