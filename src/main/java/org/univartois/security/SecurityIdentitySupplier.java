@@ -2,18 +2,16 @@ package org.univartois.security;
 
 import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.runtime.QuarkusSecurityIdentity;
-import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.Setter;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.univartois.entity.HomeRoleEntity;
-import org.univartois.repository.HomeRoleRepository;
 import org.univartois.service.RoleService;
 
-import java.security.Principal;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 @Dependent
@@ -32,7 +30,7 @@ public class SecurityIdentitySupplier implements Supplier<SecurityIdentity> {
 
         JsonWebToken user = (JsonWebToken) identity.getPrincipal();
 
-        final Map<String, Set<String>> permissions = roleService.getRolesByUserId(UUID.fromString(user.getSubject()));
+        final Map<String, String> permissions = roleService.getRolesByUserId(UUID.fromString(user.getSubject()));
 
         builder.addAttributes(Collections.singletonMap("roles", permissions));
         return builder.build();

@@ -31,4 +31,8 @@ public class UserRepository implements PanacheRepository<UserEntity> {
         ).singleResultOptional();
     }
 
+    public void updateProfilePictureByUserId(UUID userId, String imageUrl) {
+        update("profilePictureUrl = ?1 WHERE id = ?2", imageUrl, userId);
+    }
+
 }

@@ -26,8 +26,9 @@ import org.univartois.service.HomeService;
 import org.univartois.service.RoleService;
 import org.univartois.utils.Constants;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @ApplicationScoped
 public class HomeServiceImpl implements HomeService {
@@ -58,29 +59,29 @@ public class HomeServiceImpl implements HomeService {
         HomeRoleEntity homeRole = HomeRoleEntity.builder().home(home).user(user).role(HomeRoleType.ADMIN).build();
         homeRoleRepository.persist(homeRole);
 
-        return homeMapper.toHomeResponseDto(home, Set.of(HomeRoleType.ADMIN.name()));
+        return homeMapper.toHomeResponseDto(home, HomeRoleType.ADMIN.name());
     }
 
     @Override
     public HomeResponseDto getHomeById(UUID homeId) {
         final HomeEntity home = homeRepository.findById(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
-        Set<String> roles = roleService.getRolesByUserId(userId).getOrDefault(homeId.toString(), new HashSet<>());
-        return homeMapper.toHomeResponseDto(home, roles);
+        String roleInHome = roleService.getRolesByUserId(userId).getOrDefault(homeId.toString(), null);
+        return homeMapper.toHomeResponseDto(home, roleInHome);
     }
 
     @Override
     public List<HomeResponseDto> getUserHomes(UUID userId) {
-        Map<String, Set<String>> roles = roleService.getRolesByUserId(userId);
-        return homeRepository.findHomesByUserId(userId).stream().map((home) -> homeMapper.toHomeResponseDto(home, roles.getOrDefault(home.getId().toString(), new HashSet<>()))).toList();
+        Map<String, String> roles = roleService.getRolesByUserId(userId);
+        return homeRepository.findHomesByUserId(userId).stream().map((home) -> homeMapper.toHomeResponseDto(home, roles.getOrDefault(home.getId().toString(), null))).toList();
     }
 
     @Transactional
     @Override
     public void leaveHome(UUID homeId) {
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
-        Set<String> roles = roleService.getRolesByUserId(userId).getOrDefault(homeId.toString(), new HashSet<>());
-        String roleInHome = roles.stream().findFirst().orElse(null);
+        String roleInHome = roleService.getRolesByUserId(userId).getOrDefault(homeId.toString(), null);
+
         if (roleInHome != null && HomeRoleType.valueOf(roleInHome).equals(HomeRoleType.ADMIN) && homeRoleRepository.countAdminRolesByHomeId(homeId) <= 1) {
             throw new CannotLeaveHomeException(Constants.HOME_ADMIN_LEAVE_CONSTRAINT_MSG);
         }
@@ -114,7 +115,7 @@ public class HomeServiceImpl implements HomeService {
                         user.getRoles().stream()
                                 .filter(role -> role.getId().getHomeId().equals(homeId))
                                 .map(role -> role.getRole().toString())
-                                .collect(Collectors.toUnmodifiableSet())
+                                .findFirst().orElse(null)
                 ))
                 .toList();
     }
@@ -126,7 +127,7 @@ public class HomeServiceImpl implements HomeService {
 
         return userMapper.toHomeMemberResponseDto(
                 user,
-                user.getRoles().stream().filter(homeRoleEntity -> homeRoleEntity.getId().getHomeId().equals(homeId)).map(homeRoleEntity -> homeRoleEntity.getRole().toString()).collect(Collectors.toUnmodifiableSet())
+                user.getRoles().stream().filter(homeRoleEntity -> homeRoleEntity.getId().getHomeId().equals(homeId)).map(homeRoleEntity -> homeRoleEntity.getRole().toString()).findFirst().orElse(null)
         );
     }
 
@@ -134,7 +135,7 @@ public class HomeServiceImpl implements HomeService {
     @Override
     public HomeMemberResponseDto updateHomeMember(UUID homeId, UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto) {
         UUID currentAuthUserId = UUID.fromString(jsonWebToken.getSubject());
-        if (userId.equals(currentAuthUserId)){
+        if (userId.equals(currentAuthUserId)) {
             throw new AdminRoleModificationException(Constants.HOME_ADMIN_SELF_UPDATE_ROLE_CONSTRAINT_MSG);
         }
         UserEntity user = userRepository.findUserByHomeIdAndUserId(homeId, userId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_MEMBER_NOT_FOUND_MSG));
@@ -146,7 +147,7 @@ public class HomeServiceImpl implements HomeService {
         });
         return userMapper.toHomeMemberResponseDto(
                 user,
-                user.getRoles().stream().filter(homeRoleEntity -> homeRoleEntity.getId().getUserId().equals(userId) && homeRoleEntity.getId().getHomeId().equals(homeId)).map(homeRoleEntity -> homeRoleEntity.getRole().toString()).collect(Collectors.toUnmodifiableSet())
+                user.getRoles().stream().filter(homeRoleEntity -> homeRoleEntity.getId().getUserId().equals(userId) && homeRoleEntity.getId().getHomeId().equals(homeId)).map(homeRoleEntity -> homeRoleEntity.getRole().toString()).findFirst().orElse(null)
         );
     }
 
@@ -154,7 +155,7 @@ public class HomeServiceImpl implements HomeService {
     @Override
     public void deleteHomeMember(UUID homeId, UUID userId) {
         UUID currentAuthUserId = UUID.fromString(jsonWebToken.getSubject());
-        if (currentAuthUserId.equals(userId)){
+        if (currentAuthUserId.equals(userId)) {
             throw new CannotLeaveHomeException(Constants.HOME_ADMIN_SELF_DELETE_FROM_HOME_CONSTRAINT_MSG);
         }
 

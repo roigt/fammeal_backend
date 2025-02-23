@@ -6,7 +6,6 @@ import org.hibernate.proxy.HibernateProxy;
 import org.univartois.enums.HomeRoleType;
 
 import java.util.Objects;
-import java.util.Set;
 
 
 @AllArgsConstructor

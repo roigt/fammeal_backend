@@ -2,8 +2,6 @@ package org.univartois.dto.response;
 
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -28,6 +26,5 @@ public class HomeMemberResponseDto {
 
     private boolean verified;
 
-    @Builder.Default
-    private Set<String> roles = new HashSet<>();
+    private String role;
 }

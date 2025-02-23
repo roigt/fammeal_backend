@@ -17,6 +17,7 @@ public class Constants {
     public static final String EMAIL_VERIFICATION_MSG = "Veuillez vérifier votre boîte mail pour valider votre adresse mail.";
     public static final String USER_NOT_FOUND_MSG = "Cet utilisateur n'existe pas.";
     public static final String USER_PROFILE_PICTURE_UPDATED_MSG = "votre photo de profile est mise à jour.";
+    public static final String USER_PROFILE_PICTURE_DELETED_MSG = "votre photo de profile est supprimée.";
 
     /**
      * messages for homes operations

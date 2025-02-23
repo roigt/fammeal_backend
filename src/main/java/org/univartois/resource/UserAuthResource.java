@@ -3,7 +3,6 @@ package org.univartois.resource;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
-import jakarta.servlet.http.Part;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.*;
@@ -100,9 +99,17 @@ public class UserAuthResource {
     @Authenticated
     public RestResponse<ApiResponse<UpdateProfilePictureResponseDto>> updateProfilePicture(@RestForm("file") InputStream file) throws IOException {
         byte[] fileBytes = file.readAllBytes();
+        file.close();
         final UpdateProfilePictureResponseDto profilePictureResponseDto = userAuthService.updateProfilePicture(fileBytes);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(profilePictureResponseDto, Constants.USER_PROFILE_PICTURE_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
 
+    @DELETE
+    @Path("/me/profilePicture")
+    @Authenticated
+    public RestResponse<ApiResponse<Object>> deleteProfilePicture() {
+        userAuthService.deleteProfilePicture();
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_PROFILE_PICTURE_DELETED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @Authenticated

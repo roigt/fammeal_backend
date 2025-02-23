@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
         log.error("security exception at {}: {}", uriInfo.getPath(), exception.getMessage(), exception);
         ApiResponse<Object> response;
         response = ResponseUtil.errorFromStrings(
-                new ArrayList<String>(),
+                new ArrayList<>(),
                 exception.getMessage(),
                 RestResponse.Status.fromStatusCode(401),
                 uriInfo.getPath()
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Object> response;
         if (exception instanceof WebApplicationException webApplicationException) {
             response = ResponseUtil.errorFromStrings(
-                    new ArrayList<String>(),
+                    new ArrayList<>(),
                     webApplicationException.getMessage(),
                     RestResponse.Status.fromStatusCode(webApplicationException.getResponse().getStatus()),
                     uriInfo.getPath()
@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
         } else {
 
             response = ResponseUtil.errorFromStrings(
-                    new ArrayList<String>(),
+                    new ArrayList<>(),
                     "An unexpected error occurred",
                     RestResponse.Status.INTERNAL_SERVER_ERROR,
                     uriInfo.getPath()

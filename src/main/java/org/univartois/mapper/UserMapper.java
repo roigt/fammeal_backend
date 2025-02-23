@@ -5,17 +5,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 import org.univartois.dto.request.UserRegisterRequestDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.UserAuthResponseDto;
-import org.univartois.dto.response.UserRegisterResponseDto;
 import org.univartois.entity.UserEntity;
-import org.univartois.enums.HomeRoleType;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "jakarta")
 public interface UserMapper {
@@ -36,17 +31,15 @@ public interface UserMapper {
     @Mapping(source = "user.profilePictureUrl", target = "profilePictureUrl")
     @Mapping(source = "accessToken", target = "accessToken")
     @Mapping(source = "roles", target = "roles")
-    UserAuthResponseDto toAuthResponseDto(UserEntity user, String accessToken, Map<String, Set<String>> roles);
+    UserAuthResponseDto toAuthResponseDto(UserEntity user, String accessToken, Map<String, String> roles);
 
-    @Mapping(source = "roles", target = "roles")
-    HomeMemberResponseDto toHomeMemberResponseDto(UserEntity user, Set<String> roles);
+    @Mapping(source = "role", target = "role")
+    HomeMemberResponseDto toHomeMemberResponseDto(UserEntity user, String role);
 
     @Named("encodePassword")
-    default String encodePassword(String password){
+    default String encodePassword(String password) {
         return BcryptUtil.bcryptHash(password);
     }
 
 
-
-    
 }

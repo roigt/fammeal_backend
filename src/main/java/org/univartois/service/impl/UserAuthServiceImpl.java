@@ -5,7 +5,6 @@ import io.quarkus.security.UnauthorizedException;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.servlet.http.Part;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.univartois.dto.request.ForgotPasswordRequestDto;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -108,7 +106,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     private String generateUsername(String firstname, String lastname) {
-        return String.format("%s_%s_%s", firstname, lastname, UUID.randomUUID().toString());
+        return String.format("%s_%s_%s", firstname, lastname, UUID.randomUUID());
     }
 
 
@@ -135,7 +133,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         String accessToken = jwtTokenUtil.generateJwtToken(user);
-        Map<String, Set<String>> roles = roleService.getRolesByUserId(user.getId());
+        Map<String, String> roles = roleService.getRolesByUserId(user.getId());
 
         return userMapper.toAuthResponseDto(user, accessToken, roles);
     }
@@ -208,13 +206,19 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public UpdateProfilePictureResponseDto updateProfilePicture(byte[] image) {
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
-        final UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
         try {
             final String imageUrl = imageService.uploadFile(image);
-            user.setProfilePictureUrl(imageUrl);
+            userRepository.updateProfilePictureByUserId(userId, imageUrl);
             return UpdateProfilePictureResponseDto.builder().profilePicture(imageUrl).build();
         } catch (IOException exception) {
             throw new RuntimeException(exception.getMessage());
         }
+    }
+
+    @Transactional
+    @Override
+    public void deleteProfilePicture() {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        userRepository.updateProfilePictureByUserId(userId, null);
     }
 }

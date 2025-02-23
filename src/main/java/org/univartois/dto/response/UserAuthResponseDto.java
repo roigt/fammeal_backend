@@ -1,12 +1,6 @@
 package org.univartois.dto.response;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import lombok.*;
-import org.univartois.entity.HomeRoleEntity;
-import org.univartois.enums.HomeRoleType;
 
 import java.util.*;
 
@@ -35,6 +29,6 @@ public class UserAuthResponseDto {
     private boolean verified = false;
 
     @Builder.Default
-    private Map<String, Set<String>> roles = new HashMap<>();
+    private Map<String, String> roles = new HashMap<>();
 
 }
