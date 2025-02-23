@@ -3,6 +3,7 @@ package org.univartois.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.univartois.utils.Constants;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -10,10 +11,10 @@ import lombok.*;
 @Builder
 public class UserAuthRequestDto {
 
-    @Email(message = "Adresse mail n'est pas valide")
-    @NotBlank(message = "Adresse mail ne doit pas etre vide")
+    @Email(message = Constants.EMAIL_FORMAT_INVALID)
+    @NotBlank(message = Constants.EMAIL_NOT_BLANK)
     private String email;
 
-    @NotBlank(message = "Password ne doit pas etre vide")
+    @NotBlank(message = Constants.PASSWORD_NOT_BLANK)
     private String password;
 }

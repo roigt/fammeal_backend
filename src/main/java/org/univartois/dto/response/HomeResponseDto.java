@@ -6,7 +6,8 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 public class HomeResponseDto {
 
@@ -19,5 +20,7 @@ public class HomeResponseDto {
     private boolean lunchAutomaticGeneration;
 
     private boolean dinerAutomaticGeneration;
+
+    private String role;
 
 }

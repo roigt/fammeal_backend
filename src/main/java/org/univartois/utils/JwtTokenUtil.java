@@ -23,11 +23,10 @@ public class JwtTokenUtil {
 
 
     public String generateJwtToken(final UserEntity user){
-        final Map<String, Set<String>> permissions = new HashMap<>();
+        final Map<String, String> permissions = new HashMap<>();
         user.getRoles().forEach(homeRole -> {
-            final Set<String> homeRoles = permissions.getOrDefault(homeRole.getId().getHomeId().toString(), new HashSet<>());
-            homeRoles.add(homeRole.getRole().name());
-            permissions.put(homeRole.getId().getHomeId().toString(), homeRoles);
+            final String roleInHome = homeRole.getRole().toString();
+            permissions.put(homeRole.getId().getHomeId().toString(), roleInHome);
         });
 
 

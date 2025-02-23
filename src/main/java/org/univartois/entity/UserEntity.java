@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.univartois.utils.Constants;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +14,20 @@ import java.util.UUID;
 
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = Constants.QUERY_FIND_USERS_BY_HOME_ID,
+                query = "SELECT user FROM UserEntity user " +
+                        "JOIN FETCH user.roles homeRole " +
+                        " WHERE homeRole.id.homeId = :homeId"
+        ),
+        @NamedQuery(
+                name = Constants.QUERY_FIN_USER_BY_HOME_ID_AND_USER_ID,
+                query = "SELECT user FROM UserEntity user " +
+                        "JOIN FETCH user.roles homeRole " +
+                        " WHERE homeRole.id.homeId = :homeId AND homeRole.id.userId = :userId"
+        )
+})
 @Table(name = "users")
 @AllArgsConstructor
 @Getter
@@ -36,14 +51,14 @@ public class UserEntity {
 
     private String password;
 
-    private String imageUrl;
+    private String profilePictureUrl;
 
     private boolean vegetarian = false;
 
     private boolean verified = false;
 
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.PERSIST)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<HomeRoleEntity> roles = new HashSet<>();
 
 

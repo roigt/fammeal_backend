@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public interface UserAuthService {
     UserRegisterResponseDto registerUser(UserRegisterRequestDto userRegisterRequestDto);
+
     VerificationAccountResponseDto verifyAccount(String token);
 
     UserAuthResponseDto auth(UserAuthRequestDto userAuthRequestDto);
@@ -22,4 +23,8 @@ public interface UserAuthService {
     void resetPassword(@NotBlank String token);
 
     UserAuthResponseDto getUserById(UUID userId);
+
+    UpdateProfilePictureResponseDto updateProfilePicture(byte[] image);
+
+    void deleteProfilePicture();
 }

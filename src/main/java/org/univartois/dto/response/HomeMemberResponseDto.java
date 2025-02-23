@@ -2,17 +2,15 @@ package org.univartois.dto.response;
 
 import lombok.*;
 
-import java.util.*;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @Builder
-public class UserAuthResponseDto {
-
+public class HomeMemberResponseDto {
     private UUID id;
-
-    private String accessToken;
 
     private String username;
 
@@ -24,11 +22,9 @@ public class UserAuthResponseDto {
 
     private String lastname;
 
-    private boolean vegetarian = false;
+    private boolean vegetarian;
 
-    private boolean verified = false;
+    private boolean verified;
 
-    @Builder.Default
-    private Map<String, String> roles = new HashMap<>();
-
+    private String role;
 }

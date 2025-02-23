@@ -1,8 +1,6 @@
 package org.univartois.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.List;
 

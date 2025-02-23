@@ -1,13 +1,12 @@
 package org.univartois.security;
 
 import io.quarkus.security.ForbiddenException;
-import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
-import org.univartois.annotation.HomePermissionsAllowed;
+import org.univartois.annotation.security.HomePermissionsAllowed;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.service.RoleService;
 
@@ -22,8 +21,6 @@ import java.util.UUID;
 @HomePermissionsAllowed(homeIdParamName = "homeId")
 public class HomePermissionInterceptor {
 
-    @Inject
-    SecurityIdentity securityIdentity;
 
     @Inject
     RoleService roleService;

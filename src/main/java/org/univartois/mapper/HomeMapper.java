@@ -10,5 +10,5 @@ public interface HomeMapper {
 
     HomeEntity toEntity(CreateHomeRequestDto createHomeRequestDto);
 
-    HomeResponseDto toHomeResponseDto(HomeEntity homeEntity);
+    HomeResponseDto toHomeResponseDto(HomeEntity homeEntity, String role);
 }
