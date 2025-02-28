@@ -49,7 +49,7 @@ public class HomeResource {
 
     @POST
     @Authenticated
-    public RestResponse<ApiResponse<HomeResponseDto>> createHome(CreateHomeRequestDto createHomeRequestDto) {
+    public RestResponse<ApiResponse<HomeResponseDto>> createHome(@Valid CreateHomeRequestDto createHomeRequestDto) {
         final HomeResponseDto home = homeService.createHome(createHomeRequestDto);
 
         return RestResponse.status(RestResponse.Status.CREATED, ResponseUtil.success(home, Constants.HOME_CREATED_MSG, RestResponse.Status.CREATED, uriInfo.getPath()));
