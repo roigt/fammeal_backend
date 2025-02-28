@@ -106,7 +106,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     private String generateUsername(String firstname, String lastname) {
-        return String.format("%s_%s_%s", firstname, lastname, UUID.randomUUID());
+        return String.format("%s%s_%s", firstname.charAt(0), lastname.charAt(0), UUID.randomUUID());
     }
 
 

@@ -5,7 +5,7 @@ public class Constants {
     /**
      * messages for users operations
      */
-    public static final String EMAIL_ALREADY_EXISTS_MSG = "Un utilisateur avec cet email ou nom d'utilisateur existe déjà.";
+    public static final String EMAIL_ALREADY_EXISTS_MSG = "Un utilisateur avec cet email existe déjà.";
     public static final String ACCOUNT_NOT_VERIFIED_MSG = "Votre compte n'a pas encore été vérifié. Veuillez vérifier votre e-mail pour activer votre compte.";
     public static final String ACCOUNT_ALREADY_VERIFIED_MSG = "Ce compte a déjà été vérifié.";
     public static final String EMAIL_INVALID_MSG = "Adresse mail invalide. Veuillez créer un compte.";
@@ -40,10 +40,16 @@ public class Constants {
 
 //    Validation messages
     public static final String EMAIL_FORMAT_INVALID = "Adresse mail n'est pas valide";
-    public static final String EMAIL_NOT_BLANK = "Adresse mail ne doit pas etre vide";
-    public static final String PASSWORD_NOT_BLANK = "Password ne doit pas etre vide";
-    public static final String FIRSTNAME_NOT_BLANK = "Nom ne doit pas etre vide";
-    public static final String LASTNAME_NOT_BLANK = "Prénom ne doit pas etre vide";
+    public static final String EMAIL_NOT_BLANK = "Adresse mail ne doit pas être vide";
+    public static final String PASSWORD_NOT_BLANK = "Password ne doit pas être vide";
+    public static final String FIRSTNAME_NOT_BLANK = "Nom ne doit pas être vide";
+    public static final String FIRSTNAME_SIZE = "Prénom doit contenir entre 2 à 16 caractères";
+    public static final String LASTNAME_SIZE = "Nom doit contenir entre 2 à 16 caractères";
+    public static final String LASTNAME_NOT_BLANK = "Prénom ne doit pas être vide";
+    public static final String PASSWORD_SIZE = "Mot de passe doit contenir au moins 8 caractères";
+    public static final String HOME_NAME_NOT_BLANK = "Le nom d'une maison ne doit pas être vide";
+    public static final String HOME_NAME_SIZE = "Le nom d'une maison doit contenir entre 2 et 30 caractères";
+
 
     //    EVENTS
     public static final String USER_CREATED_EVENT = "USER_CREATED";
