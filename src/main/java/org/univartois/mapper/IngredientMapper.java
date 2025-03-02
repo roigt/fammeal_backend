@@ -15,7 +15,7 @@ public interface IngredientMapper {
     IngredientEntity toEntity(IngredientRequestDto ingredientRequestDto);
 
 
-    @Mapping(source="idIngredient", target="IngredientId")
+    @Mapping(source="idIngredient", target="ingredientId")
     IngredientResponseDto toResponseDto(IngredientEntity ingredientEntity);
 
     List<IngredientResponseDto> toResponseDtoList(List<IngredientEntity> ingredientEntities);

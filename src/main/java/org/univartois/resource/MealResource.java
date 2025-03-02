@@ -71,9 +71,9 @@ public class MealResource {
     @Path("/{idMeal}")
     @Authenticated
     //  @HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public  RestResponse<ApiResponse<Optional<MealResponseDto>>>  getMeals(@PathParam("idHome") UUID homeId, @PathParam("idMeal") UUID idMeal) {
+    public  RestResponse<ApiResponse<MealResponseDto>>  getMeals(@PathParam("idHome") UUID homeId, @PathParam("idMeal") UUID idMeal) {
         try {
-            Optional<MealResponseDto> meals = mealService.getMealsByHomeAndIdMeal(homeId,idMeal);
+            MealResponseDto meals = mealService.getMealsByHomeAndIdMeal(homeId,idMeal);
             return RestResponse.status(
                     RestResponse.Status.OK,
                     ResponseUtil.success(meals, "Liste des repas récupérée.", RestResponse.Status.OK, uriInfo.getPath())

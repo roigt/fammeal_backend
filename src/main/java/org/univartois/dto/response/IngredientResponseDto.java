@@ -16,5 +16,5 @@ public class IngredientResponseDto {
     private String ingredientName;
     private boolean ingredientIsVegan;
     private int nbDayBeforeExpiration;
-    private UUID IngredientId;
+    private UUID ingredientId;
 }
