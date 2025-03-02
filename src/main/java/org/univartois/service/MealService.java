@@ -19,7 +19,7 @@ public interface MealService {
      */
     List<MealResponseDto> getMealsByHome(UUID homeId);
 
-    Optional<MealResponseDto> getMealsByHomeAndIdMeal(UUID homeId,UUID idMeal);
+    MealResponseDto getMealsByHomeAndIdMeal(UUID homeId,UUID idMeal);
 
     MealResponseFromDateToDto getMealDateTo(UUID idHome, LocalDate from, LocalDate to);
 

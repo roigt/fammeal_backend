@@ -59,14 +59,14 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public Optional<MealResponseDto> getMealsByHomeAndIdMeal(UUID homeId, UUID mealId) {
+    public MealResponseDto getMealsByHomeAndIdMeal(UUID homeId, UUID mealId) {
         HomeEntity home = homeRepository.findById(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
 
         MealEntity meals = mealRepository.findByHomeAndIdMeal(homeId,mealId);
 
-        return Optional.ofNullable(mealMapper.toResponseDto(meals));
+        return mealMapper.toResponseDto(meals);
     }
 
     @Override
