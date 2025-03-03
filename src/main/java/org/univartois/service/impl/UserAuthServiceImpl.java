@@ -7,10 +7,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.univartois.dto.request.ForgotPasswordRequestDto;
-import org.univartois.dto.request.UserAuthRequestDto;
-import org.univartois.dto.request.UserRegisterRequestDto;
-import org.univartois.dto.request.UserVerificationRequestDto;
+import org.univartois.dto.request.*;
 import org.univartois.dto.response.*;
 import org.univartois.entity.TokenEntity;
 import org.univartois.entity.UserEntity;
@@ -197,9 +194,42 @@ public class UserAuthServiceImpl implements UserAuthService {
 
 
     @Override
-    public UserAuthResponseDto getUserById(UUID userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+    public UserAuthResponseDto getCurentAuthenticatedUser() {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
         return userMapper.toAuthResponseDto(user, null, roleService.getRolesByUserId(user.getId()));
+    }
+
+    @Transactional
+    @Override
+    public UserAuthResponseDto updateCurrentAuthenticatedUser(UpdateAuthenticatedUserRequestDto updateAuthenticatedUserRequestDto) {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        if (userRepository.existsByUsernameAndNotId(updateAuthenticatedUserRequestDto.getUsername(), userId)){
+            throw new UserAlreadyExistsException(Constants.USERNAME_ALREADY_EXISTS_MSG);
+        }
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+
+        userMapper.updateEntity(user, updateAuthenticatedUserRequestDto);
+
+        return userMapper.toAuthResponseDto(user, null, roleService.getRolesByUserId(userId));
+    }
+
+    @Transactional
+    @Override
+    public void updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto) {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+        if (!BcryptUtil.matches(updatePasswordRequestDto.getOldPassword(), user.getPassword())){
+            throw new OldPasswordMismatchException(Constants.USER_OLD_PASSWORD_MISMATCH_MSG);
+        }
+        user.setPassword(BcryptUtil.bcryptHash(updatePasswordRequestDto.getNewPassword()));
+    }
+
+    @Transactional
+    @Override
+    public void deleteCurrentAuthenticatedUser() {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        userRepository.deleteById(userId);
     }
 
     @Transactional

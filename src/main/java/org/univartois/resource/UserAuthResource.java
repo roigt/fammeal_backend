@@ -12,10 +12,7 @@ import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestResponse;
-import org.univartois.dto.request.ForgotPasswordRequestDto;
-import org.univartois.dto.request.UserAuthRequestDto;
-import org.univartois.dto.request.UserRegisterRequestDto;
-import org.univartois.dto.request.UserVerificationRequestDto;
+import org.univartois.dto.request.*;
 import org.univartois.dto.response.*;
 import org.univartois.service.HomeService;
 import org.univartois.service.UserAuthService;
@@ -116,9 +113,33 @@ public class UserAuthResource {
     @GET
     @Path("/me")
     public RestResponse<ApiResponse<UserAuthResponseDto>> getCurrentAuthenticatedUser() {
-        UUID userId = UUID.fromString(jwt.getSubject());
-        UserAuthResponseDto userAuthResponseDto = userAuthService.getUserById(userId);
+        UserAuthResponseDto userAuthResponseDto = userAuthService.getCurentAuthenticatedUser();
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userAuthResponseDto, "informations de votre compte", RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @PUT
+    @Path("/me")
+    @Authenticated
+    public RestResponse<ApiResponse<UserAuthResponseDto>> updateCurrentAuthenticatedUser(@Valid UpdateAuthenticatedUserRequestDto dto){
+        UserAuthResponseDto userAuthResponseDto = userAuthService.updateCurrentAuthenticatedUser(dto);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userAuthResponseDto, Constants.USER_PROFILE_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @PUT
+    @Path("/me/password")
+    @Authenticated
+    public RestResponse<ApiResponse<Object>> updatePassword(@Valid UpdatePasswordRequestDto updatePasswordRequestDto){
+        userAuthService.updatePassword(updatePasswordRequestDto);
+
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_PASSWORD_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @DELETE
+    @Authenticated
+    @Path("/me")
+    public RestResponse<ApiResponse<Object>> deleteCurrentAuthenticatedUser(){
+        userAuthService.deleteCurrentAuthenticatedUser();
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_DELETED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @GET

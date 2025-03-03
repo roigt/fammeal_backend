@@ -6,19 +6,21 @@ import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.univartois.dto.request.AddHomeMemberRequestDto;
 import org.univartois.dto.request.CreateHomeRequestDto;
+import org.univartois.dto.request.UpdateDietaryConstraintsRequestDto;
 import org.univartois.dto.request.UpdateHomeMemberRequestDto;
+import org.univartois.dto.response.DietaryConstraintsResponseDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.HomeResponseDto;
-import org.univartois.entity.HomeEntity;
-import org.univartois.entity.HomeRoleEntity;
-import org.univartois.entity.UserEntity;
+import org.univartois.entity.*;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.exception.AdminRoleModificationException;
 import org.univartois.exception.CannotLeaveHomeException;
 import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.exception.UserAlreadyInHomeException;
+import org.univartois.mapper.DietaryConstraintsMapper;
 import org.univartois.mapper.HomeMapper;
 import org.univartois.mapper.UserMapper;
+import org.univartois.repository.AllergyRepository;
 import org.univartois.repository.HomeRepository;
 import org.univartois.repository.HomeRoleRepository;
 import org.univartois.repository.UserRepository;
@@ -26,9 +28,7 @@ import org.univartois.service.HomeService;
 import org.univartois.service.RoleService;
 import org.univartois.utils.Constants;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @ApplicationScoped
 public class HomeServiceImpl implements HomeService {
@@ -41,6 +41,9 @@ public class HomeServiceImpl implements HomeService {
     UserMapper userMapper;
 
     @Inject
+    DietaryConstraintsMapper dietaryConstraintsMapper;
+
+    @Inject
     JsonWebToken jsonWebToken;
     @Inject
     UserRepository userRepository;
@@ -48,12 +51,14 @@ public class HomeServiceImpl implements HomeService {
     HomeRoleRepository homeRoleRepository;
     @Inject
     RoleService roleService;
+    @Inject
+    AllergyRepository allergyRepository;
 
     @Override
     @Transactional
     public HomeResponseDto createHome(CreateHomeRequestDto createHomeRequestDto) {
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
         HomeEntity home = homeMapper.toEntity(createHomeRequestDto);
         homeRepository.persist(home);
         HomeRoleEntity homeRole = HomeRoleEntity.builder().home(home).user(user).role(HomeRoleType.ADMIN).build();
@@ -64,7 +69,7 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public HomeResponseDto getHomeById(UUID homeId) {
-        final HomeEntity home = homeRepository.findById(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
+        final HomeEntity home = homeRepository.findByIdOptional(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
         String roleInHome = roleService.getRolesByUserId(userId).getOrDefault(homeId.toString(), null);
         return homeMapper.toHomeResponseDto(home, roleInHome);
@@ -86,7 +91,7 @@ public class HomeServiceImpl implements HomeService {
             throw new CannotLeaveHomeException(Constants.HOME_ADMIN_LEAVE_CONSTRAINT_MSG);
         }
 
-        homeRoleRepository.deleteByUserIdAndHomeId(userId, homeId);
+        homeRoleRepository.deleteById(new HomeRoleId(homeId, userId));
     }
 
     @Transactional
@@ -95,7 +100,7 @@ public class HomeServiceImpl implements HomeService {
         UserEntity user = userRepository.findByEmail(addHomeMemberRequestDto.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
 
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
 
         if (homeRoleRepository.existsByUserIdAndHomeId(user.getId(), homeId)) {
@@ -158,7 +163,27 @@ public class HomeServiceImpl implements HomeService {
         if (currentAuthUserId.equals(userId)) {
             throw new CannotLeaveHomeException(Constants.HOME_ADMIN_SELF_DELETE_FROM_HOME_CONSTRAINT_MSG);
         }
+        homeRoleRepository.deleteById(new HomeRoleId(homeId, userId));
+    }
 
-        homeRoleRepository.deleteByUserIdAndHomeId(userId, homeId);
+//    @TODO: optimize db queries
+    @Transactional
+    @Override
+    public DietaryConstraintsResponseDto updateDietaryConstraints(UUID homeId, UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
+        HomeEntity home = homeRepository.findByIdOptional(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
+
+        Set<AllergyEntity> allergies = new HashSet<>(allergyRepository.findByIds(updateDietaryConstraintsRequestDto.getAllergies()));
+        home.setAllergies(allergies);
+        home.setVegetarian(updateDietaryConstraintsRequestDto.isVegetarian());
+
+        return dietaryConstraintsMapper.toDietaryConstraintsResponseDto(home.isVegetarian(), allergies);
+    }
+
+//    @TODO: optimize db queries
+    @Override
+    public DietaryConstraintsResponseDto getDietaryConstraints(UUID homeId) {
+        HomeEntity home = homeRepository.findByIdOptional(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
+
+        return dietaryConstraintsMapper.toDietaryConstraintsResponseDto(home.isVegetarian(), home.getAllergies());
     }
 }

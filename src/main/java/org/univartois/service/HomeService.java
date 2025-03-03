@@ -2,7 +2,9 @@ package org.univartois.service;
 
 import org.univartois.dto.request.AddHomeMemberRequestDto;
 import org.univartois.dto.request.CreateHomeRequestDto;
+import org.univartois.dto.request.UpdateDietaryConstraintsRequestDto;
 import org.univartois.dto.request.UpdateHomeMemberRequestDto;
+import org.univartois.dto.response.DietaryConstraintsResponseDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.HomeResponseDto;
 
@@ -27,4 +29,8 @@ public interface HomeService {
     HomeMemberResponseDto updateHomeMember(UUID homeId, UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto);
 
     void deleteHomeMember(UUID homeId, UUID userId);
+
+    DietaryConstraintsResponseDto updateDietaryConstraints(UUID homeId, UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto);
+
+    DietaryConstraintsResponseDto getDietaryConstraints(UUID homeId);
 }

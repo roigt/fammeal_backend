@@ -2,6 +2,8 @@ package org.univartois.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.univartois.enums.TokenType;
 
 import java.time.LocalDateTime;
@@ -29,7 +31,9 @@ public class TokenEntity {
 
     private boolean used = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    we have to put EAGER because of hibernate proxies cant apply SqlRestriction
+    @NotFound(action = NotFoundAction.EXCEPTION)
+    @ManyToOne
     private UserEntity user;
 
 

@@ -11,8 +11,10 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.univartois.annotation.security.HomePermissionsAllowed;
 import org.univartois.dto.request.AddHomeMemberRequestDto;
 import org.univartois.dto.request.CreateHomeRequestDto;
+import org.univartois.dto.request.UpdateDietaryConstraintsRequestDto;
 import org.univartois.dto.request.UpdateHomeMemberRequestDto;
 import org.univartois.dto.response.ApiResponse;
+import org.univartois.dto.response.DietaryConstraintsResponseDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.HomeResponseDto;
 import org.univartois.enums.HomeRoleType;
@@ -95,7 +97,7 @@ public class HomeResource {
     @Path("/{homeId}/members/{userId}")
     @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<HomeMemberResponseDto>> updateHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto){
+    public RestResponse<ApiResponse<HomeMemberResponseDto>> updateHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto) {
         HomeMemberResponseDto updatedHomeMember = homeService.updateHomeMember(homeId, userId, updateHomeMemberRequestDto);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(updatedHomeMember, Constants.HOME_MEMBER_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
@@ -104,8 +106,28 @@ public class HomeResource {
     @Path("/{homeId}/members/{userId}")
     @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<Object>> deleteHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId){
+    public RestResponse<ApiResponse<Object>> deleteHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId) {
         homeService.deleteHomeMember(homeId, userId);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.HOME_MEMBER_DELETED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+
+    @PUT
+    @Path("/{homeId}/constraints")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> updateDietaryConstraints(@PathParam("homeId") UUID homeId,UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
+        DietaryConstraintsResponseDto responseDto = homeService.updateDietaryConstraints(homeId,updateDietaryConstraintsRequestDto);
+
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(responseDto, Constants.HOME_DIETARY_CONSTRAINTS_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @GET
+    @Path("/{homeId}/constraints")
+    @Authenticated
+    public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> getDietaryConstraints(@PathParam("homeId") UUID homeId) {
+        DietaryConstraintsResponseDto responseDto = homeService.getDietaryConstraints(homeId);
+
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(responseDto, Constants.HOME_DIETARY_CONSTRAINTS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 }

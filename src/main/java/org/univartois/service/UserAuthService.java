@@ -1,13 +1,9 @@
 package org.univartois.service;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import org.univartois.dto.request.ForgotPasswordRequestDto;
-import org.univartois.dto.request.UserAuthRequestDto;
-import org.univartois.dto.request.UserRegisterRequestDto;
-import org.univartois.dto.request.UserVerificationRequestDto;
+import org.univartois.dto.request.*;
 import org.univartois.dto.response.*;
-
-import java.util.UUID;
 
 public interface UserAuthService {
     UserRegisterResponseDto registerUser(UserRegisterRequestDto userRegisterRequestDto);
@@ -22,9 +18,15 @@ public interface UserAuthService {
 
     void resetPassword(@NotBlank String token);
 
-    UserAuthResponseDto getUserById(UUID userId);
+    UserAuthResponseDto getCurentAuthenticatedUser();
 
     UpdateProfilePictureResponseDto updateProfilePicture(byte[] image);
 
     void deleteProfilePicture();
+
+    UserAuthResponseDto updateCurrentAuthenticatedUser(UpdateAuthenticatedUserRequestDto updateAuthenticatedUserRequestDto);
+
+    void deleteCurrentAuthenticatedUser();
+
+    void updatePassword(@Valid UpdatePasswordRequestDto updatePasswordRequestDto);
 }

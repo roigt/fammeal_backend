@@ -1,10 +1,16 @@
 package org.univartois.enums;
 
+import lombok.Getter;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public enum HomeRoleType implements Role {
-    ADMIN,CHEF_REPAS, PROPOSITION_REPAS, GARDE_MANGER, MEMBER;
+    ADMIN("Admin"),CHEF_REPAS("Chef des repas"), PROPOSITION_REPAS("Propition des repas"), GARDE_MANGER("Garde manger"), MEMBER("Membre");
+
+    @Getter
+    private final String value;
+
 
     private final Set<HomeRoleType> children = new HashSet<>();
 
@@ -13,6 +19,10 @@ public enum HomeRoleType implements Role {
         CHEF_REPAS.children.add(GARDE_MANGER);
         GARDE_MANGER.children.add(PROPOSITION_REPAS);
         PROPOSITION_REPAS.children.add(MEMBER);
+    }
+
+    HomeRoleType(String value) {
+        this.value = value;
     }
 
     public static class Constants {

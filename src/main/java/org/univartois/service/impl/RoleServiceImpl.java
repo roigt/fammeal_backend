@@ -3,16 +3,15 @@ package org.univartois.service.impl;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.univartois.dto.response.HomeRoleResponseDto;
 import org.univartois.entity.HomeRoleEntity;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.enums.Role;
+import org.univartois.mapper.HomeRoleMapper;
 import org.univartois.repository.HomeRoleRepository;
 import org.univartois.service.RoleService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @ApplicationScoped
 public class RoleServiceImpl implements RoleService {
@@ -22,6 +21,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Inject
     SecurityIdentity securityIdentity;
+
+    @Inject
+    HomeRoleMapper homeRoleMapper;
 
     //    @SuppressWarnings("unchecked")
     @Override
@@ -47,5 +49,10 @@ public class RoleServiceImpl implements RoleService {
             permissions.put(homeRole.getId().getHomeId().toString(), roleInHome);
         });
         return permissions;
+    }
+
+    @Override
+    public List<HomeRoleResponseDto> getHomeRoles() {
+        return Arrays.stream(HomeRoleType.values()).map(homeRoleMapper::toHomeRoleResponseDto).toList();
     }
 }

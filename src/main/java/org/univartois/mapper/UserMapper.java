@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import org.univartois.dto.request.UpdateAuthenticatedUserRequestDto;
 import org.univartois.dto.request.UserRegisterRequestDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.UserAuthResponseDto;
@@ -35,6 +36,8 @@ public interface UserMapper {
 
     @Mapping(source = "role", target = "role")
     HomeMemberResponseDto toHomeMemberResponseDto(UserEntity user, String role);
+
+    void updateEntity(@MappingTarget UserEntity user, UpdateAuthenticatedUserRequestDto dto);
 
     @Named("encodePassword")
     default String encodePassword(String password) {
