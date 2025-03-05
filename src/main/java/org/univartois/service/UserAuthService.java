@@ -29,4 +29,9 @@ public interface UserAuthService {
     void deleteCurrentAuthenticatedUser();
 
     void updatePassword(@Valid UpdatePasswordRequestDto updatePasswordRequestDto);
+
+
+    DietaryConstraintsResponseDto updateCurrentAuthUserDietaryConstraints(UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto);
+
+    DietaryConstraintsResponseDto getCurrentAuthUserDietaryConstraints();
 }

@@ -2,13 +2,15 @@ package org.univartois.entity;
 
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.HQLSelect;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.*;
 import org.univartois.utils.Constants;
 
 import java.util.HashSet;
@@ -36,21 +38,16 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@SQLDelete(sql = """
-            UPDATE users SET deleted = true WHERE id = ?
-        """)
-@SQLRestriction(value = "deleted = false")
-@HQLSelect(query = """
-            SELECT u FROM UserEntity u WHERE u.id = ?1 AND u.deleted = false
-        """)
-public class UserEntity extends SoftDeletableEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(unique = true)
     private String username;
 
+    @Column(unique = true)
     private String email;
 
     private String firstname;
@@ -66,7 +63,7 @@ public class UserEntity extends SoftDeletableEntity {
     private boolean verified = false;
 
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private Set<HomeRoleEntity> roles = new HashSet<>();
 
 
@@ -95,8 +92,5 @@ public class UserEntity extends SoftDeletableEntity {
         token.setUser(null);
     }
 
-    @PreRemove
-    public void preRemove() {
-        this.deleted = true;
-    }
+
 }

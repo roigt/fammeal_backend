@@ -32,7 +32,6 @@ CREATE TABLE tokens
 CREATE TABLE users
 (
     id                UUID    NOT NULL,
-    deleted           BOOLEAN NOT NULL,
     username          VARCHAR(255),
     email             VARCHAR(255),
     firstname         VARCHAR(255),

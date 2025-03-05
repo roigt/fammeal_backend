@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface RoleService {
     boolean hasAnyRoleByHomeId(UUID homeId, Role... roles);
 
+
     Map<String, String> getRolesByUserId(UUID userId);
 
     List<HomeRoleResponseDto> getHomeRoles();

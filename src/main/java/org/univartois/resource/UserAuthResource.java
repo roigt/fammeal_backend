@@ -12,8 +12,10 @@ import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.univartois.annotation.security.HomePermissionsAllowed;
 import org.univartois.dto.request.*;
 import org.univartois.dto.response.*;
+import org.univartois.enums.HomeRoleType;
 import org.univartois.service.HomeService;
 import org.univartois.service.UserAuthService;
 import org.univartois.utils.Constants;
@@ -151,5 +153,21 @@ public class UserAuthResource {
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeList, "La liste de vos maisons a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
     }
 
+    @PUT
+    @Path("/me/constraints")
+    @Authenticated
+    public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> updateCurrentAuthUserDietaryConstraints(UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
+        DietaryConstraintsResponseDto responseDto = userAuthService.updateCurrentAuthUserDietaryConstraints(updateDietaryConstraintsRequestDto);
 
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(responseDto, Constants.USER_DIETARY_CONSTRAINTS_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @GET
+    @Path("/me/constraints")
+    @Authenticated
+    public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> getCurrentAuthUserDietaryConstraints() {
+        DietaryConstraintsResponseDto responseDto = userAuthService.getCurrentAuthUserDietaryConstraints();
+
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(responseDto, Constants.USER_DIETARY_CONSTRAINTS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
 }

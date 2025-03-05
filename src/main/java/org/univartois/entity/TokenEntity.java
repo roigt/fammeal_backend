@@ -31,9 +31,7 @@ public class TokenEntity {
 
     private boolean used = false;
 
-//    we have to put EAGER because of hibernate proxies cant apply SqlRestriction
-    @NotFound(action = NotFoundAction.EXCEPTION)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 
 

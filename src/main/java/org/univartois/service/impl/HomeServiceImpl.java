@@ -4,10 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.univartois.dto.request.AddHomeMemberRequestDto;
-import org.univartois.dto.request.CreateHomeRequestDto;
-import org.univartois.dto.request.UpdateDietaryConstraintsRequestDto;
-import org.univartois.dto.request.UpdateHomeMemberRequestDto;
+import org.univartois.dto.request.*;
 import org.univartois.dto.response.DietaryConstraintsResponseDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.HomeResponseDto;
@@ -63,6 +60,16 @@ public class HomeServiceImpl implements HomeService {
         homeRepository.persist(home);
         HomeRoleEntity homeRole = HomeRoleEntity.builder().home(home).user(user).role(HomeRoleType.ADMIN).build();
         homeRoleRepository.persist(homeRole);
+
+        return homeMapper.toHomeResponseDto(home, HomeRoleType.ADMIN.name());
+    }
+
+    @Transactional
+    @Override
+    public HomeResponseDto updateHome(UUID homeId, UpdateHomeRequestDto updateHomeRequestDto) {
+        HomeEntity home = homeRepository.findByIdOptional(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
+
+        home.setName(updateHomeRequestDto.getName());
 
         return homeMapper.toHomeResponseDto(home, HomeRoleType.ADMIN.name());
     }
@@ -185,5 +192,15 @@ public class HomeServiceImpl implements HomeService {
         HomeEntity home = homeRepository.findByIdOptional(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
 
         return dietaryConstraintsMapper.toDietaryConstraintsResponseDto(home.isVegetarian(), home.getAllergies());
+    }
+
+
+    @Transactional
+    @Override
+    public void toggleMealGeneration(UUID homeId, boolean lunch) {
+        HomeEntity home = homeRepository.findByIdOptional(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
+
+        if (lunch) home.setLunchAutomaticGeneration(!home.isLunchAutomaticGeneration());
+        else home.setDinerAutomaticGeneration(!home.isDinerAutomaticGeneration());
     }
 }

@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.univartois.dto.request.*;
 import org.univartois.dto.response.*;
+import org.univartois.entity.AllergyEntity;
 import org.univartois.entity.TokenEntity;
 import org.univartois.entity.UserEntity;
 import org.univartois.enums.TokenType;
@@ -16,7 +17,9 @@ import org.univartois.event.ForgotPasswordEvent;
 import org.univartois.event.PasswordResetEvent;
 import org.univartois.event.UserCreatedEvent;
 import org.univartois.exception.*;
+import org.univartois.mapper.DietaryConstraintsMapper;
 import org.univartois.mapper.UserMapper;
+import org.univartois.repository.AllergyRepository;
 import org.univartois.repository.TokenRepository;
 import org.univartois.repository.UserRepository;
 import org.univartois.service.ImageService;
@@ -28,9 +31,7 @@ import org.univartois.utils.PasswordGenerator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @ApplicationScoped
 public class UserAuthServiceImpl implements UserAuthService {
@@ -61,6 +62,12 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Inject
     ImageService imageService;
+
+    @Inject
+    AllergyRepository allergyRepository;
+
+    @Inject
+    DietaryConstraintsMapper dietaryConstraintsMapper;
 
     @Override
     @Transactional
@@ -250,5 +257,28 @@ public class UserAuthServiceImpl implements UserAuthService {
     public void deleteProfilePicture() {
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
         userRepository.updateProfilePictureByUserId(userId, null);
+    }
+
+//    @TODO: optimize db queries
+    @Transactional
+    @Override
+    public DietaryConstraintsResponseDto updateCurrentAuthUserDietaryConstraints(UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+
+        Set<AllergyEntity> allergies = new HashSet<>(allergyRepository.findByIds(updateDietaryConstraintsRequestDto.getAllergies()));
+        user.setAllergies(allergies);
+        user.setVegetarian(updateDietaryConstraintsRequestDto.isVegetarian());
+
+        return dietaryConstraintsMapper.toDietaryConstraintsResponseDto(user.isVegetarian(), allergies);
+    }
+
+//    @TODO: optimize db queries
+    @Override
+    public DietaryConstraintsResponseDto getCurrentAuthUserDietaryConstraints() {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+
+        return dietaryConstraintsMapper.toDietaryConstraintsResponseDto(user.isVegetarian(), user.getAllergies());
     }
 }

@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.univartois.annotation.security.HomePermissionsAllowed;
-import org.univartois.dto.request.AddHomeMemberRequestDto;
-import org.univartois.dto.request.CreateHomeRequestDto;
-import org.univartois.dto.request.UpdateDietaryConstraintsRequestDto;
-import org.univartois.dto.request.UpdateHomeMemberRequestDto;
+import org.univartois.dto.request.*;
 import org.univartois.dto.response.ApiResponse;
 import org.univartois.dto.response.DietaryConstraintsResponseDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
@@ -56,6 +53,17 @@ public class HomeResource {
 
         return RestResponse.status(RestResponse.Status.CREATED, ResponseUtil.success(home, Constants.HOME_CREATED_MSG, RestResponse.Status.CREATED, uriInfo.getPath()));
     }
+
+    @PUT
+    @Path("{homeId}")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<HomeResponseDto>> updateHome(@PathParam("homeId") UUID homeId, @Valid UpdateHomeRequestDto updateHomeRequestDto){
+        final HomeResponseDto home = homeService.updateHome(homeId,updateHomeRequestDto);
+
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(home, Constants.HOME_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath() ));
+    }
+
 
     @DELETE
     @Path("/{homeId}/leave")
@@ -129,5 +137,16 @@ public class HomeResource {
         DietaryConstraintsResponseDto responseDto = homeService.getDietaryConstraints(homeId);
 
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(responseDto, Constants.HOME_DIETARY_CONSTRAINTS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+
+    @PUT
+    @Path("/{homeId}/mealGeneration")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<Object>> toggleMealGeneration(@PathParam("homeId") UUID homeId, @QueryParam("lunch") boolean lunch){
+        homeService.toggleMealGeneration(homeId, lunch);
+
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.HOME_TOGGLE_GENERATION_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 }

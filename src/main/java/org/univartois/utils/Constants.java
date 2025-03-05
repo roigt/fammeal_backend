@@ -23,11 +23,20 @@ public class Constants {
     public static final String USER_DELETED_MSG = "votre compte est supprimé.";
     public static final String USER_PASSWORD_UPDATED_MSG = "votre mot de passe est mis à jour.";
     public static final String USER_OLD_PASSWORD_MISMATCH_MSG = "votre ancien mot de passe n'est pas correcte";
+    public static final String USER_DIETARY_CONSTRAINTS_UPDATED_MSG = "Votre contraintes alimentaires sont mises à jour.";
+    public static final String USER_DIETARY_CONSTRAINTS_RETRIEVED_MSG = "Votre contraintes alimentaires sont récupérées.";
+
 
     /**
      * messages for roles operations
      */
     public static final String HOME_ROLES_RETRIEVED_MSG = "Les roles disponibles dans la maison.";
+
+
+    /**
+     * messages for allergies operations
+     */
+    public static final String ALLERGIES_RETRIEVED_MSG = "Les types allergies disponibles.";
 
 
     /**
@@ -37,6 +46,7 @@ public class Constants {
     public static final String HOME_ADMIN_LEAVE_CONSTRAINT_MSG = "Vous ne pouvez pas quitter la maison tant qu'il n'y a pas au moins un autre administrateur.";
     public static final String HOME_DETAILS_RETRIEVED_MSG = "Détails de la maison récupérés.";
     public static final String HOME_CREATED_MSG = "La maison a été créée avec succès.";
+    public static final String HOME_UPDATED_MSG = "La maison a été mise à jour avec succès." ;
     public static final String HOME_LEFT_MSG = "Vous avez quitté la maison avec succès.";
     public static final String USER_ALREADY_IN_HOME_MSG = "Cet utilisateur est déjà membre de cette maison.";
     public static final String USER_ADDED_TO_HOME_MSG = "Cet utilisateur est désormais un membre de votre maison";
@@ -48,6 +58,7 @@ public class Constants {
     public static final String HOME_MEMBER_DELETED_MSG = "Ce membre est supprimé de cette maison avec succès.";
     public static final String HOME_DIETARY_CONSTRAINTS_UPDATED_MSG = "Les contraintes alimentaires de votre maison sont mises à jour.";
     public static final String HOME_DIETARY_CONSTRAINTS_RETRIEVED_MSG = "Les contraintes alimentaires de votre maison sont récupérées.";
+    public static final String HOME_TOGGLE_GENERATION_MSG = "La génération automatique des repas est mise à jour.";
 
 
 
