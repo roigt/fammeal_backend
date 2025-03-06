@@ -9,10 +9,7 @@ import org.univartois.enums.Role;
 import org.univartois.repository.HomeRoleRepository;
 import org.univartois.service.RoleService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @ApplicationScoped
 public class RoleServiceImpl implements RoleService {
@@ -23,13 +20,15 @@ public class RoleServiceImpl implements RoleService {
     @Inject
     SecurityIdentity securityIdentity;
 
+
     //    @SuppressWarnings("unchecked")
     @Override
     public boolean hasAnyRoleByHomeId(UUID homeId, Role... roles) {
-        String roleInHome = ((Map<String, String>) securityIdentity.getAttributes().get("roles")).getOrDefault(homeId.toString(), null);
+        HomeRoleType roleInHome = getCurrentAuthUserRolesFromJwt().getOrDefault(homeId.toString(), null);
 
+        if (roleInHome == null) return false;
         for (Role role : roles) {
-            if (HomeRoleType.valueOf(roleInHome).includes(role)) {
+            if (roleInHome.includes(role)) {
                 return true;
             }
         }
@@ -37,15 +36,27 @@ public class RoleServiceImpl implements RoleService {
     }
 
 
+
     @Override
-    public Map<String, String> getRolesByUserId(UUID userId) {
+    public Map<String, HomeRoleType> getRolesByUserId(UUID userId) {
+        final Map<String, HomeRoleType> permissions = new HashMap<>();
+
         final List<HomeRoleEntity> roles = homeRoleRepository.findByUserId(userId);
 
-        final Map<String, String> permissions = new HashMap<>();
         roles.forEach(homeRole -> {
-            final String roleInHome = homeRole.getRole().toString();
+            final HomeRoleType roleInHome = homeRole.getRole();
             permissions.put(homeRole.getId().getHomeId().toString(), roleInHome);
         });
         return permissions;
+    }
+
+    @Override
+    public Map<String, HomeRoleType> getCurrentAuthUserRolesFromJwt() {
+        return (Map<String, HomeRoleType>) securityIdentity.getAttributes().getOrDefault("roles", new HashMap<>());
+    }
+
+    @Override
+    public List<HomeRoleType> getHomeRoles() {
+        return Arrays.stream(HomeRoleType.values()).toList();
     }
 }

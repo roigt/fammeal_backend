@@ -1,4 +1,4 @@
-package org.univartois.entity;
+package org.univartois.entity.id;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.univartois.utils.Constants;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -32,6 +34,11 @@ public class HomeEntity {
     private boolean lunchAutomaticGeneration;
 
     private boolean dinerAutomaticGeneration;
+
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "homes_allergies", joinColumns = @JoinColumn(name = "home_id"), inverseJoinColumns = @JoinColumn(name = "allergy_id"))
+    private Set<AllergyEntity> allergies = new HashSet<>();
 
 
 }

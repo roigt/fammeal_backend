@@ -7,36 +7,35 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.univartois.dto.request.ForgotPasswordRequestDto;
-import org.univartois.dto.request.UserAuthRequestDto;
-import org.univartois.dto.request.UserRegisterRequestDto;
-import org.univartois.dto.request.UserVerificationRequestDto;
+import org.univartois.dto.request.*;
 import org.univartois.dto.response.*;
+import org.univartois.entity.AllergyEntity;
 import org.univartois.entity.TokenEntity;
 import org.univartois.entity.UserEntity;
+import org.univartois.enums.HomeRoleType;
 import org.univartois.enums.TokenType;
 import org.univartois.event.ForgotPasswordEvent;
 import org.univartois.event.PasswordResetEvent;
 import org.univartois.event.UserCreatedEvent;
 import org.univartois.exception.*;
+import org.univartois.mapper.DietaryConstraintsMapper;
 import org.univartois.mapper.UserMapper;
+import org.univartois.repository.AllergyRepository;
 import org.univartois.repository.TokenRepository;
 import org.univartois.repository.UserRepository;
 import org.univartois.service.ImageService;
 import org.univartois.service.RoleService;
-import org.univartois.service.UserAuthService;
+import org.univartois.service.UserService;
 import org.univartois.utils.Constants;
 import org.univartois.utils.JwtTokenUtil;
 import org.univartois.utils.PasswordGenerator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @ApplicationScoped
-public class UserAuthServiceImpl implements UserAuthService {
+public class UserServiceImpl implements UserService {
 
     private static final int DEFAULT_TOKEN_EXPIRATION_HOURS = 24;
 
@@ -64,6 +63,12 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Inject
     ImageService imageService;
+
+    @Inject
+    AllergyRepository allergyRepository;
+
+    @Inject
+    DietaryConstraintsMapper dietaryConstraintsMapper;
 
     @Override
     @Transactional
@@ -133,7 +138,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         String accessToken = jwtTokenUtil.generateJwtToken(user);
-        Map<String, String> roles = roleService.getRolesByUserId(user.getId());
+        Map<String, HomeRoleType> roles = roleService.getRolesByUserId(user.getId());
 
         return userMapper.toAuthResponseDto(user, accessToken, roles);
     }
@@ -197,9 +202,42 @@ public class UserAuthServiceImpl implements UserAuthService {
 
 
     @Override
-    public UserAuthResponseDto getUserById(UUID userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
-        return userMapper.toAuthResponseDto(user, null, roleService.getRolesByUserId(user.getId()));
+    public UserAuthResponseDto getProfile() {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+        return userMapper.toAuthResponseDto(user, null, roleService.getCurrentAuthUserRolesFromJwt());
+    }
+
+    @Transactional
+    @Override
+    public UserAuthResponseDto updateProfile(UpdateAuthenticatedUserRequestDto updateAuthenticatedUserRequestDto) {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        if (userRepository.existsByUsernameAndNotId(updateAuthenticatedUserRequestDto.getUsername(), userId)){
+            throw new UserAlreadyExistsException(Constants.USERNAME_ALREADY_EXISTS_MSG);
+        }
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+
+        userMapper.updateEntity(user, updateAuthenticatedUserRequestDto);
+
+        return userMapper.toAuthResponseDto(user, null, roleService.getCurrentAuthUserRolesFromJwt());
+    }
+
+    @Transactional
+    @Override
+    public void updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto) {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+        if (!BcryptUtil.matches(updatePasswordRequestDto.getOldPassword(), user.getPassword())){
+            throw new OldPasswordMismatchException(Constants.USER_OLD_PASSWORD_MISMATCH_MSG);
+        }
+        user.setPassword(BcryptUtil.bcryptHash(updatePasswordRequestDto.getNewPassword()));
+    }
+
+    @Transactional
+    @Override
+    public void deleteProfile() {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        userRepository.deleteById(userId);
     }
 
     @Transactional
@@ -220,5 +258,28 @@ public class UserAuthServiceImpl implements UserAuthService {
     public void deleteProfilePicture() {
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
         userRepository.updateProfilePictureByUserId(userId, null);
+    }
+
+//    @TODO: optimize db queries
+    @Transactional
+    @Override
+    public DietaryConstraintsResponseDto updateDietaryConstraints(UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+
+        Set<AllergyEntity> allergies = new HashSet<>(allergyRepository.findByIds(updateDietaryConstraintsRequestDto.getAllergies()));
+        user.setAllergies(allergies);
+        user.setVegetarian(updateDietaryConstraintsRequestDto.isVegetarian());
+
+        return dietaryConstraintsMapper.toDietaryConstraintsResponseDto(user.isVegetarian(), allergies);
+    }
+
+//    @TODO: optimize db queries
+    @Override
+    public DietaryConstraintsResponseDto getDietaryConstraints() {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
+
+        return dietaryConstraintsMapper.toDietaryConstraintsResponseDto(user.isVegetarian(), user.getAllergies());
     }
 }

@@ -2,6 +2,8 @@ package org.univartois.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.univartois.enums.TokenType;
 
 import java.time.LocalDateTime;

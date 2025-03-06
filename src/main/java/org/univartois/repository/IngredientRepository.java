@@ -1,6 +1,7 @@
 package org.univartois.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.constraints.NotBlank;
@@ -11,12 +12,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class IngredientRepository implements PanacheRepository<IngredientEntity> {
-
-    public Optional<IngredientEntity> findById(UUID id) {
-        return find("idIngredient = ?1", id).firstResultOptional();
-    }
-
+public class IngredientRepository implements PanacheRepositoryBase<IngredientEntity, UUID> {
+    
 
     public IngredientEntity findByIdE(UUID id) {
         return find("idIngredient = ?1", id).firstResult();

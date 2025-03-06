@@ -1,6 +1,7 @@
 package org.univartois.dto.response;
 
 import lombok.*;
+import org.univartois.enums.HomeRoleType;
 
 import java.util.UUID;
 
@@ -26,5 +27,5 @@ public class HomeMemberResponseDto {
 
     private boolean verified;
 
-    private String role;
+    private HomeRoleType role;
 }

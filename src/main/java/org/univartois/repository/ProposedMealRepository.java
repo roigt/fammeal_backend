@@ -1,8 +1,7 @@
 package org.univartois.repository;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
-import org.univartois.entity.MealEntity;
 import org.univartois.entity.ProposedMealEntity;
 import org.univartois.entity.ProposedMealEntity.ProposedMealId;
 
@@ -12,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class ProposedMealRepository implements PanacheRepository<ProposedMealEntity> {
+public class ProposedMealRepository implements PanacheRepositoryBase<ProposedMealEntity, ProposedMealId> {
 
 
     public List<ProposedMealEntity> findByAllPropositions() {
@@ -22,6 +21,7 @@ public class ProposedMealRepository implements PanacheRepository<ProposedMealEnt
 
     /**
      * Trouver les repas proposés pour un repas spécifique.
+     *
      * @param mealId l'UUID du repas
      * @return Liste des ProposedMealEntity associés au repas
      */
@@ -31,6 +31,7 @@ public class ProposedMealRepository implements PanacheRepository<ProposedMealEnt
 
     /**
      * Trouver les repas proposés pour une recette spécifique.
+     *
      * @param recipeId l'UUID de la recette
      * @return Liste des ProposedMealEntity associés à la recette
      */
@@ -40,6 +41,7 @@ public class ProposedMealRepository implements PanacheRepository<ProposedMealEnt
 
     /**
      * Trouver les repas proposés par un utilisateur spécifique.
+     *
      * @param proposerId l'UUID de l'utilisateur proposant le repas
      * @return Liste des ProposedMealEntity proposés par l'utilisateur
      */
@@ -49,8 +51,9 @@ public class ProposedMealRepository implements PanacheRepository<ProposedMealEnt
 
     /**
      * Trouver une proposition spécifique par son ID composite.
-     * @param recipeId l'UUID de la recette
-     * @param mealId l'UUID du repas
+     *
+     * @param recipeId   l'UUID de la recette
+     * @param mealId     l'UUID du repas
      * @param proposerId l'UUID du proposeur
      * @return Optional<ProposedMealEntity>
      */
@@ -58,8 +61,8 @@ public class ProposedMealRepository implements PanacheRepository<ProposedMealEnt
         return find("recipe.id = ?1 AND meal.id = ?2 AND proposer.id = ?3", recipeId, mealId, proposerId).firstResultOptional();
     }
 
-    public ProposedMealEntity findByMealIdAndProposerId( UUID mealId, UUID proposerId) {
-        return find(" meal.id = ?1  AND proposer.id=?2", mealId,proposerId).firstResult();
+    public ProposedMealEntity findByMealIdAndProposerId(UUID mealId, UUID proposerId) {
+        return find(" meal.id = ?1  AND proposer.id=?2", mealId, proposerId).firstResult();
 
     }
 
@@ -67,15 +70,16 @@ public class ProposedMealRepository implements PanacheRepository<ProposedMealEnt
         return find(" proposer.id = ?1", proposerId).list();
     }
 
-    public List<ProposedMealEntity> getProposedMealsByDate( LocalDate date) {
+    public List<ProposedMealEntity> getProposedMealsByDate(LocalDate date) {
         return find("meal.mealDate = ?1", date).list();
     }
 
 
     /**
      * Supprimer une proposition spécifique par son ID composite.
-     * @param recipeId l'UUID de la recette
-     * @param mealId l'UUID du repas
+     *
+     * @param recipeId   l'UUID de la recette
+     * @param mealId     l'UUID du repas
      * @param proposerId l'UUID du proposeur
      */
     public void deleteById(UUID recipeId, UUID mealId, UUID proposerId) {

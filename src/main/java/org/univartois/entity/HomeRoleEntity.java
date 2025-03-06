@@ -3,6 +3,7 @@ package org.univartois.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import org.univartois.entity.id.HomeRoleId;
 import org.univartois.enums.HomeRoleType;
 
 import java.util.Objects;

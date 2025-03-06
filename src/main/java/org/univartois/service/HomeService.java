@@ -1,8 +1,7 @@
 package org.univartois.service;
 
-import org.univartois.dto.request.AddHomeMemberRequestDto;
-import org.univartois.dto.request.CreateHomeRequestDto;
-import org.univartois.dto.request.UpdateHomeMemberRequestDto;
+import org.univartois.dto.request.*;
+import org.univartois.dto.response.DietaryConstraintsResponseDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.HomeResponseDto;
 
@@ -12,13 +11,14 @@ import java.util.UUID;
 public interface HomeService {
 
     HomeResponseDto createHome(CreateHomeRequestDto createHomeRequestDto);
+
     HomeResponseDto getHomeById(UUID homeId);
 
-    List<HomeResponseDto> getUserHomes(UUID userId);
+    List<HomeResponseDto> getMyHomes();
 
     void leaveHome(UUID homeId);
 
-    void addHomeMember(UUID homeId, AddHomeMemberRequestDto addHomeMemberRequestDto);
+    HomeMemberResponseDto addHomeMember(UUID homeId, AddHomeMemberRequestDto addHomeMemberRequestDto);
 
     List<HomeMemberResponseDto> getHomeMembers(UUID homeId);
 
@@ -27,4 +27,12 @@ public interface HomeService {
     HomeMemberResponseDto updateHomeMember(UUID homeId, UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto);
 
     void deleteHomeMember(UUID homeId, UUID userId);
+
+    DietaryConstraintsResponseDto updateDietaryConstraints(UUID homeId, UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto);
+
+    DietaryConstraintsResponseDto getDietaryConstraints(UUID homeId);
+
+    HomeResponseDto updateHome(UUID homeId, UpdateHomeRequestDto updateHomeRequestDto);
+
+    void toggleMealGeneration(UUID homeId, boolean lunch);
 }
