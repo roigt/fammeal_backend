@@ -52,7 +52,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public RecipeResponseDto createRecipe(RecipeRequestDto createRecipeRequestDto) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        UserEntity creator = userRepository.findById(userId)
+        UserEntity creator = userRepository.findByIdOptional(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         RecipeEntity recipeEntity = new RecipeEntity();
@@ -109,7 +109,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public RecipeResponseDto getRecipeById(UUID recipeId) {
 
-        RecipeEntity recipeEntity = recipeRepository.findById(recipeId)
+        RecipeEntity recipeEntity = recipeRepository.findByIdOptional(recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found"));
         List<RecipesIngredientsEntity> recipeIngredients = recipesIngredientsRepository.findByRecipeId(recipeId);
         RecipeResponseDto recipeResponseDto = recipeMapper.toResponseDto(recipeEntity);
@@ -166,7 +166,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional
     @Override
     public RecipeResponseDto updateRecipe(UUID recipeId, RecipeRequestDto recipeRequestDto) {
-        RecipeEntity recipeEntity = recipeRepository.findById(recipeId)
+        RecipeEntity recipeEntity = recipeRepository.findByIdOptional(recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found"));
 
         recipeEntity.setRecipeName(recipeRequestDto.getRecipeName());
@@ -225,7 +225,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional
     @Override
     public void deleteRecipe(UUID recipeId) {
-        RecipeEntity recipeEntity = recipeRepository.findById(recipeId)
+        RecipeEntity recipeEntity = recipeRepository.findByIdOptional(recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found"));
         //  soft delete
          recipeEntity.setUser(null);

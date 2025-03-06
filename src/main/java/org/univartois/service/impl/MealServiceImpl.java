@@ -50,7 +50,7 @@ public class MealServiceImpl implements MealService {
      */
     @Override
     public List<MealResponseDto> getMealsByHome(UUID homeId) {
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
         List<MealEntity> meals = mealRepository.findByHome(homeId);
@@ -60,7 +60,7 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public MealResponseDto getMealsByHomeAndIdMeal(UUID homeId, UUID mealId) {
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
 
@@ -128,13 +128,13 @@ public class MealServiceImpl implements MealService {
     @Override
     public MealResponseDto planMeal(UUID homeId, MealRequestDto mealRequestDto) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        Optional<UserEntity> user = userRepository.findById(userId);
+        Optional<UserEntity> user = userRepository.findByIdOptional(userId);
 
 
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
-        RecipeEntity recipe = recipeRepository.findById(mealRequestDto.getIdRecipe())
+        RecipeEntity recipe = recipeRepository.findByIdOptional(mealRequestDto.getIdRecipe())
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
 
@@ -183,16 +183,16 @@ public class MealServiceImpl implements MealService {
     @Override
     public MealResponseDto updateMeal(UUID homeId, UUID mealId, MealRequestDto mealRequestDto) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        Optional<UserEntity> user = userRepository.findById(userId);
+        Optional<UserEntity> user = userRepository.findByIdOptional(userId);
 
 
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Home not found"));
 
-        MealEntity mealEntity = mealRepository.findById(mealId)
+        MealEntity mealEntity = mealRepository.findByIdOptional(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found"));
 
-        RecipeEntity recipe = recipeRepository.findById(mealRequestDto.getIdRecipe())
+        RecipeEntity recipe = recipeRepository.findByIdOptional(mealRequestDto.getIdRecipe())
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
 
@@ -238,10 +238,10 @@ public class MealServiceImpl implements MealService {
     @Override
     public void deleteMeal(UUID homeId, UUID mealId) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Home not found"));
 
-        MealEntity mealEntity = mealRepository.findById(mealId)
+        MealEntity mealEntity = mealRepository.findByIdOptional(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found"));
 
         ProposedMealEntity proposeOld = proposedMealRepository.findByMealIdAndProposerId(mealId,userId);

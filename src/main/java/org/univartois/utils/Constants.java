@@ -10,6 +10,7 @@ public class Constants {
     public static final String ACCOUNT_NOT_VERIFIED_MSG = "Votre compte n'a pas encore été vérifié. Veuillez vérifier votre e-mail pour activer votre compte.";
     public static final String ACCOUNT_ALREADY_VERIFIED_MSG = "Ce compte a déjà été vérifié.";
     public static final String EMAIL_INVALID_MSG = "Adresse mail invalide. Veuillez créer un compte.";
+    public static final String USER_PROFILE_RETRIEVED = "informations de votre profile.";
     public static final String PASSWORD_INVALID_MSG = "Mot de passe invalide !";
     public static final String ACCOUNT_CREATED_MSG = "Votre compte a été créé avec succès.";
     public static final String ACCOUNT_ACTIVATED_MSG = "Votre compte est désormais activé !";
@@ -21,10 +22,13 @@ public class Constants {
     public static final String USER_PROFILE_PICTURE_DELETED_MSG = "votre photo de profile est supprimée.";
     public static final String USER_PROFILE_UPDATED_MSG = "votre profile est mis à jour.";
     public static final String USER_DELETED_MSG = "votre compte est supprimé.";
+    public static final String USER_PASSWORD_RESET_MSG = "votre nouveau mot de passe est réinitialisé. Veuillez vérifier votre adresse mail.";
+    public static final String USER_AUTHENTICATED_MSG = "authentification réussie. Bienvenue dans votre espace fammeal.";
     public static final String USER_PASSWORD_UPDATED_MSG = "votre mot de passe est mis à jour.";
     public static final String USER_OLD_PASSWORD_MISMATCH_MSG = "votre ancien mot de passe n'est pas correcte";
     public static final String USER_DIETARY_CONSTRAINTS_UPDATED_MSG = "Votre contraintes alimentaires sont mises à jour.";
     public static final String USER_DIETARY_CONSTRAINTS_RETRIEVED_MSG = "Votre contraintes alimentaires sont récupérées.";
+    public static final String USER_HOMES_RETRIEVED_MSG = "La liste de vos maisons est récupérée.";
 
 
     /**

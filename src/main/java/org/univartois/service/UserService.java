@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.univartois.dto.request.*;
 import org.univartois.dto.response.*;
 
-public interface UserAuthService {
+public interface UserService {
     UserRegisterResponseDto registerUser(UserRegisterRequestDto userRegisterRequestDto);
 
     VerificationAccountResponseDto verifyAccount(String token);
@@ -18,20 +18,20 @@ public interface UserAuthService {
 
     void resetPassword(@NotBlank String token);
 
-    UserAuthResponseDto getCurentAuthenticatedUser();
+    UserAuthResponseDto getProfile();
 
     UpdateProfilePictureResponseDto updateProfilePicture(byte[] image);
 
     void deleteProfilePicture();
 
-    UserAuthResponseDto updateCurrentAuthenticatedUser(UpdateAuthenticatedUserRequestDto updateAuthenticatedUserRequestDto);
+    UserAuthResponseDto updateProfile(UpdateAuthenticatedUserRequestDto updateAuthenticatedUserRequestDto);
 
-    void deleteCurrentAuthenticatedUser();
+    void deleteProfile();
 
     void updatePassword(@Valid UpdatePasswordRequestDto updatePasswordRequestDto);
 
 
-    DietaryConstraintsResponseDto updateCurrentAuthUserDietaryConstraints(UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto);
+    DietaryConstraintsResponseDto updateDietaryConstraints(UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto);
 
-    DietaryConstraintsResponseDto getCurrentAuthUserDietaryConstraints();
+    DietaryConstraintsResponseDto getDietaryConstraints();
 }

@@ -2,7 +2,7 @@ package org.univartois.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
-import org.univartois.compositekey.RecipesIngredientsId;
+import org.univartois.entity.id.RecipesIngredientsId;
 
 @Entity
 @Table(name = "recipes_ingredients")

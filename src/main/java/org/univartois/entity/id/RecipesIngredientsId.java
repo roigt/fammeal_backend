@@ -1,4 +1,4 @@
-package org.univartois.compositekey;
+package org.univartois.entity.id;
 
 
 import jakarta.persistence.Embeddable;

@@ -3,7 +3,7 @@ package org.univartois.repository;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.univartois.entity.HomeRoleEntity;
-import org.univartois.entity.HomeRoleId;
+import org.univartois.entity.id.HomeRoleId;
 import org.univartois.enums.HomeRoleType;
 
 import java.util.List;

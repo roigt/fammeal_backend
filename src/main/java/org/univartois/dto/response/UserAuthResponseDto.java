@@ -1,6 +1,7 @@
 package org.univartois.dto.response;
 
 import lombok.*;
+import org.univartois.enums.HomeRoleType;
 
 import java.util.*;
 
@@ -29,6 +30,6 @@ public class UserAuthResponseDto {
     private boolean verified = false;
 
     @Builder.Default
-    private Map<String, String> roles = new HashMap<>();
+    private Map<String, HomeRoleType> roles = new HashMap<>();
 
 }

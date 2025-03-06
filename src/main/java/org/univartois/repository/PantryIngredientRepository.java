@@ -1,6 +1,7 @@
 package org.univartois.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.univartois.entity.HomeEntity;
 import org.univartois.entity.IngredientEntity;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class PantryIngredientRepository implements PanacheRepository<PantryIngredientEntity> {
+public class PantryIngredientRepository implements PanacheRepositoryBase<PantryIngredientEntity, UUID> {
 
 
     /**

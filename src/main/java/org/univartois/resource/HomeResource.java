@@ -78,9 +78,9 @@ public class HomeResource {
     @Path("/{homeId}/members")
     @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<Object>> addHomeMember(@PathParam("homeId") UUID homeId, @Valid AddHomeMemberRequestDto addHomeMemberRequestDto) {
-        homeService.addHomeMember(homeId, addHomeMemberRequestDto);
-        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_ADDED_TO_HOME_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    public RestResponse<ApiResponse<HomeMemberResponseDto>> addHomeMember(@PathParam("homeId") UUID homeId, @Valid AddHomeMemberRequestDto addHomeMemberRequestDto) {
+        final HomeMemberResponseDto homeMemberResponseDto = homeService.addHomeMember(homeId, addHomeMemberRequestDto);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeMemberResponseDto, Constants.USER_ADDED_TO_HOME_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @GET
@@ -96,7 +96,7 @@ public class HomeResource {
     @Path("/{homeId}/members/{userId}")
     @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<HomeMemberResponseDto>> getHomeMembers(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId) {
+    public RestResponse<ApiResponse<HomeMemberResponseDto>> getHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId) {
         final HomeMemberResponseDto homeMember = homeService.getHomeMember(homeId, userId);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeMember, Constants.HOME_MEMBER_DETAILS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }

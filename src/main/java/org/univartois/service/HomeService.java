@@ -14,11 +14,11 @@ public interface HomeService {
 
     HomeResponseDto getHomeById(UUID homeId);
 
-    List<HomeResponseDto> getUserHomes(UUID userId);
+    List<HomeResponseDto> getMyHomes();
 
     void leaveHome(UUID homeId);
 
-    void addHomeMember(UUID homeId, AddHomeMemberRequestDto addHomeMemberRequestDto);
+    HomeMemberResponseDto addHomeMember(UUID homeId, AddHomeMemberRequestDto addHomeMemberRequestDto);
 
     List<HomeMemberResponseDto> getHomeMembers(UUID homeId);
 

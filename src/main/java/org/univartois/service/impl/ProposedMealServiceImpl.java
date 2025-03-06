@@ -45,7 +45,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
      */
     @Override
     public List<ProposedMealResponseDto> getAllProposedMeals(UUID homeId) {
-        HomeEntity  home = homeRepository.findById(homeId)
+        HomeEntity  home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
         return proposedMealMapper.toResponseDtoList(proposedMealRepository.findByAllPropositions());
     }
@@ -57,7 +57,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
      */
     @Override
     public List<ProposedMealResponseDto> getProposedMealsByMealId(UUID homeId,UUID mealId) {
-        HomeEntity  home = homeRepository.findById(homeId)
+        HomeEntity  home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
         List<ProposedMealEntity> proposedMeals = proposedMealRepository.findByMealId(mealId);
@@ -77,16 +77,16 @@ public class ProposedMealServiceImpl implements ProposedMealService {
     @Override
     public ProposedMealResponseDto proposeMeal(UUID homeId,ProposedMealRequestDto proposedMealRequestDto) {
 
-        HomeEntity  home = homeRepository.findById(homeId)
+        HomeEntity  home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
-        RecipeEntity recipe = recipeRepository.findById(proposedMealRequestDto.getRecipeId())
+        RecipeEntity recipe = recipeRepository.findByIdOptional(proposedMealRequestDto.getRecipeId())
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
-        MealEntity meal = mealRepository.findById(proposedMealRequestDto.getMealId())
+        MealEntity meal = mealRepository.findByIdOptional(proposedMealRequestDto.getMealId())
                 .orElseThrow(() -> new RuntimeException("Meal not found"));
 
-        UserEntity proposer = userRepository.findById(proposedMealRequestDto.getProposerId())
+        UserEntity proposer = userRepository.findByIdOptional(proposedMealRequestDto.getProposerId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
 
@@ -115,7 +115,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
                 .orElseThrow(() -> new ResourceNotFoundException("Proposed meal not found"));
 
 
-        RecipeEntity newRecipe = recipeRepository.findById(proposedMealRequestDto.getRecipeId())
+        RecipeEntity newRecipe = recipeRepository.findByIdOptional(proposedMealRequestDto.getRecipeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found"));
 
         proposedMealEntity.setRecipe(newRecipe);

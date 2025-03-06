@@ -8,7 +8,11 @@ import org.univartois.dto.request.*;
 import org.univartois.dto.response.DietaryConstraintsResponseDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.HomeResponseDto;
-import org.univartois.entity.*;
+import org.univartois.entity.AllergyEntity;
+import org.univartois.entity.HomeEntity;
+import org.univartois.entity.HomeRoleEntity;
+import org.univartois.entity.UserEntity;
+import org.univartois.entity.id.HomeRoleId;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.exception.AdminRoleModificationException;
 import org.univartois.exception.CannotLeaveHomeException;
@@ -61,7 +65,7 @@ public class HomeServiceImpl implements HomeService {
         HomeRoleEntity homeRole = HomeRoleEntity.builder().home(home).user(user).role(HomeRoleType.ADMIN).build();
         homeRoleRepository.persist(homeRole);
 
-        return homeMapper.toHomeResponseDto(home, HomeRoleType.ADMIN.name());
+        return homeMapper.toHomeResponseDto(home, HomeRoleType.ADMIN);
     }
 
     @Transactional
@@ -71,20 +75,20 @@ public class HomeServiceImpl implements HomeService {
 
         home.setName(updateHomeRequestDto.getName());
 
-        return homeMapper.toHomeResponseDto(home, HomeRoleType.ADMIN.name());
+        return homeMapper.toHomeResponseDto(home, HomeRoleType.ADMIN);
     }
 
     @Override
     public HomeResponseDto getHomeById(UUID homeId) {
         final HomeEntity home = homeRepository.findByIdOptional(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
-        UUID userId = UUID.fromString(jsonWebToken.getSubject());
-        String roleInHome = roleService.getRolesByUserId(userId).getOrDefault(homeId.toString(), null);
+        HomeRoleType roleInHome = roleService.getCurrentAuthUserRolesFromJwt().getOrDefault(homeId.toString(), null);
         return homeMapper.toHomeResponseDto(home, roleInHome);
     }
 
     @Override
-    public List<HomeResponseDto> getUserHomes(UUID userId) {
-        Map<String, String> roles = roleService.getRolesByUserId(userId);
+    public List<HomeResponseDto> getMyHomes() {
+        UUID userId = UUID.fromString(jsonWebToken.getSubject());
+        Map<String, HomeRoleType> roles = roleService.getCurrentAuthUserRolesFromJwt();
         return homeRepository.findHomesByUserId(userId).stream().map((home) -> homeMapper.toHomeResponseDto(home, roles.getOrDefault(home.getId().toString(), null))).toList();
     }
 
@@ -92,9 +96,9 @@ public class HomeServiceImpl implements HomeService {
     @Override
     public void leaveHome(UUID homeId) {
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
-        String roleInHome = roleService.getRolesByUserId(userId).getOrDefault(homeId.toString(), null);
+        HomeRoleType roleInHome = roleService.getCurrentAuthUserRolesFromJwt().getOrDefault(homeId.toString(), null);
 
-        if (roleInHome != null && HomeRoleType.valueOf(roleInHome).equals(HomeRoleType.ADMIN) && homeRoleRepository.countAdminRolesByHomeId(homeId) <= 1) {
+        if (roleInHome != null && roleInHome.equals(HomeRoleType.ADMIN) && homeRoleRepository.countAdminRolesByHomeId(homeId) <= 1) {
             throw new CannotLeaveHomeException(Constants.HOME_ADMIN_LEAVE_CONSTRAINT_MSG);
         }
 
@@ -103,7 +107,7 @@ public class HomeServiceImpl implements HomeService {
 
     @Transactional
     @Override
-    public void addHomeMember(UUID homeId, AddHomeMemberRequestDto addHomeMemberRequestDto) {
+    public HomeMemberResponseDto addHomeMember(UUID homeId, AddHomeMemberRequestDto addHomeMemberRequestDto) {
         UserEntity user = userRepository.findByEmail(addHomeMemberRequestDto.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
 
@@ -116,6 +120,10 @@ public class HomeServiceImpl implements HomeService {
 
         HomeRoleEntity homeRole = HomeRoleEntity.builder().user(user).home(home).role(addHomeMemberRequestDto.getRole()).build();
         homeRoleRepository.persist(homeRole);
+        return userMapper.toHomeMemberResponseDto(
+                user,
+                addHomeMemberRequestDto.getRole()
+        );
     }
 
     //    @TODO: optimize db queries later
@@ -126,7 +134,7 @@ public class HomeServiceImpl implements HomeService {
                         user,
                         user.getRoles().stream()
                                 .filter(role -> role.getId().getHomeId().equals(homeId))
-                                .map(role -> role.getRole().toString())
+                                .map(HomeRoleEntity::getRole)
                                 .findFirst().orElse(null)
                 ))
                 .toList();
@@ -139,7 +147,10 @@ public class HomeServiceImpl implements HomeService {
 
         return userMapper.toHomeMemberResponseDto(
                 user,
-                user.getRoles().stream().filter(homeRoleEntity -> homeRoleEntity.getId().getHomeId().equals(homeId)).map(homeRoleEntity -> homeRoleEntity.getRole().toString()).findFirst().orElse(null)
+                user.getRoles().stream()
+                        .filter(homeRoleEntity -> homeRoleEntity.getId().getHomeId().equals(homeId))
+                        .map(HomeRoleEntity::getRole)
+                        .findFirst().orElse(null)
         );
     }
 
@@ -159,7 +170,7 @@ public class HomeServiceImpl implements HomeService {
         });
         return userMapper.toHomeMemberResponseDto(
                 user,
-                user.getRoles().stream().filter(homeRoleEntity -> homeRoleEntity.getId().getUserId().equals(userId) && homeRoleEntity.getId().getHomeId().equals(homeId)).map(homeRoleEntity -> homeRoleEntity.getRole().toString()).findFirst().orElse(null)
+                updateHomeMemberRequestDto.getRole()
         );
     }
 
@@ -173,7 +184,7 @@ public class HomeServiceImpl implements HomeService {
         homeRoleRepository.deleteById(new HomeRoleId(homeId, userId));
     }
 
-//    @TODO: optimize db queries
+    //    @TODO: optimize db queries
     @Transactional
     @Override
     public DietaryConstraintsResponseDto updateDietaryConstraints(UUID homeId, UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
@@ -186,7 +197,7 @@ public class HomeServiceImpl implements HomeService {
         return dietaryConstraintsMapper.toDietaryConstraintsResponseDto(home.isVegetarian(), allergies);
     }
 
-//    @TODO: optimize db queries
+    //    @TODO: optimize db queries
     @Override
     public DietaryConstraintsResponseDto getDietaryConstraints(UUID homeId) {
         HomeEntity home = homeRepository.findByIdOptional(homeId).orElseThrow(() -> new ResourceNotFoundException(Constants.HOME_NOT_FOUND_MSG));
