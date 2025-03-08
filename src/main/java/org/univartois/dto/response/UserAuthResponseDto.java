@@ -30,6 +30,6 @@ public class UserAuthResponseDto {
     private boolean verified = false;
 
     @Builder.Default
-    private Map<String, HomeRoleType> roles = new HashMap<>();
+    private Map<String, HomeRoleTypeResponseDto> roles = new HashMap<>();
 
 }

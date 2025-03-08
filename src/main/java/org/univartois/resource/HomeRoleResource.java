@@ -8,6 +8,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.univartois.dto.response.ApiResponse;
+import org.univartois.dto.response.HomeRoleTypeResponseDto;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.service.RoleService;
 import org.univartois.utils.Constants;
@@ -27,8 +28,8 @@ public class HomeRoleResource {
 
     @Authenticated
     @GET
-    public RestResponse<ApiResponse<List<HomeRoleType>>> getHomeRoles(){
-        List<HomeRoleType> homeRoles = roleService.getHomeRoles();
+    public RestResponse<ApiResponse<List<HomeRoleTypeResponseDto>>> getHomeRoles(){
+        List<HomeRoleTypeResponseDto> homeRoles = roleService.getHomeRoles();
 
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeRoles, Constants.HOME_ROLES_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }

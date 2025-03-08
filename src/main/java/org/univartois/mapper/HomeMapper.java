@@ -6,7 +6,7 @@ import org.univartois.dto.response.HomeResponseDto;
 import org.univartois.entity.HomeEntity;
 import org.univartois.enums.HomeRoleType;
 
-@Mapper(componentModel = "jakarta")
+@Mapper(componentModel = "jakarta", uses = {HomeRoleTypeMapper.class})
 public interface HomeMapper {
 
     HomeEntity toEntity(CreateHomeRequestDto createHomeRequestDto);

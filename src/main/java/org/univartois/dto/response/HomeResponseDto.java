@@ -22,6 +22,6 @@ public class HomeResponseDto {
 
     private boolean dinerAutomaticGeneration;
 
-    private HomeRoleType role;
+    private HomeRoleTypeResponseDto role;
 
 }

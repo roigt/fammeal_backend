@@ -1,15 +1,12 @@
 package org.univartois.enums;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
-import org.univartois.serializer.json.HomeRoleTypeSerializer;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@JsonSerialize(using = HomeRoleTypeSerializer.class)
 public enum HomeRoleType implements Role {
-    ADMIN("Admin"),CHEF_REPAS("Chef des repas"), PROPOSITION_REPAS("Proposition des repas"), GARDE_MANGER("Garde manger"), MEMBER("Membre");
+    ADMIN("Administrateur"), CHEF_REPAS("Chef des repas"), PROPOSITION_REPAS("Proposition des repas"), GARDE_MANGER("Garde manger"), MEMBER("Membre");
 
     @Getter
     private final String value;

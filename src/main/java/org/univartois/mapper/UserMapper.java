@@ -14,7 +14,7 @@ import org.univartois.enums.HomeRoleType;
 
 import java.util.Map;
 
-@Mapper(componentModel = "jakarta")
+@Mapper(componentModel = "jakarta", uses = {HomeRoleTypeMapper.class})
 public interface UserMapper {
 
     @Mapping(source = "password", target = "password", qualifiedByName = "encodePassword")
