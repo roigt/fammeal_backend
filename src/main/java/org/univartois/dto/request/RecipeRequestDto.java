@@ -18,7 +18,7 @@ import java.util.UUID;
 public class RecipeRequestDto {
 
 
-    private String recipeImageLink;
+//    private String recipeImageLink;
     private String recipeName;
     private int prepTimeMinutes;
     private String recipeVideoLink;
@@ -27,7 +27,6 @@ public class RecipeRequestDto {
     private boolean recipeLunchBox;
     private int recipeNbCovers;
     private int cookTimeMinutes;
-//    List<UUID> idsIngredients;
-   private Map<UUID, Float> ingredients ;
-   // List<Integer> quantityNeed;
+    private Map<UUID, Float> ingredients ;
+
 }

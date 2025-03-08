@@ -4,94 +4,28 @@ import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import org.univartois.dto.request.MealRequestDto;
 import org.univartois.dto.response.*;
-import org.univartois.enums.HomeRoleType;
-import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.service.MealService;
 import org.univartois.utils.ResponseUtil;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
+
 @Path("/api/homes/{idHome}/meals")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class MealResource {
+public class MealResource{
+
 
     @Inject
     MealService mealService;
+
     @Inject
     UriInfo uriInfo;
-
-    /**
-     * Récupérer le planning des repas pour une maison
-     * @param homeId l'ID de la maison
-     * @return Response contenant la liste des repas
-     */
-    @GET
-    @Authenticated
-  //  @HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public  RestResponse<ApiResponse<List<MealResponseDto>>>  getMeals(@PathParam("idHome") UUID homeId) {
-        try {
-            List<MealResponseDto> meals = mealService.getMealsByHome(homeId);
-            return RestResponse.status(
-                    RestResponse.Status.OK,
-                    ResponseUtil.success(meals, "Liste des repas récupérée.", RestResponse.Status.OK, uriInfo.getPath())
-            );
-        } catch (RuntimeException e) {
-            return RestResponse.status(
-                    RestResponse.Status.NOT_FOUND,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "homeId",
-                            "Erreur lors de la récupération de la liste des repas planifié dans une maison",
-                            RestResponse.Status.NOT_FOUND,
-                            uriInfo.getPath()
-                    )
-            );
-        }
-
-    }
-
-    /**
-     *
-     * @param homeId
-     * @param idMeal
-     * @return
-     */
-    @GET
-    @Path("/{idMeal}")
-    @Authenticated
-    //  @HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public  RestResponse<ApiResponse<MealResponseDto>>  getMeals(@PathParam("idHome") UUID homeId, @PathParam("idMeal") UUID idMeal) {
-        try {
-            MealResponseDto meals = mealService.getMealsByHomeAndIdMeal(homeId,idMeal);
-            return RestResponse.status(
-                    RestResponse.Status.OK,
-                    ResponseUtil.success(meals, "Liste des repas récupérée.", RestResponse.Status.OK, uriInfo.getPath())
-            );
-        } catch (RuntimeException e) {
-            return RestResponse.status(
-                    RestResponse.Status.NOT_FOUND,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "homeId",
-                            "Erreur lors de la récupération de la liste des repas planifié dans une maison",
-                            RestResponse.Status.NOT_FOUND,
-                            uriInfo.getPath()
-                    )
-            );
-        }
-
-    }
 
     @GET
     @Path("/DateTo")

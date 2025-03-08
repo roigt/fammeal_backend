@@ -38,8 +38,8 @@ public class ProposedMealEntity {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ProposedMealId implements Serializable {
-        private UUID recipe; // Matches the type of RecipeEntity's primary key
-        private UUID meal;   // Matches the type of MealEntity's primary key
-        private UUID proposer; // Matches the type of UserEntity's primary key
+        private UUID recipe;
+        private UUID meal;
+        private UUID proposer;
     }
 }

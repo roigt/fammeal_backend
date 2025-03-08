@@ -163,19 +163,21 @@ public class ProposedMealResource {
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<ProposedMealResponseDto>>  proposeMeal(@PathParam("homeId") UUID homeId, ProposedMealRequestDto proposedMealRequestDto) {
 
+
         try {
+
             ProposedMealResponseDto responseDto = proposedMealService.proposeMeal(homeId,proposedMealRequestDto);
 
             return RestResponse.status(
                     RestResponse.Status.CREATED,
                     ResponseUtil.success(responseDto, "Repas ajouté a la liste des repas proposé.", RestResponse.Status.CREATED, uriInfo.getPath())
             );
-        } catch (ResourceNotFoundException e) {
+        } catch (RuntimeException e) {
             return RestResponse.status(
                     RestResponse.Status.NOT_FOUND,
                     ResponseUtil.error(
                             e.getMessage(),
-                            "homeId",
+                            "mealId",
                             "Erreur lors de l'ajout du repas à la liste des repas proposés",
                             RestResponse.Status.NOT_FOUND,
                             uriInfo.getPath()
@@ -194,57 +196,54 @@ public class ProposedMealResource {
      * @param proposedMealRequestDto
      * @return Response
      */
-    @PUT
-    @Authenticated
-    @Path("/{recipeId}/{mealId}/{proposerId}")
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<ProposedMealResponseDto>> updateProposedMeal(
-            @PathParam("homeId") UUID homeId,
-            @PathParam("recipeId") UUID recipeId,
-            @PathParam("mealId") UUID mealId,
-            @PathParam("proposerId") UUID proposerId,
-            ProposedMealRequestDto proposedMealRequestDto) {
-
-        try {
-            ProposedMealResponseDto responseDto = proposedMealService.updateProposedMeal(recipeId, mealId, proposerId, proposedMealRequestDto);
-
-            return RestResponse.status(
-                    RestResponse.Status.OK,
-                    ResponseUtil.success(responseDto, "Repas proposé mise a jour avec succès", RestResponse.Status.OK, uriInfo.getPath())
-            );
-        } catch (ResourceNotFoundException e) {
-            return RestResponse.status(
-                    RestResponse.Status.NOT_FOUND,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "homeId, recipeId, mealId, proposerId",
-                            "Erreur lors de la mise a jour du repas repas proposé",
-                            RestResponse.Status.NOT_FOUND,
-                            uriInfo.getPath()
-                    )
-            );
-        }
-
-
-    }
+//    @PUT
+//    @Authenticated
+//    @Path("/{recipeId}/{mealId}/{proposerId}")
+//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    public RestResponse<ApiResponse<ProposedMealResponseDto>> updateProposedMeal(
+//            @PathParam("homeId") UUID homeId,
+//            @PathParam("recipeId") UUID recipeId,
+//            @PathParam("mealId") UUID mealId,
+//            @PathParam("proposerId") UUID proposerId,
+//            ProposedMealRequestDto proposedMealRequestDto) {
+//
+//        try {
+//            ProposedMealResponseDto responseDto = proposedMealService.updateProposedMeal(recipeId, mealId, proposerId, proposedMealRequestDto);
+//
+//            return RestResponse.status(
+//                    RestResponse.Status.OK,
+//                    ResponseUtil.success(responseDto, "Repas proposé mise a jour avec succès", RestResponse.Status.OK, uriInfo.getPath())
+//            );
+//        } catch (ResourceNotFoundException e) {
+//            return RestResponse.status(
+//                    RestResponse.Status.NOT_FOUND,
+//                    ResponseUtil.error(
+//                            e.getMessage(),
+//                            "homeId, recipeId, mealId, proposerId",
+//                            "Erreur lors de la mise a jour du repas repas proposé",
+//                            RestResponse.Status.NOT_FOUND,
+//                            uriInfo.getPath()
+//                    )
+//            );
+//        }
+//
+//
+//    }
 
     /**
      * Supprimer une proposition de repas
-     * @param recipeId
-     * @param mealId
-     * @param proposerId
+
      * @return Response
      */
     @DELETE
     @Authenticated
-    @Path("/{recipeId}/{mealId}/{proposerId}")
+    @Path("/")
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public Response deleteProposedMeal(
             @PathParam("homeId") UUID homeId,
-            @PathParam("recipeId") UUID recipeId,
-            @PathParam("mealId") UUID mealId,
-            @PathParam("proposerId") UUID proposerId) {
-        proposedMealService.deleteProposedMeal(recipeId, mealId, proposerId);
+            ProposedMealRequestDto proposedMealRequestDto){
+
+        proposedMealService.deleteProposedMeal(homeId,proposedMealRequestDto);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 }
