@@ -1,6 +1,8 @@
 package org.univartois.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -25,8 +27,10 @@ public class RecipeEntity {
     private UserEntity user;
 
     @Column(name = "recipe_image_link")
+ //   @NotNull(message = "L'image de la recette est obligatoire.")
     private String recipeImageLink;
 
+    @Size(min = 2, max = 30, message = "Le nom de la recette doit contenir entre 2 et 30 caractères.")
     private String recipeName;
 
     @Column(name = "prep_time_minutes")

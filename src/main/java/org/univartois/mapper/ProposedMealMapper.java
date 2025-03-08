@@ -16,13 +16,17 @@ import java.util.List;
 public interface ProposedMealMapper {
 
     @Mapping(source = "recipeId", target = "recipe.idRecipe")
-    @Mapping(source = "mealId", target = "meal.idMeal")
-    @Mapping(source = "proposerId", target = "proposer.id")
+    @Mapping(source="date", target ="meal.mealDate")
+    @Mapping(source="lunch", target ="meal.mealLunch")
     ProposedMealEntity toEntity(ProposedMealRequestDto dto);
 
     @Mapping(source = "recipe.idRecipe", target = "recipeId")
+    @Mapping(source ="recipe.recipeName", target ="recipe.name")
+    @Mapping(source ="recipe.recipeImageLink", target ="recipe.imageUrl")
     @Mapping(source = "meal.idMeal", target = "mealId")
     @Mapping(source = "proposer.id", target = "proposerId")
+    @Mapping(source="meal.mealDate", target ="date")
+    @Mapping(source="meal.mealLunch", target="lunch")
     ProposedMealResponseDto toResponseDto(ProposedMealEntity entity);
 
     List<ProposedMealResponseDto> toResponseDtoList(List<ProposedMealEntity> entities);

@@ -27,5 +27,5 @@ public interface ProposedMealService {
     MealProposalsByDateResponse searchMealByDate(UUID homeId, LocalDate date);
 
     @Transactional
-    void deleteProposedMeal(UUID recipeId, UUID mealId, UUID proposerId);
+    void deleteProposedMeal(UUID homeId,ProposedMealRequestDto proposedMealRequestDto);
 }

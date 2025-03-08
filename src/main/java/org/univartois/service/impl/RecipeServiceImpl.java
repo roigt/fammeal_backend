@@ -1,9 +1,12 @@
 package org.univartois.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Request;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.univartois.dto.request.RecipeRequestDto;
 import org.univartois.dto.response.RecipeResponseDto;
@@ -19,6 +22,7 @@ import org.univartois.repository.RecipesIngredientsRepository;
 import org.univartois.repository.UserRepository;
 import org.univartois.service.RecipeService;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,15 +54,17 @@ public class RecipeServiceImpl implements RecipeService {
      */
     @Transactional
     @Override
-    public RecipeResponseDto createRecipe(RecipeRequestDto createRecipeRequestDto) {
+    public RecipeResponseDto createRecipe(String imageUrlRecipe,RecipeRequestDto createRecipeRequestDto) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        UserEntity creator = userRepository.findByIdOptional(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        UserEntity creator = userRepository.findById(userId);
+        if(creator==null){
+            throw new ResourceNotFoundException("User not found");
+        }
 
         RecipeEntity recipeEntity = new RecipeEntity();
 
 
-        recipeEntity.setRecipeImageLink(createRecipeRequestDto.getRecipeImageLink());
+        recipeEntity.setRecipeImageLink(imageUrlRecipe);
         recipeEntity.setRecipeName(createRecipeRequestDto.getRecipeName());
         addDataInRecipeEntity(createRecipeRequestDto, recipeEntity);
 
@@ -109,8 +115,11 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public RecipeResponseDto getRecipeById(UUID recipeId) {
 
-        RecipeEntity recipeEntity = recipeRepository.findByIdOptional(recipeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found"));
+        RecipeEntity recipeEntity = recipeRepository.findById(recipeId);
+        if(recipeEntity==null){
+            throw new ResourceNotFoundException("Recipe not found");
+        }
+
         List<RecipesIngredientsEntity> recipeIngredients = recipesIngredientsRepository.findByRecipeId(recipeId);
         RecipeResponseDto recipeResponseDto = recipeMapper.toResponseDto(recipeEntity);
 
@@ -165,16 +174,15 @@ public class RecipeServiceImpl implements RecipeService {
      */
     @Transactional
     @Override
-    public RecipeResponseDto updateRecipe(UUID recipeId, RecipeRequestDto recipeRequestDto) {
-        RecipeEntity recipeEntity = recipeRepository.findByIdOptional(recipeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found"));
+    public RecipeResponseDto updateRecipe(UUID recipeId, RecipeRequestDto recipeRequestDto,String imageUrlRecipe) {
+        RecipeEntity recipeEntity = recipeRepository.findById(recipeId);
+        if(recipeEntity==null){
+            throw new ResourceNotFoundException("Recipe not found");
+        }
 
         recipeEntity.setRecipeName(recipeRequestDto.getRecipeName());
-        recipeEntity.setRecipeImageLink(recipeRequestDto.getRecipeImageLink());
+        recipeEntity.setRecipeImageLink(imageUrlRecipe);
         addDataInRecipeEntity(recipeRequestDto, recipeEntity);
-
-
-        //  List<UUID> recipesIngredientsRequest = recipeRequestDto.getIdsIngredients();
 
 
         List<RecipesIngredientsEntity> recipeIngredients = recipesIngredientsRepository.findByRecipeId(recipeId);
@@ -203,13 +211,9 @@ public class RecipeServiceImpl implements RecipeService {
             recipesIngredientsRepository.persist(recipesIngredientsEntity);
         });
 
-
-
-
         RecipeResponseDto recipeResponseDto = recipeMapper.toResponseDto(recipeEntity);
 
         recipeIngredientsList(recipeResponseDto, recipeId);
-
 
         return  recipeResponseDto;
 
@@ -225,8 +229,10 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional
     @Override
     public void deleteRecipe(UUID recipeId) {
-        RecipeEntity recipeEntity = recipeRepository.findByIdOptional(recipeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found"));
+        RecipeEntity recipeEntity = recipeRepository.findById(recipeId);
+        if(recipeEntity==null){
+            throw new ResourceNotFoundException("Recipe not found");
+        }
         //  soft delete
          recipeEntity.setUser(null);
         recipeEntity.setRecipePublic(false);
@@ -243,6 +249,8 @@ public class RecipeServiceImpl implements RecipeService {
         return getRecipeResponseDtos(recipeResponseDto);
 
     }
+
+
 
     /**
      * Parcourir chaque recette de la liste de recette de la reponse et leur ajouter
@@ -282,4 +290,47 @@ public class RecipeServiceImpl implements RecipeService {
             recipe.getIngredients().add(ingredients);
         }
     }
+
+
+    /**
+     * fonction qui fait appel a uploader pour charger l image
+     * @param image
+     * @return
+     */
+    @Transactional
+    @Override
+    public String uploadRecipeImage(byte[] image) {
+        try {
+            return uploadFile(image);
+        } catch (IOException exception) {
+            throw new RuntimeException(exception.getMessage());
+        }
+    }
+
+
+    /**
+     * fonction qui charge l image sur cloudinary et retourne le lien pour acceder a image
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public String uploadFile(byte[] file) throws IOException {
+        final Cloudinary cloudinary;
+        String cloudName = ConfigProvider.getConfig().getValue("cloudinary.cloud_name", String.class);
+        String apiKey = ConfigProvider.getConfig().getValue("cloudinary.api_key", String.class);
+        String apiSecret = ConfigProvider.getConfig().getValue("cloudinary.api_secret", String.class);
+
+        cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret
+        ));
+
+        return cloudinary.uploader()
+                .upload(file,
+                        Map.of("public_id", UUID.randomUUID().toString()))
+                .get("url")
+                .toString();
+    }
+
 }

@@ -2,6 +2,7 @@ package org.univartois.dto.response;
 
 
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import lombok.*;
@@ -12,8 +13,9 @@ public class ProposedMealResponseDto {
     private UUID recipeId;
     private UUID mealId;
     private UUID proposerId;
-
     private RecipeDto recipe;
+    private Boolean lunch;
+    private LocalDate date;
 
 
 
