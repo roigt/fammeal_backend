@@ -1,6 +1,7 @@
 package org.univartois.dto.response;
 
 import lombok.*;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.univartois.enums.HomeRoleType;
 
 import java.util.UUID;
@@ -27,5 +28,5 @@ public class HomeMemberResponseDto {
 
     private boolean verified;
 
-    private HomeRoleType role;
+    private HomeRoleTypeResponseDto role;
 }

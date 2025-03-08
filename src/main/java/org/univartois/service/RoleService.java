@@ -1,5 +1,6 @@
 package org.univartois.service;
 
+import org.univartois.dto.response.HomeRoleTypeResponseDto;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.enums.Role;
 
@@ -15,5 +16,5 @@ public interface RoleService {
 
     Map<String, HomeRoleType> getCurrentAuthUserRolesFromJwt();
 
-    List<HomeRoleType> getHomeRoles();
+    List<HomeRoleTypeResponseDto> getHomeRoles();
 }
