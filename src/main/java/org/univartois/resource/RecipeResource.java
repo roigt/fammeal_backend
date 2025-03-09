@@ -126,7 +126,7 @@ public class RecipeResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Authenticated
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public Response searchRecipes( //pour un utilisateur  precis
+    public RestResponse<ApiResponse<List<RecipeResponseDto>>> searchRecipes( //pour un utilisateur  precis
             @QueryParam("keywords") List<String> keywords,
             @QueryParam("ingredients") List<String> ingredientIds,
             @QueryParam("vegetarian") Boolean vegetarian,
@@ -135,7 +135,7 @@ public class RecipeResource {
             ) {
 
         List<RecipeResponseDto> recipes = recipeService.searchRecipes(keywords, ingredientIds, vegetarian, covers, lunchBox);
-        return Response.ok(recipes).build();
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(recipes, "La liste des recettes de l'utilisateur a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
     }
 
 

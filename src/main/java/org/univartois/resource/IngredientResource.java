@@ -41,35 +41,9 @@ public class IngredientResource {
     @GET
     @Authenticated
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public Map<String, List<IngredientResponseDto>> getIngredients() {
+    public RestResponse<ApiResponse<List<IngredientResponseDto>>> getIngredients() {
         List<IngredientResponseDto> ingredients = ingredientService.getAllIngredients();
-
-        Map<String, List<IngredientResponseDto>> response = new HashMap<>();
-        response.put("ingredients", ingredients);
-        return response;
-
-//        try {
-//
-//            List<IngredientResponseDto> ingredientList = ingredientService.getAllIngredients();
-//
-//
-//            return RestResponse.status(
-//                    RestResponse.Status.OK,
-//                    ResponseUtil.success(ingredientList, "La liste des ingrédients a été créé avec succès", RestResponse.Status.OK, uriInfo.getPath())
-//            );
-//        } catch (RuntimeException e) {
-//
-//            return RestResponse.status(
-//                    RestResponse.Status.NOT_FOUND,
-//                    ResponseUtil.error(
-//                            e.getMessage(),
-//                            "ingredientName",
-//                            "Erreur lors de la création de la liste des ingrédients",
-//                            RestResponse.Status.NOT_FOUND,
-//                            uriInfo.getPath()
-//                    )
-//            );
-//        }
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(ingredients, "La liste des ingrédients a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @GET
