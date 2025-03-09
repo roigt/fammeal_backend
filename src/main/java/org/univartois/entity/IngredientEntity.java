@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.univartois.enums.IngredientUnit;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -36,4 +38,9 @@ public class IngredientEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "ingredient", fetch = FetchType.LAZY)
     public List<RecipesIngredientsEntity> recipesIngredients;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "ingredients_allergies", joinColumns = @JoinColumn(name = "ingredient_id"), inverseJoinColumns = @JoinColumn(name = "allergy_id"))
+    private Set<AllergyEntity> allergies = new HashSet<>();
+
 }

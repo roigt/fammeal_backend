@@ -1,13 +1,17 @@
 package org.univartois.resource;
 
 import io.quarkus.security.Authenticated;
+import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.resteasy.reactive.MultipartForm;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.univartois.dto.request.RecipeMultipartForm;
 import org.univartois.dto.request.RecipeRequestDto;
 import org.univartois.dto.response.ApiResponse;
 import org.univartois.dto.response.RecipeResponseDto;
+import org.univartois.dto.response.UpdateProfilePictureResponseDto;
 import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.mapper.RecipeMapper;
 import org.univartois.repository.RecipeRepository;
@@ -20,6 +24,8 @@ import jakarta.ws.rs.core.MediaType;
 import org.univartois.service.RecipeService;
 import org.univartois.utils.ResponseUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +49,8 @@ public class RecipeResource {
 
     @Inject
     UriInfo uriInfo;
+    @Inject
+    Request request;
 
     /**
      * Récupérer la liste de toutes les recettes
@@ -50,6 +58,8 @@ public class RecipeResource {
      */
     @GET
     @Authenticated
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Operation(summary = "Get all recipes", description = "Returns a list of all recipes.")
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<List<RecipeResponseDto>>> getAllRecipes() {
@@ -81,8 +91,10 @@ public class RecipeResource {
      * @return
      */
     @GET
-    @Path("/publics")
+    @Path("/publics") //pour un user precis 
     @Authenticated
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Operation(summary = "Get all public recipes", description = "Returns a list of all public recipes.")
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<List<RecipeResponseDto>>> getPublicRecipes() {
@@ -114,7 +126,7 @@ public class RecipeResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Authenticated
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<List<RecipeResponseDto>>> searchRecipes(
+    public RestResponse<ApiResponse<List<RecipeResponseDto>>> searchRecipes( //pour un utilisateur  precis
             @QueryParam("keywords") List<String> keywords,
             @QueryParam("ingredients") List<String> ingredientIds,
             @QueryParam("vegetarian") Boolean vegetarian,
@@ -129,22 +141,34 @@ public class RecipeResource {
 
     /**
      *  Créer une nouvelle recette
-     * @param recipeRequestDto
+     * @param
      * @return
      */
     @Authenticated
     @POST
     @Operation(summary = "Create a new recipe", description = "Creates a new recipe.")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<RecipeResponseDto>>  createRecipe(RecipeRequestDto recipeRequestDto) {
+    public RestResponse<ApiResponse<RecipeResponseDto>>  createRecipe(@MultipartForm RecipeMultipartForm form ) {// ,RecipeRequestDto recipeRequestDto  @MultipartForm RecipeMultipartForm form
         try{
-            RecipeResponseDto responseDto = recipeService.createRecipe(recipeRequestDto);
+
+            InputStream file = form.file;
+            RecipeRequestDto recipeRequestDto = form.recipeRequest;
+            byte[] fileBytes = file.readAllBytes();
+            file.close();
+
+            final String imageUrl = recipeService.uploadRecipeImage(fileBytes);
+
+
+            RecipeResponseDto responseDto = recipeService.createRecipe(imageUrl,recipeRequestDto);
             return RestResponse.status(
                     RestResponse.Status.OK,
                     ResponseUtil.success(responseDto, "Recette créer avec succès.", RestResponse.Status.OK, uriInfo.getPath())
             );
-        }catch (ResourceNotFoundException e){
+        }catch (ResourceNotFoundException e) {
             return RestResponse.status(
                     RestResponse.Status.NOT_FOUND,
                     ResponseUtil.error(
@@ -155,10 +179,13 @@ public class RecipeResource {
                             uriInfo.getPath()
                     )
             );
-
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }
+
+
 
     /**
      * Récupérer les détails d'une recette par son ID
@@ -169,6 +196,7 @@ public class RecipeResource {
     @Authenticated
     @Path("/{idRecipe}")
     @Operation(summary = "Get recipe by ID", description = "Returns the details of a recipe.")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<RecipeResponseDto>>  getRecipeById(@PathParam("idRecipe") UUID idRecipe) {
         try{
@@ -196,18 +224,25 @@ public class RecipeResource {
     /**
      * Mettre à jour une recette existante
      * @param idRecipe
-     * @param recipeRequestDto
+     * @param
      * @return
      */
     @PUT
     @Authenticated
     @Path("/{idRecipe}")
     @Operation(summary = "Update recipe", description = "Updates an existing recipe.")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<RecipeResponseDto>> updateRecipe(@PathParam("idRecipe") UUID idRecipe, RecipeRequestDto recipeRequestDto) {
+    public RestResponse<ApiResponse<RecipeResponseDto>> updateRecipe(@PathParam("idRecipe") UUID idRecipe,@MultipartForm RecipeMultipartForm form ) {//RecipeRequestDto recipeRequestDto
         try{
-            RecipeResponseDto responseDto =recipeService.updateRecipe(idRecipe, recipeRequestDto);
+            InputStream file = form.file;
+            RecipeRequestDto recipeRequestDto = form.recipeRequest;
+            byte[] fileBytes = file.readAllBytes();
+            file.close();
+
+            final String imageUrl = recipeService.uploadRecipeImage(fileBytes);
+            RecipeResponseDto responseDto =recipeService.updateRecipe(idRecipe, recipeRequestDto,imageUrl);
             return RestResponse.status(
                     RestResponse.Status.OK,
                     ResponseUtil.success(responseDto, "Recette Modifié avec succès.", RestResponse.Status.OK, uriInfo.getPath())
@@ -223,6 +258,8 @@ public class RecipeResource {
                             uriInfo.getPath()
                     )
             );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
 

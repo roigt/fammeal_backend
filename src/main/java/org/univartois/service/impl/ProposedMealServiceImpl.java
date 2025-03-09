@@ -3,6 +3,7 @@ package org.univartois.service.impl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.univartois.dto.request.ProposedMealRequestDto;
 
 import org.univartois.dto.response.MealProposalsByDateResponse;
@@ -39,15 +40,21 @@ public class ProposedMealServiceImpl implements ProposedMealService {
     @Inject
     HomeRepository homeRepository;
 
+
+    @Inject
+    JsonWebToken jwt;
+
     /**
      * Afficher tous les repas proposés
      * @return
      */
     @Override
     public List<ProposedMealResponseDto> getAllProposedMeals(UUID homeId) {
-        HomeEntity  home = homeRepository.findById(homeId)
+        HomeEntity  home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
+
         return proposedMealMapper.toResponseDtoList(proposedMealRepository.findByAllPropositions());
+
     }
 
     /**
@@ -57,7 +64,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
      */
     @Override
     public List<ProposedMealResponseDto> getProposedMealsByMealId(UUID homeId,UUID mealId) {
-        HomeEntity  home = homeRepository.findById(homeId)
+        HomeEntity  home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
         List<ProposedMealEntity> proposedMeals = proposedMealRepository.findByMealId(mealId);
@@ -77,21 +84,42 @@ public class ProposedMealServiceImpl implements ProposedMealService {
     @Override
     public ProposedMealResponseDto proposeMeal(UUID homeId,ProposedMealRequestDto proposedMealRequestDto) {
 
-        HomeEntity  home = homeRepository.findById(homeId)
-                .orElseThrow(() -> new RuntimeException("Home not found"));
 
-        RecipeEntity recipe = recipeRepository.findById(proposedMealRequestDto.getRecipeId())
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        HomeEntity  home = homeRepository.findById(homeId);
+        if(home==null) throw new RuntimeException("Home not found");
+
+        RecipeEntity recipe = recipeRepository.findByIdOptional(proposedMealRequestDto.getRecipeId())
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
-        MealEntity meal = mealRepository.findById(proposedMealRequestDto.getMealId())
-                .orElseThrow(() -> new RuntimeException("Meal not found"));
 
-        UserEntity proposer = userRepository.findById(proposedMealRequestDto.getProposerId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity proposer = userRepository.findById(userId);
+        if(proposer==null) throw new RuntimeException("User not found");
+
+
+        MealEntity meal = mealRepository.findByIdRecipe(proposedMealRequestDto.getRecipeId());
+        if(meal==null){//on verifie si le meal existe dans la table meal pour cette proposition et on le crée
+             meal= new MealEntity();
+             meal.setMealLunch(proposedMealRequestDto.getLunch());
+             meal.setMealDate(proposedMealRequestDto.getDate());
+             meal.setHome(home);
+             meal.setRecipe(recipe);
+            mealRepository.persist(meal);
+        }
+
+        List<ProposedMealEntity> mealExistingAlready =proposedMealRepository.findByMealId(meal.getIdMeal());
+
+        if(!mealExistingAlready.isEmpty()) {
+            throw new RuntimeException("Meal à déja été proposé");
+        }
 
 
 
         ProposedMealEntity proposedMealEntity = proposedMealMapper.toEntity(proposedMealRequestDto);
+        proposedMealEntity.setProposer(proposer);
+        proposedMealEntity.setMeal(meal);
+        proposedMealEntity.setRecipe(recipe);
 
         proposedMealRepository.persist(proposedMealEntity);
 
@@ -115,7 +143,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
                 .orElseThrow(() -> new ResourceNotFoundException("Proposed meal not found"));
 
 
-        RecipeEntity newRecipe = recipeRepository.findById(proposedMealRequestDto.getRecipeId())
+        RecipeEntity newRecipe = recipeRepository.findByIdOptional(proposedMealRequestDto.getRecipeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found"));
 
         proposedMealEntity.setRecipe(newRecipe);
@@ -151,12 +179,14 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
             proposals.forEach(proposal -> {
                 ProposedMealResponseDto.RecipeDto  recipeDto = new ProposedMealResponseDto.RecipeDto(proposal.getRecipe().getIdRecipe(), proposal.getRecipe().getRecipeName(),
-                        proposal.getProposer().getProfilePictureUrl());
+                        proposal.getRecipe().getRecipeImageLink());
                 //on construit chaque meals en fonction du type de meal lunch ou dinner
                 proposedMealResponseDto.setRecipeId(proposal.getRecipe().getIdRecipe());
                 proposedMealResponseDto.setMealId(proposal.getMeal().getIdMeal());
                 proposedMealResponseDto.setProposerId(proposal.getProposer().getId());
                 proposedMealResponseDto.setRecipe(recipeDto);
+                proposedMealResponseDto.setDate(date);
+                proposedMealResponseDto.setLunch(mealType.equals("lunch"));
 
                 //on ajoute le meal creer au prototype selon le lunch ou le dinner
                 mealsPrototype.getMealList().add(proposedMealResponseDto);
@@ -177,13 +207,25 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
     /**
      * Supprimer une proposition de repas
-     * @param recipeId
-     * @param mealId
-     * @param proposerId
+
      */
     @Transactional
     @Override
-    public void deleteProposedMeal(UUID recipeId, UUID mealId, UUID proposerId) {
-        proposedMealRepository.deleteById(recipeId, mealId, proposerId);
+    public void deleteProposedMeal(UUID homeId,ProposedMealRequestDto proposedMealRequestDto) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        UserEntity proposer = userRepository.findById(userId);
+        if(proposer == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+
+
+        MealEntity meal = mealRepository.findByIdRecipe(proposedMealRequestDto.getRecipeId());
+        if(meal == null) {
+            throw new ResourceNotFoundException("Meal not found");
+        }
+         ProposedMealEntity proposeMealToDelete = proposedMealRepository.findByMealIdAndProposerId(meal.getIdMeal(),userId);
+
+        proposedMealRepository.delete(proposeMealToDelete);
     }
 }

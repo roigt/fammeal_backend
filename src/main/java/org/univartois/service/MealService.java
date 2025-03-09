@@ -12,14 +12,13 @@ import java.util.UUID;
 
 public interface MealService {
 
-    /**
-     * Récupère les repas planifiés pour une maison donnée.
-     * @param homeId
-     * @return List<MealResponseDto>
-     */
-    List<MealResponseDto> getMealsByHome(UUID homeId);
+//    /**
+//     * Récupère les repas planifiés pour une maison donnée.
+//     * @param homeId
+//     * @return List<MealResponseDto>
+//     */
+//    List<MealResponseDto> getMealsByHome(UUID homeId);
 
-    MealResponseDto getMealsByHomeAndIdMeal(UUID homeId,UUID idMeal);
 
     MealResponseFromDateToDto getMealDateTo(UUID idHome, LocalDate from, LocalDate to);
 

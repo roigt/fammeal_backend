@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.Setter;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.univartois.enums.HomeRoleType;
 import org.univartois.service.RoleService;
 
 import java.util.Collections;
@@ -30,7 +31,7 @@ public class SecurityIdentitySupplier implements Supplier<SecurityIdentity> {
 
         JsonWebToken user = (JsonWebToken) identity.getPrincipal();
 
-        final Map<String, String> permissions = roleService.getRolesByUserId(UUID.fromString(user.getSubject()));
+        final Map<String, HomeRoleType> permissions = roleService.getRolesByUserId(UUID.fromString(user.getSubject()));
 
         builder.addAttributes(Collections.singletonMap("roles", permissions));
         return builder.build();

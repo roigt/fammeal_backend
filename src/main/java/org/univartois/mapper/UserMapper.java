@@ -5,14 +5,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import org.univartois.dto.request.UpdateAuthenticatedUserRequestDto;
 import org.univartois.dto.request.UserRegisterRequestDto;
 import org.univartois.dto.response.HomeMemberResponseDto;
 import org.univartois.dto.response.UserAuthResponseDto;
 import org.univartois.entity.UserEntity;
+import org.univartois.enums.HomeRoleType;
 
 import java.util.Map;
 
-@Mapper(componentModel = "jakarta")
+@Mapper(componentModel = "jakarta", uses = {HomeRoleTypeMapper.class})
 public interface UserMapper {
 
     @Mapping(source = "password", target = "password", qualifiedByName = "encodePassword")
@@ -31,10 +33,12 @@ public interface UserMapper {
     @Mapping(source = "user.profilePictureUrl", target = "profilePictureUrl")
     @Mapping(source = "accessToken", target = "accessToken")
     @Mapping(source = "roles", target = "roles")
-    UserAuthResponseDto toAuthResponseDto(UserEntity user, String accessToken, Map<String, String> roles);
+    UserAuthResponseDto toAuthResponseDto(UserEntity user, String accessToken, Map<String, HomeRoleType> roles);
 
     @Mapping(source = "role", target = "role")
-    HomeMemberResponseDto toHomeMemberResponseDto(UserEntity user, String role);
+    HomeMemberResponseDto toHomeMemberResponseDto(UserEntity user, HomeRoleType role);
+
+    void updateEntity(@MappingTarget UserEntity user, UpdateAuthenticatedUserRequestDto dto);
 
     @Named("encodePassword")
     default String encodePassword(String password) {

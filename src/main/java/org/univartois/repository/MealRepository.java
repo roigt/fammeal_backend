@@ -1,6 +1,7 @@
 package org.univartois.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import org.univartois.entity.MealEntity;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
-public class MealRepository implements PanacheRepository<MealEntity> {
+public class MealRepository implements PanacheRepositoryBase<MealEntity, UUID> {
 
     /**
      * Trouver les repas associés à une maison spécifique
@@ -32,18 +33,11 @@ public class MealRepository implements PanacheRepository<MealEntity> {
         return find("home.id", idHome).list();
     }
 
-    /**
-     * Trouver un repas par son ID
-     * @param mealId l'UUID du repas
-     * @return MealEntity si trouvé, sinon null
-     */
-    public Optional<MealEntity> findById(UUID mealId) {
-        return find("idMeal", mealId).firstResultOptional();
-    }
-
     public MealEntity findByIdRecipe(UUID recipeId) {
         return find("recipe.idRecipe",recipeId).firstResult();
     }
+
+
 
     /**
      *Trouver un repas d'une maison précis

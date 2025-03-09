@@ -51,11 +51,15 @@ public class GlobalExceptionHandler {
 
     @ServerExceptionMapper(value = {UnauthorizedException.class, ForbiddenException.class, AuthenticationFailedException.class, SecurityException.class}, priority = Priorities.AUTHENTICATION - 1)
     public RestResponse<ApiResponse<Object>> handleSecurityException(SecurityException exception) {
-        log.error("security exception at {}: {}", uriInfo.getPath(), exception.getMessage(), exception);
+        String errorMessage = exception.getMessage();
+        errorMessage = (errorMessage == null || errorMessage.isBlank()) ? "Veuillez vous authentifier avant d'accéder à cette resource ." : errorMessage;
+
+        log.error("security exception at {}: {}", uriInfo.getPath(), errorMessage, exception);
+
         ApiResponse<Object> response;
         response = ResponseUtil.errorFromStrings(
                 new ArrayList<>(),
-                exception.getMessage(),
+                errorMessage,
                 RestResponse.Status.fromStatusCode(401),
                 uriInfo.getPath()
         );

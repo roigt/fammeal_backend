@@ -1,10 +1,11 @@
 package org.univartois.service.impl;
 
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.mapstruct.InheritConfiguration;
 import org.univartois.dto.request.MealRequestDto;
 import org.univartois.dto.response.MealResponseDto;
 import org.univartois.dto.response.MealResponseFromDateToDto;
@@ -18,60 +19,39 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ApplicationScoped
-public class MealServiceImpl implements MealService {
 
-    @Inject
-    HomeRepository homeRepository;
+
+@ApplicationScoped
+public class MealServiceImpl implements MealService{
 
     @Inject
     MealRepository mealRepository;
 
     @Inject
+    HomeRepository homeRepository;
+
+    @Inject
+    JsonWebToken jwt;
+
+    @Inject
+    ProposedMealRepository proposedMealRepository;
+
+    @Inject
+    UserRepository userRepository;
+
+    @Inject
     RecipeRepository recipeRepository;
+
 
     @Inject
     MealMapper mealMapper;
 
-    @Inject
-    JsonWebToken jwt;
-    @Inject
-    ProposedMealServiceImpl proposedMealServiceImpl;
-    @Inject
-    ProposedMealRepository proposedMealRepository;
-    @Inject
-    UserRepository userRepository;
 
 
-    /**
-     * Récupérer le planning des repas pour une maison donnée
-     * @param homeId
-     * @return Liste des repas
-     */
-    @Override
-    public List<MealResponseDto> getMealsByHome(UUID homeId) {
-        HomeEntity home = homeRepository.findById(homeId)
-                .orElseThrow(() -> new RuntimeException("Home not found"));
-
-        List<MealEntity> meals = mealRepository.findByHome(homeId);
-
-        return mealMapper.toResponseDtoList(meals);
-    }
-
-    @Override
-    public MealResponseDto getMealsByHomeAndIdMeal(UUID homeId, UUID mealId) {
-        HomeEntity home = homeRepository.findById(homeId)
-                .orElseThrow(() -> new RuntimeException("Home not found"));
-
-
-        MealEntity meals = mealRepository.findByHomeAndIdMeal(homeId,mealId);
-
-        return mealMapper.toResponseDto(meals);
-    }
 
     @Override
     public MealResponseFromDateToDto getMealDateTo(UUID idHome, LocalDate from, LocalDate to){
-     List<MealEntity> mealEntities = mealRepository.findFromDateToDate(idHome,from,to);
+        List<MealEntity> mealEntities = mealRepository.findFromDateToDate(idHome,from,to);
 
         Map<String, List<MealEntity>> groupedByMealType = mealEntities.stream()
                 .collect(Collectors.groupingBy(meal -> meal.isMealLunch() ? "lunch" : "dinner"));
@@ -85,7 +65,7 @@ public class MealServiceImpl implements MealService {
 
         groupedByMealType.forEach((mealType, meals) -> {
             MealResponseFromDateToDto.MealDto  mealDto = new MealResponseFromDateToDto.MealDto();
-            System.out.println("Meal Type: " + mealType);
+
             meals.forEach(meal -> {
 
 
@@ -94,7 +74,7 @@ public class MealServiceImpl implements MealService {
                 mealDto.setImage_url(meal.getRecipe().getRecipeImageLink());
 
                 if(mealType.equals("lunch")){
-                  day.getLunch().add(mealDto);
+                    day.getLunch().add(mealDto);
                 }else{
                     day.getDiner().add(mealDto);
                 }
@@ -103,18 +83,18 @@ public class MealServiceImpl implements MealService {
 
             });
 
-            mealFromTo.put(meals.get(0).getMealDate(), day);
+            mealFromTo.put(meals.getFirst().getMealDate(), day);
 
 
 
         });
 
-      mealResponseFromTo.setMeals(mealFromTo);
+        mealResponseFromTo.setMeals(mealFromTo);
 
 
 
-             return mealResponseFromTo;
-//        return mealMapper.toResponseDtoList(mealEntities);
+        return mealResponseFromTo;
+    //        return mealMapper.toResponseDtoList(mealEntities);
     }
 
 
@@ -128,13 +108,13 @@ public class MealServiceImpl implements MealService {
     @Override
     public MealResponseDto planMeal(UUID homeId, MealRequestDto mealRequestDto) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        Optional<UserEntity> user = userRepository.findById(userId);
+        Optional<UserEntity> user = userRepository.findByIdOptional(userId);
 
 
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
-        RecipeEntity recipe = recipeRepository.findById(mealRequestDto.getIdRecipe())
+        RecipeEntity recipe = recipeRepository.findByIdOptional(mealRequestDto.getIdRecipe())
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
 
@@ -145,16 +125,16 @@ public class MealServiceImpl implements MealService {
         //gestion du cas ou l utilisateur a deja proposer un repas pour le dejeuner ou le dinner
         if(proposedMealRepository.findByProposerId(userId)!=null){
             //recupère la liste des propositions de l utilisateur
-           List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerId(userId);
+            List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerId(userId);
 
-           for(ProposedMealEntity proposedMealEntity : proposedMeal){
+            for(ProposedMealEntity proposedMealEntity : proposedMeal){
 
-               if(proposedMealEntity.getMeal().isMealLunch() && mealRequestDto.isMealLunch()){
-                   throw new RuntimeException("Vous avez déja proposer un repas pour le dejeuner . ");
-               }else if(!proposedMealEntity.getMeal().isMealLunch() && !mealRequestDto.isMealLunch()){
-                   throw new RuntimeException("vous avez déja proposer un repas pour le dinner. ");
-               }
-           }
+                if(proposedMealEntity.getMeal().isMealLunch() && mealRequestDto.isMealLunch()){
+                    throw new RuntimeException("Vous avez déja proposer un repas pour le dejeuner . ");
+                }else if(!proposedMealEntity.getMeal().isMealLunch() && !mealRequestDto.isMealLunch()){
+                    throw new RuntimeException("vous avez déja proposer un repas pour le dinner. ");
+                }
+            }
 
 
         }
@@ -166,8 +146,8 @@ public class MealServiceImpl implements MealService {
         mealRepository.persist(mealEntity);
 
         //rajouter la proposition de l utilisateur dans proposedMeal
-        ProposedMealEntity proposedMeal = new ProposedMealEntity(recipe,mealEntity,user.orElse(null));
-        proposedMealRepository.persist(proposedMeal);
+//        ProposedMealEntity proposedMeal = new ProposedMealEntity(recipe,mealEntity,user.orElse(null));
+//        proposedMealRepository.persist(proposedMeal);
 
         return mealMapper.toResponseDto(mealEntity);
     }
@@ -183,16 +163,16 @@ public class MealServiceImpl implements MealService {
     @Override
     public MealResponseDto updateMeal(UUID homeId, UUID mealId, MealRequestDto mealRequestDto) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        Optional<UserEntity> user = userRepository.findById(userId);
+        Optional<UserEntity> user = userRepository.findByIdOptional(userId);
 
 
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Home not found"));
 
-        MealEntity mealEntity = mealRepository.findById(mealId)
+        MealEntity mealEntity = mealRepository.findByIdOptional(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found"));
 
-        RecipeEntity recipe = recipeRepository.findById(mealRequestDto.getIdRecipe())
+        RecipeEntity recipe = recipeRepository.findByIdOptional(mealRequestDto.getIdRecipe())
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
 
@@ -205,7 +185,7 @@ public class MealServiceImpl implements MealService {
 
 
             ProposedMealEntity proposedMeal = new ProposedMealEntity(
-                 recipe,mealEntity,user.orElse(null)
+                    recipe,mealEntity,user.orElse(null)
             );
 
             if (proposeOld != null) {
@@ -238,19 +218,19 @@ public class MealServiceImpl implements MealService {
     @Override
     public void deleteMeal(UUID homeId, UUID mealId) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Home not found"));
 
-        MealEntity mealEntity = mealRepository.findById(mealId)
+        MealEntity mealEntity = mealRepository.findByIdOptional(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found"));
 
-        ProposedMealEntity proposeOld = proposedMealRepository.findByMealIdAndProposerId(mealId,userId);
-        proposeOld.setMeal(null);
-        proposedMealRepository.persist(proposeOld);
-       // mealRepository.delete(mealEntity);
+//        ProposedMealEntity proposeOld = proposedMealRepository.findByMealIdAndProposerId(mealId,userId);
+//        proposeOld.setMeal(null);
+//        proposedMealRepository.persist(proposeOld);
+        // mealRepository.delete(mealEntity);
         // Safe delete  on met id_recipe à NULL sans supprimer le repas
         mealEntity.setRecipe(null);
-       mealRepository.persist(mealEntity);
+        mealRepository.persist(mealEntity);
     }
 
 

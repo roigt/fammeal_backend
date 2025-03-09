@@ -1,6 +1,7 @@
 package org.univartois.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.*;
 import org.univartois.entity.RecipeEntity;
@@ -11,20 +12,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class RecipeRepository implements PanacheRepository<RecipeEntity> {
+public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUID> {
 
 
     public RecipeEntity findByIdRecipe(UUID id) {
         return find("idRecipe= ?1", id).firstResult();
     }
-    /**
-     * Recherche une recette par son ID
-     * @param idRecipe
-     * @return
-     */
-    public Optional<RecipeEntity> findById(UUID idRecipe) {
-        return find("idRecipe = ?1", idRecipe).firstResultOptional();
-    }
+    
 
     /**
      * Recherche toutes les recettes d'un créateur
@@ -83,7 +77,7 @@ public class RecipeRepository implements PanacheRepository<RecipeEntity> {
 
 
         //recupérer toutes les recettes dans l alias r
-        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r WHERE 1=1");
+        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r WHERE r.recipePublic=true and 1=1");
         Map<String, Object> params = new HashMap<>();
         query.append(" AND (");
         if (!allKeywords.isEmpty()) {

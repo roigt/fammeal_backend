@@ -2,9 +2,13 @@ package org.univartois.utils;
 
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.Claims;
 import org.univartois.entity.UserEntity;
+import org.univartois.enums.HomeRoleType;
 
 import java.time.Instant;
 import java.util.*;
@@ -23,12 +27,17 @@ public class JwtTokenUtil {
 
 
     public String generateJwtToken(final UserEntity user){
-        final Map<String, String> permissions = new HashMap<>();
+        final JsonObjectBuilder permissionsBuilder = Json.createObjectBuilder();
         user.getRoles().forEach(homeRole -> {
-            final String roleInHome = homeRole.getRole().toString();
-            permissions.put(homeRole.getId().getHomeId().toString(), roleInHome);
+            final HomeRoleType roleInHome = homeRole.getRole();
+            permissionsBuilder.add(
+                    homeRole.getId().getHomeId().toString(),
+                    Json.createObjectBuilder()
+                            .add("name", roleInHome.name())
+                            .add("value", roleInHome.getValue())
+                            .build()
+            );
         });
-
 
         return Jwt.issuer(issuer)
                 .upn(user.getEmail())
@@ -36,7 +45,7 @@ public class JwtTokenUtil {
                 .claim(Claims.full_name.name(), user.getFirstname() + " " + user.getLastname())
                 .claim(Claims.given_name.name(), user.getFirstname())
                 .claim(Claims.family_name.name(), user.getLastname())
-                .claim("roles", permissions)
+                .claim("roles", permissionsBuilder.build())
                 .groups(Set.of())
                 .issuedAt(Instant.now())
                 .expiresIn(DEFAULT_JWT_EXPIRES_DURATION)

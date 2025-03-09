@@ -1,6 +1,6 @@
 package org.univartois.repository;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.univartois.entity.TokenEntity;
@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class TokenRepository implements PanacheRepository<TokenEntity> {
+public class TokenRepository implements PanacheRepositoryBase<TokenEntity, UUID> {
 
     public Optional<TokenEntity> findValidToken(String token, TokenType tokenType) {
         return find(

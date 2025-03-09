@@ -1,6 +1,7 @@
 package org.univartois.dto.response;
 
 import lombok.*;
+import org.univartois.enums.HomeRoleType;
 
 import java.util.UUID;
 
@@ -21,6 +22,6 @@ public class HomeResponseDto {
 
     private boolean dinerAutomaticGeneration;
 
-    private String role;
+    private HomeRoleTypeResponseDto role;
 
 }

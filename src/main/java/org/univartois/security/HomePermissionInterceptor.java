@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Interceptor
 @Priority(Interceptor.Priority.APPLICATION)
-@HomePermissionsAllowed(homeIdParamName = "homeId")
+@HomePermissionsAllowed()
 public class HomePermissionInterceptor {
 
 

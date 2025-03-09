@@ -6,9 +6,11 @@ public class Constants {
      * messages for users operations
      */
     public static final String EMAIL_ALREADY_EXISTS_MSG = "Un utilisateur avec cet email existe déjà.";
+    public static final String USERNAME_ALREADY_EXISTS_MSG = "Un utilisateur avec ce nom d'utilisateur existe déjà.";
     public static final String ACCOUNT_NOT_VERIFIED_MSG = "Votre compte n'a pas encore été vérifié. Veuillez vérifier votre e-mail pour activer votre compte.";
     public static final String ACCOUNT_ALREADY_VERIFIED_MSG = "Ce compte a déjà été vérifié.";
     public static final String EMAIL_INVALID_MSG = "Adresse mail invalide. Veuillez créer un compte.";
+    public static final String USER_PROFILE_RETRIEVED = "informations de votre profile.";
     public static final String PASSWORD_INVALID_MSG = "Mot de passe invalide !";
     public static final String ACCOUNT_CREATED_MSG = "Votre compte a été créé avec succès.";
     public static final String ACCOUNT_ACTIVATED_MSG = "Votre compte est désormais activé !";
@@ -18,6 +20,28 @@ public class Constants {
     public static final String USER_NOT_FOUND_MSG = "Cet utilisateur n'existe pas.";
     public static final String USER_PROFILE_PICTURE_UPDATED_MSG = "votre photo de profile est mise à jour.";
     public static final String USER_PROFILE_PICTURE_DELETED_MSG = "votre photo de profile est supprimée.";
+    public static final String USER_PROFILE_UPDATED_MSG = "votre profile est mis à jour.";
+    public static final String USER_DELETED_MSG = "votre compte est supprimé.";
+    public static final String USER_PASSWORD_RESET_MSG = "votre nouveau mot de passe est réinitialisé. Veuillez vérifier votre adresse mail.";
+    public static final String USER_AUTHENTICATED_MSG = "authentification réussie. Bienvenue dans votre espace fammeal.";
+    public static final String USER_PASSWORD_UPDATED_MSG = "votre mot de passe est mis à jour.";
+    public static final String USER_OLD_PASSWORD_MISMATCH_MSG = "votre ancien mot de passe n'est pas correcte";
+    public static final String USER_DIETARY_CONSTRAINTS_UPDATED_MSG = "Votre contraintes alimentaires sont mises à jour.";
+    public static final String USER_DIETARY_CONSTRAINTS_RETRIEVED_MSG = "Votre contraintes alimentaires sont récupérées.";
+    public static final String USER_HOMES_RETRIEVED_MSG = "La liste de vos maisons est récupérée.";
+
+
+    /**
+     * messages for roles operations
+     */
+    public static final String HOME_ROLES_RETRIEVED_MSG = "Les roles disponibles dans la maison.";
+
+
+    /**
+     * messages for allergies operations
+     */
+    public static final String ALLERGIES_RETRIEVED_MSG = "Les types allergies disponibles.";
+
 
     /**
      * messages for homes operations
@@ -26,6 +50,7 @@ public class Constants {
     public static final String HOME_ADMIN_LEAVE_CONSTRAINT_MSG = "Vous ne pouvez pas quitter la maison tant qu'il n'y a pas au moins un autre administrateur.";
     public static final String HOME_DETAILS_RETRIEVED_MSG = "Détails de la maison récupérés.";
     public static final String HOME_CREATED_MSG = "La maison a été créée avec succès.";
+    public static final String HOME_UPDATED_MSG = "La maison a été mise à jour avec succès." ;
     public static final String HOME_LEFT_MSG = "Vous avez quitté la maison avec succès.";
     public static final String USER_ALREADY_IN_HOME_MSG = "Cet utilisateur est déjà membre de cette maison.";
     public static final String USER_ADDED_TO_HOME_MSG = "Cet utilisateur est désormais un membre de votre maison";
@@ -35,20 +60,29 @@ public class Constants {
     public static final String HOME_ADMIN_SELF_UPDATE_ROLE_CONSTRAINT_MSG = "Un administrateur ne peut pas modifier son propre rôle dans la maison.";
     public static final String HOME_ADMIN_SELF_DELETE_FROM_HOME_CONSTRAINT_MSG = "Un administrateur ne peut pas se supprimer lui-même de la maison. Utilisez plutôt l'option 'Quitter une maison'.";
     public static final String HOME_MEMBER_DELETED_MSG = "Ce membre est supprimé de cette maison avec succès.";
+    public static final String HOME_DIETARY_CONSTRAINTS_UPDATED_MSG = "Les contraintes alimentaires de votre maison sont mises à jour.";
+    public static final String HOME_DIETARY_CONSTRAINTS_RETRIEVED_MSG = "Les contraintes alimentaires de votre maison sont récupérées.";
+    public static final String HOME_TOGGLE_GENERATION_MSG = "La génération automatique des repas est mise à jour.";
 
 
 
 //    Validation messages
     public static final String EMAIL_FORMAT_INVALID = "Adresse mail n'est pas valide";
     public static final String EMAIL_NOT_BLANK = "Adresse mail ne doit pas être vide";
-    public static final String PASSWORD_NOT_BLANK = "Password ne doit pas être vide";
+    public static final String PASSWORD_NOT_BLANK = "Mot de pass ne doit pas être vide";
     public static final String FIRSTNAME_NOT_BLANK = "Nom ne doit pas être vide";
     public static final String FIRSTNAME_SIZE = "Prénom doit contenir entre 2 à 16 caractères";
     public static final String LASTNAME_SIZE = "Nom doit contenir entre 2 à 16 caractères";
     public static final String LASTNAME_NOT_BLANK = "Prénom ne doit pas être vide";
     public static final String PASSWORD_SIZE = "Mot de passe doit contenir au moins 8 caractères";
+    public static final String USERNAME_NOT_BLANK = "Le nom d'utilisateur ne doit pas être vide";
+    public static final String USERNAME_FORMAT_INVALID = "Le nom d'utilisateur doit contenir entre 5 et 40 caractères et ne peut pas contenir d'espaces";
     public static final String HOME_NAME_NOT_BLANK = "Le nom d'une maison ne doit pas être vide";
     public static final String HOME_NAME_SIZE = "Le nom d'une maison doit contenir entre 2 et 30 caractères";
+    public static final String OLD_PASSWORD_NOT_BLANK = "l'ancien mot de pass ne doit pas être vide";
+    public static final String NEW_PASSWORD_NOT_BLANK = "le nouveau mot de pass ne peut pas être vide";
+    public static final String NEW_PASSWORD_SIZE = "le nouveau mot de pass doit contenir au moins 8 caractères.";
+
 
 
     //    EVENTS
@@ -59,7 +93,7 @@ public class Constants {
     //    NAMED QUERIES
     public static final String QUERY_FIND_HOMES_BY_USER_ID = "FIND_HOMES_BY_USER_ID";
     public static final String QUERY_FIND_USERS_BY_HOME_ID = "FIND_USERS_BY_HOME_ID";
-    public static final String QUERY_FIN_USER_BY_HOME_ID_AND_USER_ID = "FIND_USER_BY_HOME_ID_AND_USER_ID";
+    public static final String QUERY_FIND_USER_BY_HOME_ID_AND_USER_ID = "FIND_USER_BY_HOME_ID_AND_USER_ID";
 
 
 }

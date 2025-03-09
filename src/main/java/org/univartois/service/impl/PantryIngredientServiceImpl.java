@@ -59,14 +59,14 @@ public class PantryIngredientServiceImpl implements PantryIngredientService {
         UUID userId = UUID.fromString(jwt.getSubject());
 
 
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Home not found"));
 
 
-        IngredientEntity ingredient = ingredientRepository.findById(pantryIngredientRequestDto.getId_ingredient())
+        IngredientEntity ingredient = ingredientRepository.findByIdOptional(pantryIngredientRequestDto.getId_ingredient())
                 .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found"));
 
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = userRepository.findByIdOptional(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         //on essaie de recuperer l ingredient grace a son id dans le garde-manger de la maison
@@ -117,7 +117,7 @@ public class PantryIngredientServiceImpl implements PantryIngredientService {
     @Override
     @Transactional
     public List<PantryIngredientResponseDto> getPantryIngredientsByHomeId(UUID homeId) {
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Home not found"));
 
         List<PantryIngredientEntity> pantryIngredients = pantryIngredientRepository.findByHome(homeId);
@@ -147,7 +147,7 @@ public class PantryIngredientServiceImpl implements PantryIngredientService {
     @Transactional
     @Override
     public PantryIngredientResponseDto getPantryIngredientByPantryIngredientIdAndHomeId(UUID homeId, UUID pantryIngredientId) {
-        HomeEntity home = homeRepository.findById(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Home not found"));
 
         PantryIngredientEntity pantryIngredients = pantryIngredientRepository. findByIdPantryIngredientAndHomeId(pantryIngredientId,homeId);

@@ -12,20 +12,16 @@ import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestResponse;
-import org.univartois.dto.request.ForgotPasswordRequestDto;
-import org.univartois.dto.request.UserAuthRequestDto;
-import org.univartois.dto.request.UserRegisterRequestDto;
-import org.univartois.dto.request.UserVerificationRequestDto;
+import org.univartois.dto.request.*;
 import org.univartois.dto.response.*;
 import org.univartois.service.HomeService;
-import org.univartois.service.UserAuthService;
+import org.univartois.service.UserService;
 import org.univartois.utils.Constants;
 import org.univartois.utils.ResponseUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.UUID;
 
 @Path("/api/users")
 public class UserAuthResource {
@@ -33,7 +29,7 @@ public class UserAuthResource {
     UriInfo uriInfo;
 
     @Inject
-    UserAuthService userAuthService;
+    UserService userService;
 
     @Inject
     JsonWebToken jwt;
@@ -45,7 +41,7 @@ public class UserAuthResource {
     @PermitAll
     @POST
     public RestResponse<ApiResponse<UserRegisterResponseDto>> registerUser(@Valid UserRegisterRequestDto userRegisterRequestDto) {
-        UserRegisterResponseDto userRegisterResponseDto = userAuthService.registerUser(userRegisterRequestDto);
+        UserRegisterResponseDto userRegisterResponseDto = userService.registerUser(userRegisterRequestDto);
         return RestResponse.status(RestResponse.Status.CREATED, ResponseUtil.success(userRegisterResponseDto, userRegisterResponseDto.getMessage(), RestResponse.Status.CREATED, uriInfo.getPath()));
     }
 
@@ -53,7 +49,7 @@ public class UserAuthResource {
     @GET
     @Path("/verify")
     public RestResponse<ApiResponse<VerificationAccountResponseDto>> verifyUser(@QueryParam("token") @NotBlank String token) {
-        final VerificationAccountResponseDto verificationAccountResponseDto = userAuthService.verifyAccount(token);
+        final VerificationAccountResponseDto verificationAccountResponseDto = userService.verifyAccount(token);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(verificationAccountResponseDto, verificationAccountResponseDto.getMessage(), RestResponse.Status.OK, uriInfo.getPath()));
     }
 
@@ -61,9 +57,9 @@ public class UserAuthResource {
     @POST
     @Path("/auth")
     public RestResponse<ApiResponse<UserAuthResponseDto>> login(@Valid UserAuthRequestDto userAuthRequestDto) {
-        final UserAuthResponseDto userAuthResponseDto = userAuthService.auth(userAuthRequestDto);
+        final UserAuthResponseDto userAuthResponseDto = userService.auth(userAuthRequestDto);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(
-                userAuthResponseDto, "authentification réussie. Bienvenue dans votre espace fammeal",
+                userAuthResponseDto, Constants.USER_AUTHENTICATED_MSG,
                 RestResponse.Status.OK,
                 uriInfo.getPath()
         ));
@@ -73,7 +69,7 @@ public class UserAuthResource {
     @PUT
     @Path("/userVerification")
     public RestResponse<ApiResponse<UserVerificationResponseDto>> userVerification(UserVerificationRequestDto userVerificationRequestDto) {
-        final UserVerificationResponseDto userVerificationResponse = userAuthService.userVerification(userVerificationRequestDto);
+        final UserVerificationResponseDto userVerificationResponse = userService.userVerification(userVerificationRequestDto);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userVerificationResponse, userVerificationResponse.getMessage(), RestResponse.Status.OK, uriInfo.getPath()));
     }
 
@@ -81,7 +77,7 @@ public class UserAuthResource {
     @PUT
     @Path("/forgottenPassword")
     public RestResponse<ApiResponse<ForgotPasswordResponseDto>> forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) {
-        final ForgotPasswordResponseDto forgotPasswordResponse = userAuthService.forgotPassword(forgotPasswordRequestDto);
+        final ForgotPasswordResponseDto forgotPasswordResponse = userService.forgotPassword(forgotPasswordRequestDto);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(forgotPasswordResponse, forgotPasswordResponse.getMessage(), RestResponse.Status.OK, uriInfo.getPath()));
     }
 
@@ -89,8 +85,8 @@ public class UserAuthResource {
     @GET
     @Path("/resetPassword")
     public RestResponse<ApiResponse<Object>> resetPassword(@QueryParam("token") @NotBlank String token) {
-        userAuthService.resetPassword(token);
-        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, "votre nouveau mot de passe est réinitialisé. Veuillez vérifier votre adresse mail", RestResponse.Status.OK, uriInfo.getPath()));
+        userService.resetPassword(token);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_PASSWORD_RESET_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @PUT
@@ -100,7 +96,7 @@ public class UserAuthResource {
     public RestResponse<ApiResponse<UpdateProfilePictureResponseDto>> updateProfilePicture(@RestForm("file") InputStream file) throws IOException {
         byte[] fileBytes = file.readAllBytes();
         file.close();
-        final UpdateProfilePictureResponseDto profilePictureResponseDto = userAuthService.updateProfilePicture(fileBytes);
+        final UpdateProfilePictureResponseDto profilePictureResponseDto = userService.updateProfilePicture(fileBytes);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(profilePictureResponseDto, Constants.USER_PROFILE_PICTURE_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
@@ -108,27 +104,66 @@ public class UserAuthResource {
     @Path("/me/profilePicture")
     @Authenticated
     public RestResponse<ApiResponse<Object>> deleteProfilePicture() {
-        userAuthService.deleteProfilePicture();
+        userService.deleteProfilePicture();
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_PROFILE_PICTURE_DELETED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @Authenticated
     @GET
     @Path("/me")
-    public RestResponse<ApiResponse<UserAuthResponseDto>> getCurrentAuthenticatedUser() {
-        UUID userId = UUID.fromString(jwt.getSubject());
-        UserAuthResponseDto userAuthResponseDto = userAuthService.getUserById(userId);
-        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userAuthResponseDto, "informations de votre compte", RestResponse.Status.OK, uriInfo.getPath()));
+    public RestResponse<ApiResponse<UserAuthResponseDto>> getProfile() {
+        UserAuthResponseDto userAuthResponseDto = userService.getProfile();
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userAuthResponseDto, Constants.USER_PROFILE_RETRIEVED, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @PUT
+    @Path("/me")
+    @Authenticated
+    public RestResponse<ApiResponse<UserAuthResponseDto>> updateProfile(@Valid UpdateAuthenticatedUserRequestDto dto){
+        UserAuthResponseDto userAuthResponseDto = userService.updateProfile(dto);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(userAuthResponseDto, Constants.USER_PROFILE_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @PUT
+    @Path("/me/password")
+    @Authenticated
+    public RestResponse<ApiResponse<Object>> updatePassword(@Valid UpdatePasswordRequestDto updatePasswordRequestDto){
+        userService.updatePassword(updatePasswordRequestDto);
+
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_PASSWORD_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @DELETE
+    @Authenticated
+    @Path("/me")
+    public RestResponse<ApiResponse<Object>> deleteProfile(){
+        userService.deleteProfile();
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.USER_DELETED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
     @GET
     @Path("/me/homes")
     @Authenticated
-    public RestResponse<ApiResponse<List<HomeResponseDto>>> getHomes() {
-        UUID userUuid = UUID.fromString(jwt.getSubject());
-        List<HomeResponseDto> homeList = homeService.getUserHomes(userUuid);
-        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeList, "La liste de vos maisons a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
+    public RestResponse<ApiResponse<List<HomeResponseDto>>> getMyHomes() {
+        List<HomeResponseDto> homeList = homeService.getMyHomes();
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeList, Constants.USER_HOMES_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
+    @PUT
+    @Path("/me/constraints")
+    @Authenticated
+    public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> updateDietaryConstraints(UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
+        DietaryConstraintsResponseDto responseDto = userService.updateDietaryConstraints(updateDietaryConstraintsRequestDto);
 
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(responseDto, Constants.USER_DIETARY_CONSTRAINTS_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @GET
+    @Path("/me/constraints")
+    @Authenticated
+    public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> getDietaryConstraints() {
+        DietaryConstraintsResponseDto responseDto = userService.getDietaryConstraints();
+
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(responseDto, Constants.USER_DIETARY_CONSTRAINTS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
 }

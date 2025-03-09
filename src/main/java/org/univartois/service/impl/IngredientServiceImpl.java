@@ -70,7 +70,7 @@ public class IngredientServiceImpl implements IngredientService {
      */
     @Override
     public IngredientResponseDto getIngredientById(UUID ingredientId) {
-        IngredientEntity ingredientEntity = ingredientRepository.findById(ingredientId)
+        IngredientEntity ingredientEntity = ingredientRepository.findByIdOptional(ingredientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ingrédient non trouvé"));
         return ingredientMapper.toResponseDto(ingredientEntity);
     }
@@ -115,7 +115,7 @@ public class IngredientServiceImpl implements IngredientService {
     @Transactional
     public IngredientResponseDto updateIngredient(UUID ingredientId, IngredientRequestDto ingredientRequestDto) {
 
-        Optional<IngredientEntity> existingIngredient = ingredientRepository.findById(ingredientId);
+        Optional<IngredientEntity> existingIngredient = ingredientRepository.findByIdOptional(ingredientId);
 
 
         if (existingIngredient.isEmpty()) {
@@ -139,7 +139,7 @@ public class IngredientServiceImpl implements IngredientService {
     @Transactional
     public void deleteIngredient(UUID ingredientId) {
 
-        Optional<IngredientEntity> ingredient = ingredientRepository.findById(ingredientId);
+        Optional<IngredientEntity> ingredient = ingredientRepository.findByIdOptional(ingredientId);
 
         if (ingredient.isEmpty()) {
             throw new ResourceNotFoundException("Ingrédient non trouvé.");
