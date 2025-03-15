@@ -235,7 +235,6 @@ public class ProposedMealResource {
      */
     @DELETE
     @Authenticated
-    @Path("/")
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public Response deleteProposedMeal(
             @PathParam("homeId") UUID homeId,
