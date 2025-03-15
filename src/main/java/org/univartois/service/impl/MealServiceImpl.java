@@ -47,55 +47,46 @@ public class MealServiceImpl implements MealService{
     MealMapper mealMapper;
 
 
-
-
     @Override
-    public MealResponseFromDateToDto getMealDateTo(UUID idHome, LocalDate from, LocalDate to){
-        List<MealEntity> mealEntities = mealRepository.findFromDateToDate(idHome,from,to);
-
-        Map<String, List<MealEntity>> groupedByMealType = mealEntities.stream()
-                .collect(Collectors.groupingBy(meal -> meal.isMealLunch() ? "lunch" : "dinner"));
+    public MealResponseFromDateToDto getMealDateTo(UUID idHome, LocalDate from, LocalDate to) {
+        List<MealEntity> mealEntities = mealRepository.findFromDateToDate(idHome, from, to);
 
 
-        MealResponseFromDateToDto mealResponseFromTo = new MealResponseFromDateToDto();
         Map<LocalDate, MealResponseFromDateToDto.DailyMealsDto> mealFromTo = new HashMap<>();
 
-        MealResponseFromDateToDto.DailyMealsDto day= new MealResponseFromDateToDto.DailyMealsDto();
+        for (MealEntity meal : mealEntities) {
+            if(meal.getRecipe()!=null){//si le meal n a pas ete supprimé c a d idRecipe a null
+                LocalDate mealDate = meal.getMealDate();
+                boolean isLunch = meal.isMealLunch();
 
 
-        groupedByMealType.forEach((mealType, meals) -> {
-            MealResponseFromDateToDto.MealDto  mealDto = new MealResponseFromDateToDto.MealDto();
-
-            meals.forEach(meal -> {
+                MealResponseFromDateToDto.DailyMealsDto dayMeals = mealFromTo.computeIfAbsent(mealDate,
+                        date -> new MealResponseFromDateToDto.DailyMealsDto());
 
 
+                MealResponseFromDateToDto.MealDto mealDto = new MealResponseFromDateToDto.MealDto();
                 mealDto.setId_recipe(meal.getRecipe().getIdRecipe());
                 mealDto.setName(meal.getRecipe().getRecipeName());
                 mealDto.setImage_url(meal.getRecipe().getRecipeImageLink());
+                mealDto.setIdMeal(meal.getIdMeal());
 
-                if(mealType.equals("lunch")){
-                    day.getLunch().add(mealDto);
-                }else{
-                    day.getDiner().add(mealDto);
+
+                if (isLunch) {
+                    dayMeals.getLunch().add(mealDto);
+                } else {
+                    dayMeals.getDiner().add(mealDto);
                 }
+            }
+
+        }
 
 
-
-            });
-
-            mealFromTo.put(meals.getFirst().getMealDate(), day);
-
-
-
-        });
-
+        MealResponseFromDateToDto mealResponseFromTo = new MealResponseFromDateToDto();
         mealResponseFromTo.setMeals(mealFromTo);
 
-
-
         return mealResponseFromTo;
-    //        return mealMapper.toResponseDtoList(mealEntities);
     }
+
 
 
     /**
@@ -125,14 +116,14 @@ public class MealServiceImpl implements MealService{
         //gestion du cas ou l utilisateur a deja proposer un repas pour le dejeuner ou le dinner
         if(proposedMealRepository.findByProposerId(userId)!=null){
             //recupère la liste des propositions de l utilisateur
-            List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerId(userId);
+            List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerIdAndMealDate(userId,mealRequestDto.getMealDate());
 
             for(ProposedMealEntity proposedMealEntity : proposedMeal){
 
                 if(proposedMealEntity.getMeal().isMealLunch() && mealRequestDto.isMealLunch()){
-                    throw new RuntimeException("Vous avez déja proposer un repas pour le dejeuner . ");
+                    throw new RuntimeException("Vous avez déja proposer un repas pour le dejeuner pour ce jour  . ");
                 }else if(!proposedMealEntity.getMeal().isMealLunch() && !mealRequestDto.isMealLunch()){
-                    throw new RuntimeException("vous avez déja proposer un repas pour le dinner. ");
+                    throw new RuntimeException("vous avez déja proposer un repas pour le dinner pour ce jour . ");
                 }
             }
 
@@ -146,8 +137,8 @@ public class MealServiceImpl implements MealService{
         mealRepository.persist(mealEntity);
 
         //rajouter la proposition de l utilisateur dans proposedMeal
-//        ProposedMealEntity proposedMeal = new ProposedMealEntity(recipe,mealEntity,user.orElse(null));
-//        proposedMealRepository.persist(proposedMeal);
+        ProposedMealEntity proposedMeal = new ProposedMealEntity(recipe,mealEntity,user.orElse(null));
+        proposedMealRepository.persist(proposedMeal);
 
         return mealMapper.toResponseDto(mealEntity);
     }
@@ -189,7 +180,7 @@ public class MealServiceImpl implements MealService{
             );
 
             if (proposeOld != null) {
-                System.out.println("Existe deja dans proposed-meal");
+
                 proposedMealRepository.delete(proposeOld);
 
             }
@@ -224,13 +215,15 @@ public class MealServiceImpl implements MealService{
         MealEntity mealEntity = mealRepository.findByIdOptional(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found"));
 
-//        ProposedMealEntity proposeOld = proposedMealRepository.findByMealIdAndProposerId(mealId,userId);
-//        proposeOld.setMeal(null);
-//        proposedMealRepository.persist(proposeOld);
-        // mealRepository.delete(mealEntity);
+        ProposedMealEntity proposeOld = proposedMealRepository.findByMealIdAndProposerId(mealId,userId);
+        if(proposeOld != null) {
+            System.out.println("old not null");
+        }
+        proposedMealRepository.delete(proposeOld);
+
         // Safe delete  on met id_recipe à NULL sans supprimer le repas
         mealEntity.setRecipe(null);
-        mealRepository.persist(mealEntity);
+//        mealRepository.persist(mealEntity);
     }
 
 

@@ -52,46 +52,13 @@ public class RecipeResource {
     @Inject
     Request request;
 
-    /**
-     * Récupérer la liste de toutes les recettes
-     * @return
-     */
-    @GET
-    @Authenticated
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Operation(summary = "Get all recipes", description = "Returns a list of all recipes.")
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<List<RecipeResponseDto>>> getAllRecipes() {
-        try{
-            List<RecipeResponseDto> responseDto = recipeService.getAllRecipes();
 
-            return RestResponse.status(
-                    RestResponse.Status.OK,
-                    ResponseUtil.success(responseDto, "Liste des Recettes récupérée avec succès.", RestResponse.Status.OK, uriInfo.getPath())
-            );
-
-        }catch (ResourceNotFoundException e){
-            return RestResponse.status(
-                    RestResponse.Status.NOT_FOUND,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "idRecette",
-                            "Erreur lors de la récupération de la recette ",
-                            RestResponse.Status.NOT_FOUND,
-                            uriInfo.getPath()
-                    )
-            );
-        }
-
-    }
 
     /**
      * Récupérer la liste de toutes les recettes publiques
      * @return
      */
     @GET
-    @Path("/publics") //pour un user precis 
     @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -126,16 +93,36 @@ public class RecipeResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Authenticated
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<List<RecipeResponseDto>>> searchRecipes( //pour un utilisateur  precis
+    public RestResponse<ApiResponse<List<RecipeResponseDto>>> searchRecipes(
+
             @QueryParam("keywords") List<String> keywords,
             @QueryParam("ingredients") List<String> ingredientIds,
             @QueryParam("vegetarian") Boolean vegetarian,
             @QueryParam("covers") Integer covers,
-            @QueryParam("lunch_box") Boolean lunchBox
+            @QueryParam("lunch_box") Boolean lunchBox, @QueryParam("allergies") List<String> allergies
             ) {
 
-        List<RecipeResponseDto> recipes = recipeService.searchRecipes(keywords, ingredientIds, vegetarian, covers, lunchBox);
-        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(recipes, "La liste des recettes de l'utilisateur a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
+        List<RecipeResponseDto> recipes = recipeService.searchRecipes(keywords, ingredientIds, vegetarian, covers, lunchBox,allergies);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(recipes, "La liste des recettes de publique filtrée a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
+    }
+
+    @GET
+    @Path("/search/me")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Authenticated
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    public RestResponse<ApiResponse<List<RecipeResponseDto>>> searchRecipesUser(
+
+            @QueryParam("keywords") List<String> keywords,
+            @QueryParam("ingredients") List<String> ingredientIds,
+            @QueryParam("vegetarian") Boolean vegetarian,
+            @QueryParam("covers") Integer covers,
+            @QueryParam("lunch_box") Boolean lunchBox, @QueryParam("allergies") List<String> allergies
+    ) {
+
+        UUID userId = UUID.fromString(jwt.getSubject());
+        List<RecipeResponseDto> recipes = recipeService.searchRecipesUser(keywords, ingredientIds, vegetarian, covers, lunchBox,allergies,userId);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(recipes, "La liste des recettes de l'utilisateur filtrée a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
     }
 
 
@@ -275,6 +262,7 @@ public class RecipeResource {
     @Path("/{idRecipe}")
     @Operation(summary = "Delete recipe", description = "Deletes a recipe (soft delete).")
     @Transactional
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<Object>> deleteRecipe(@PathParam("idRecipe") UUID idRecipe) {
         try{

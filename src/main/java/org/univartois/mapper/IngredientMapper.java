@@ -14,7 +14,8 @@ public interface IngredientMapper {
 
     IngredientEntity toEntity(IngredientRequestDto ingredientRequestDto);
 
-
+    @Mapping(target = "allergies", expression = "java(ingredientEntity.getAllAllergies())")
+    @Mapping(source ="idIngredient" , target="idIngredient")
     IngredientResponseDto toResponseDto(IngredientEntity ingredientEntity);
 
     List<IngredientResponseDto> toResponseDtoList(List<IngredientEntity> ingredientEntities);

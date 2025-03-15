@@ -24,7 +24,7 @@ import org.univartois.service.RecipeService;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.RecursiveAction;
 
 @ApplicationScoped
 public class RecipeServiceImpl implements RecipeService {
@@ -92,8 +92,22 @@ public class RecipeServiceImpl implements RecipeService {
 
         recipeRepository.persist(recipeEntity);
 
+        List<RecipesIngredientsEntity> recipeIngredients = recipesIngredientsRepository.findByRecipeId(recipeEntity.getIdRecipe());
 
-        return recipeMapper.toResponseDto(recipeEntity);
+        RecipeResponseDto recipeResponseDto = recipeMapper.toResponseDto(recipeEntity);
+
+        for (RecipesIngredientsEntity recipesIngredient : recipeIngredients) {
+            //  recipeResponseDto.getIdsIngredients().add(recipesIngredient.ingredient.getIdIngredient());
+            RecipeResponseDto.Ingredients in = new RecipeResponseDto.Ingredients(recipesIngredient.ingredient.getIdIngredient(),
+                    recipesIngredient.ingredient.getIngredientName(), recipesIngredient.quantityNeed, recipesIngredient.ingredient.isIngredientIsVegan(),
+                    recipesIngredient.ingredient.getIdUnit());
+
+            recipeResponseDto.getIngredients().add(in);
+
+        }
+        return recipeResponseDto;
+
+//        return recipeMapper.toResponseDto(recipeEntity);
     }
 
     private void addDataInRecipeEntity(RecipeRequestDto createRecipeRequestDto, RecipeEntity recipeEntity) {
@@ -143,7 +157,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public List<RecipeResponseDto> getAllRecipes() {
         List<RecipeEntity> recipeEntities = recipeRepository.listAll();
-        if (recipeEntities.isEmpty()) throw new ResourceNotFoundException("Recipes not found");
+        //if (recipeEntities.isEmpty()) throw new ResourceNotFoundException("Recipes not found");
 
         //on recupère la liste de toutes les recette dans la table recette
         List<RecipeResponseDto> allRecipes = recipeMapper.toResponseDtoList(recipeEntities);
@@ -161,7 +175,28 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeResponseDto> getAllPublicRecipes(){
         List<RecipeEntity> recipeEntitiesPublic = recipeRepository.findPublicRecipes();
         if (recipeEntitiesPublic.isEmpty()) throw new ResourceNotFoundException("Recipes public not found");
-        return recipeMapper.toResponseDtoList(recipeEntitiesPublic);
+
+        List<RecipeResponseDto> listRecipeResponseDtos =  new ArrayList<>();
+
+        for(RecipeEntity recipeEntity : recipeEntitiesPublic){
+            List<RecipesIngredientsEntity> recipeIngredients = recipesIngredientsRepository.findByRecipeId(recipeEntity.getIdRecipe());
+            RecipeResponseDto recipeResponseDto = recipeMapper.toResponseDto(recipeEntity);
+            for (RecipesIngredientsEntity recipesIngredient : recipeIngredients) {
+
+                RecipeResponseDto.Ingredients in = new RecipeResponseDto.Ingredients(recipesIngredient.ingredient.getIdIngredient(),
+                        recipesIngredient.ingredient.getIngredientName(), recipesIngredient.quantityNeed, recipesIngredient.ingredient.isIngredientIsVegan(),
+                        recipesIngredient.ingredient.getIdUnit());
+
+                recipeResponseDto.getIngredients().add(in);
+
+            }
+            listRecipeResponseDtos.add(recipeResponseDto);
+
+        }
+
+
+   return listRecipeResponseDtos;
+
     }
 
 
@@ -235,13 +270,25 @@ public class RecipeServiceImpl implements RecipeService {
         }
         //  soft delete
          recipeEntity.setUser(null);
-        recipeEntity.setRecipePublic(false);
+
     }
 
     @Override
-    public List<RecipeResponseDto> searchRecipes(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, Integer covers, Boolean lunchBox) {
+    public List<RecipeResponseDto> searchRecipes(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, Integer covers, Boolean lunchBox,List<String> allergies) {
 
-        List<RecipeResponseDto> recipeResponseDto = recipeRepository.searchRecipes(keywords, ingredientIds, vegetarian, covers, lunchBox)
+        List<RecipeResponseDto> recipeResponseDto = recipeRepository.searchRecipes(keywords, ingredientIds, vegetarian, covers, lunchBox,allergies)
+                .stream()
+                .map(recipeMapper::toResponseDto)
+                .toList();
+
+        return getRecipeResponseDtos(recipeResponseDto);
+
+    }
+
+    @Override
+    public List<RecipeResponseDto> searchRecipesUser(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, Integer covers, Boolean lunchBox, List<String> allergies, UUID creatorId) {
+
+        List<RecipeResponseDto> recipeResponseDto = recipeRepository.searchRecipesUser(keywords, ingredientIds, vegetarian, covers, lunchBox,allergies,creatorId)
                 .stream()
                 .map(recipeMapper::toResponseDto)
                 .toList();

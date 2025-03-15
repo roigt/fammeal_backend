@@ -2,12 +2,15 @@ package org.univartois.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import jakarta.ws.rs.Consumes;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Entity
 @Table(name = "recipes")
@@ -36,6 +39,7 @@ public class RecipeEntity {
     @Column(name = "prep_time_minutes")
     private int prepTimeMinutes;
 
+   // @Pattern(regexp = "^https://youtu\\.be/[_a-zA-Z0-9]{11}(\\?.*)?$", message = "Lien YouTube invalide")
     @Column(name = "recipe_video_link")
     private String recipeVideoLink;
 
@@ -56,6 +60,15 @@ public class RecipeEntity {
 
     @OneToMany(mappedBy = "recipe")
     public List<RecipesIngredientsEntity> recipesIngredients = new ArrayList<>();
+
+    //recuperer le nom complet du user
+    public String getFullName() {
+        return user != null ? user.getFirstname() + " " + user.getLastname() : null;
+    }
+
+
+    @Transient
+    List<IngredientEntity> ingredientsList = new ArrayList<>();
 
 
 }

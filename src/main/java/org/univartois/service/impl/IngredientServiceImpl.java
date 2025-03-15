@@ -88,7 +88,8 @@ public class IngredientServiceImpl implements IngredientService {
                         ingredient.getIngredientName(),
                         ingredient.isIngredientIsVegan(),
                         ingredient.getNbDayBeforeExpiration(),
-                        ingredient.getIdIngredient()
+                        ingredient.getIdIngredient(),
+                        ingredient.getAllAllergies()
                 ))
                 .toList();
     }
