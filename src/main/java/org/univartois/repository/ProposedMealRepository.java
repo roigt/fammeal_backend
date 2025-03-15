@@ -67,7 +67,10 @@ public class ProposedMealRepository implements PanacheRepositoryBase<ProposedMea
     }
 
     public List<ProposedMealEntity> findByProposerId(UUID proposerId) {
-        return find(" proposer.id = ?1", proposerId).list();
+        return find(" proposer.id = ?1 ", proposerId).list();
+    }
+    public List<ProposedMealEntity> findByProposerIdAndMealDate(UUID proposerId,LocalDate date) {
+        return find(" proposer.id = ?1 AND meal.mealDate= ?2 ", proposerId,date).list();
     }
 
     public List<ProposedMealEntity> getProposedMealsByDate(LocalDate date) {

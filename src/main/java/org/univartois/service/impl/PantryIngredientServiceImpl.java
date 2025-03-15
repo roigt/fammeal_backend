@@ -88,7 +88,15 @@ public class PantryIngredientServiceImpl implements PantryIngredientService {
 
             PantryIngredientEntity result = pantryIngredientMapper.toEntity(pantryIngredientRequestDto);
 
-            return pantryIngredientMapper.toResponseDto(result);
+            PantryIngredientResponseDto pantryIngredientResponseDto = pantryIngredientMapper.toResponseDto(result);
+
+
+            pantryIngredientResponseDto.setIngredient(ingredient);
+            pantryIngredientResponseDto.setIngredientQuantity(pantryIngredientSearch.get().getIngredientQuantity());
+            pantryIngredientResponseDto.setIdIngredientInPantry(pantryIngredientSearch.get().getIdIngredientInPantry());
+
+            return pantryIngredientResponseDto;
+
 
         } else {
             PantryIngredientEntity pantryIngredient = pantryIngredientMapper.toEntity(pantryIngredientRequestDto);
@@ -98,8 +106,11 @@ public class PantryIngredientServiceImpl implements PantryIngredientService {
 
             pantryIngredientRepository.persist(pantryIngredient);
 
+            PantryIngredientResponseDto pantryIngredientResponseDto = pantryIngredientMapper.toResponseDto(pantryIngredient);
+            pantryIngredientResponseDto.setIngredient(ingredient);
+            pantryIngredientResponseDto.setIdIngredientInPantry(pantryIngredient.getIdIngredientInPantry());
 
-            return pantryIngredientMapper.toResponseDto(pantryIngredient);
+            return pantryIngredientResponseDto;
 
         }
 
@@ -121,18 +132,6 @@ public class PantryIngredientServiceImpl implements PantryIngredientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Home not found"));
 
         List<PantryIngredientEntity> pantryIngredients = pantryIngredientRepository.findByHome(homeId);
-//        pantryIngredients.forEach(entity -> {
-//            IngredientResponseDto responseIngredientClient = ingredientClient.getIngredientById(entity.getIngredient().getIdIngredient());
-//
-//            IngredientEntity ingredientEntity = new IngredientEntity();
-//
-//            ingredientEntity.setIngredientName(responseIngredientClient.getIngredientName());
-//            ingredientEntity.setIngredientIsVegan(responseIngredientClient.isIngredientIsVegan());
-//            ingredientEntity.setNbDayBeforeExpiration(responseIngredientClient.getNbDayBeforeExpiration());
-//
-//            entity.setIngredientDetails(ingredientEntity);
-//        });
-
 
         return pantryIngredientMapper.toResponseDtoList(pantryIngredients);
     }

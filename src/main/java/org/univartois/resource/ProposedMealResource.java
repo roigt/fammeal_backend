@@ -13,9 +13,7 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.univartois.dto.request.ProposedMealRequestDto;
 import org.univartois.dto.response.ApiResponse;
 import org.univartois.dto.response.MealProposalsByDateResponse;
-import org.univartois.dto.response.PantryIngredientResponseDto;
 import org.univartois.dto.response.ProposedMealResponseDto;
-import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.service.ProposedMealService;
 import org.univartois.utils.ResponseUtil;
 

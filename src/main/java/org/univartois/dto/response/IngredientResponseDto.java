@@ -3,6 +3,7 @@ package org.univartois.dto.response;
 import lombok.*;
 import org.univartois.enums.IngredientUnit;
 
+import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -16,5 +17,6 @@ public class IngredientResponseDto {
     private String ingredientName;
     private boolean ingredientIsVegan;
     private int nbDayBeforeExpiration;
-    private UUID ingredientId;
+    private UUID idIngredient;
+    private Map<Long, String> allergies;
 }

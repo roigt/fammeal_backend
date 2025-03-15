@@ -17,7 +17,8 @@ public interface RecipeMapper {
 
     RecipeEntity toEntity(RecipeRequestDto recipeRequestDto);
 
-    @Mapping(source="user.firstname", target="creatorName")
+//    @Mapping(source="user.fullName", target="creatorName")
+    @Mapping(target = "creatorName", expression = "java(recipeEntity.getFullName())")
     @Mapping(source="user.id" , target="creator.id")
     @Mapping(source="user.username" , target="creator.username")
     @Mapping(source="user.profilePictureUrl" , target="creator.imageUrl")

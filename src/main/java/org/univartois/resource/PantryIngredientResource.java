@@ -3,6 +3,7 @@ package org.univartois.resource;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -24,6 +25,7 @@ import java.util.UUID;
 
 @Slf4j
 @Path("/api/homes/{homeId}/pantryIngredients")
+
 public class PantryIngredientResource {
 
     @Inject
@@ -43,6 +45,8 @@ public class PantryIngredientResource {
      */
     @GET
     @Authenticated
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
    // @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<List<PantryIngredientResponseDto>>> getPantryIngredients(@PathParam("homeId") UUID homeId) {
         try {
@@ -71,6 +75,8 @@ public class PantryIngredientResource {
     @GET
     @Authenticated
     @Path("/{ingredientInPantryId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     // @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<PantryIngredientResponseDto>> getPantryIngredientsById(@PathParam("homeId") UUID homeId, @PathParam("ingredientInPantryId") UUID ingredientPantryId) {
         try {
@@ -102,6 +108,8 @@ public class PantryIngredientResource {
      */
     @POST
     @Authenticated
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<PantryIngredientResponseDto>> addPantryIngredient(@PathParam("homeId") UUID homeId,PantryIngredientRequestDto pantryIngredientRequestDto) {
         try {
@@ -130,6 +138,8 @@ public class PantryIngredientResource {
      */
     @PUT
     @Authenticated
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
 //    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
     @Path("/{ingredientInPantryId}")
     public RestResponse<ApiResponse<PantryIngredientResponseDto>> updatePantryIngredient(@PathParam("homeId") UUID homeId, @PathParam("ingredientInPantryId") UUID ingredientInPantryId, PantryIngredientRequestDto pantryIngredientRequestDto) {
@@ -160,6 +170,8 @@ public class PantryIngredientResource {
      */
     @DELETE
     @Authenticated
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
 // @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
     @Path("/{ingredientInPantryId}")
     public RestResponse<ApiResponse<Void>> deletePantryIngredient(@PathParam("homeId") UUID homeId,@PathParam("ingredientInPantryId") UUID ingredientInPantryId) {

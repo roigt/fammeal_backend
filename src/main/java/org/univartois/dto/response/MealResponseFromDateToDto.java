@@ -33,6 +33,7 @@ public class MealResponseFromDateToDto {
         private UUID id_recipe;
         private String name;
         private String image_url;
+        private UUID idMeal;
 
     }
 }

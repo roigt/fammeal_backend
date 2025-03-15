@@ -77,86 +77,87 @@ public class IngredientResource {
     }
 
 
-    @POST
-    @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<IngredientResponseDto>> createIngredient(IngredientRequestDto IngredientRequestDto) {
-        try {
-
-            final IngredientResponseDto ingredient = ingredientService.createIngredient(IngredientRequestDto);
-             System.out.println("unite recu est "+ingredient.getIdUnit().getUnitName());
-
-            return RestResponse.status(
-                    RestResponse.Status.CREATED,
-                    ResponseUtil.success(ingredient, "L'ingrédient a été créé avec succès", RestResponse.Status.CREATED, uriInfo.getPath())
-            );
-        } catch (IngredientAlreadyExistsException e) {
-
-            return RestResponse.status(
-                    RestResponse.Status.CONFLICT,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "ingredientName",
-                            "Erreur lors de la création de l'ingrédient",
-                            RestResponse.Status.CONFLICT,
-                            uriInfo.getPath()
-                    )
-            );
-        }
-    }
-
-    @PUT
-    @Authenticated
-    @Path("/{ingredientId}")
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<IngredientResponseDto>> updateIngredient(@PathParam("ingredientId") UUID ingredientId,
-                                                                             IngredientRequestDto ingredientRequestDto) {
-        try {
-
-            final IngredientResponseDto updatedIngredient = ingredientService.updateIngredient(ingredientId, ingredientRequestDto);
-
-            return RestResponse.status(
-                    RestResponse.Status.OK,
-                    ResponseUtil.success(updatedIngredient, "L'ingrédient a été mis à jour avec succès", RestResponse.Status.OK, uriInfo.getPath())
-            );
-        } catch (ResourceNotFoundException e) {
-            return RestResponse.status(
-                    RestResponse.Status.NOT_FOUND,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "ingredientId",
-                            "Erreur lors de la mise à jour de l'ingrédient",
-                            RestResponse.Status.NOT_FOUND,
-                            uriInfo.getPath()
-                    )
-            );
-        }
-    }
-
-    @DELETE
-    @Authenticated
-    @Path("/{ingredientId}")
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public RestResponse<ApiResponse<Void>> deleteIngredient(@PathParam("ingredientId") UUID ingredientId) {
-        try {
-
-            ingredientService.deleteIngredient(ingredientId);
-
-            return RestResponse.status(
-                    RestResponse.Status.NO_CONTENT,
-                    ResponseUtil.success(null, "L'ingrédient a été supprimé avec succès", RestResponse.Status.NO_CONTENT, uriInfo.getPath())
-            );
-        } catch (ResourceNotFoundException e) {
-            return RestResponse.status(
-                    RestResponse.Status.NOT_FOUND,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "ingredientId",
-                            "Erreur lors de la suppression de l'ingrédient",
-                            RestResponse.Status.NOT_FOUND,
-                            uriInfo.getPath()
-                    )
-            );
-        }
-    }
+//
+//    @POST
+//    @Authenticated
+//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    public RestResponse<ApiResponse<IngredientResponseDto>> createIngredient(IngredientRequestDto IngredientRequestDto) {
+//        try {
+//
+//            final IngredientResponseDto ingredient = ingredientService.createIngredient(IngredientRequestDto);
+//             System.out.println("unite recu est "+ingredient.getIdUnit().getUnitName());
+//
+//            return RestResponse.status(
+//                    RestResponse.Status.CREATED,
+//                    ResponseUtil.success(ingredient, "L'ingrédient a été créé avec succès", RestResponse.Status.CREATED, uriInfo.getPath())
+//            );
+//        } catch (IngredientAlreadyExistsException e) {
+//
+//            return RestResponse.status(
+//                    RestResponse.Status.CONFLICT,
+//                    ResponseUtil.error(
+//                            e.getMessage(),
+//                            "ingredientName",
+//                            "Erreur lors de la création de l'ingrédient",
+//                            RestResponse.Status.CONFLICT,
+//                            uriInfo.getPath()
+//                    )
+//            );
+//        }
+//    }
+//
+//    @PUT
+//    @Authenticated
+//    @Path("/{ingredientId}")
+//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    public RestResponse<ApiResponse<IngredientResponseDto>> updateIngredient(@PathParam("ingredientId") UUID ingredientId,
+//                                                                             IngredientRequestDto ingredientRequestDto) {
+//        try {
+//
+//            final IngredientResponseDto updatedIngredient = ingredientService.updateIngredient(ingredientId, ingredientRequestDto);
+//
+//            return RestResponse.status(
+//                    RestResponse.Status.OK,
+//                    ResponseUtil.success(updatedIngredient, "L'ingrédient a été mis à jour avec succès", RestResponse.Status.OK, uriInfo.getPath())
+//            );
+//        } catch (ResourceNotFoundException e) {
+//            return RestResponse.status(
+//                    RestResponse.Status.NOT_FOUND,
+//                    ResponseUtil.error(
+//                            e.getMessage(),
+//                            "ingredientId",
+//                            "Erreur lors de la mise à jour de l'ingrédient",
+//                            RestResponse.Status.NOT_FOUND,
+//                            uriInfo.getPath()
+//                    )
+//            );
+//        }
+//    }
+//
+//    @DELETE
+//    @Authenticated
+//    @Path("/{ingredientId}")
+//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    public RestResponse<ApiResponse<Void>> deleteIngredient(@PathParam("ingredientId") UUID ingredientId) {
+//        try {
+//
+//            ingredientService.deleteIngredient(ingredientId);
+//
+//            return RestResponse.status(
+//                    RestResponse.Status.NO_CONTENT,
+//                    ResponseUtil.success(null, "L'ingrédient a été supprimé avec succès", RestResponse.Status.NO_CONTENT, uriInfo.getPath())
+//            );
+//        } catch (ResourceNotFoundException e) {
+//            return RestResponse.status(
+//                    RestResponse.Status.NOT_FOUND,
+//                    ResponseUtil.error(
+//                            e.getMessage(),
+//                            "ingredientId",
+//                            "Erreur lors de la suppression de l'ingrédient",
+//                            RestResponse.Status.NOT_FOUND,
+//                            uriInfo.getPath()
+//                    )
+//            );
+//        }
+//    }
 }

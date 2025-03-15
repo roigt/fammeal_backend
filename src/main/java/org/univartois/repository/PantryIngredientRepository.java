@@ -3,6 +3,7 @@ package org.univartois.repository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import org.univartois.entity.HomeEntity;
 import org.univartois.entity.IngredientEntity;
 import org.univartois.entity.PantryIngredientEntity;
@@ -21,12 +22,13 @@ public class PantryIngredientRepository implements PanacheRepositoryBase<PantryI
      * @param homeId
      * @return
      */
+    @Transactional
     public List<PantryIngredientEntity> findByHome(UUID homeId) {
         return find("home.id = ?1", homeId).list();
     }
 
 
-
+    @Transactional
     public PantryIngredientEntity findByIdPantryIngredientAndHomeId(UUID idPantryIngredient,UUID homeId) {
         return find("idIngredientInPantry=?1 and home.id= ?2", idPantryIngredient,homeId).firstResult();
     }
@@ -42,11 +44,13 @@ public class PantryIngredientRepository implements PanacheRepositoryBase<PantryI
      * @param homeId
      * @return
      */
+    @Transactional
     public Optional<PantryIngredientEntity> findPantryIngredientByHomeId(UUID homeId) {
         return find("home.id = ?1", homeId).firstResultOptional();
     }
 
 
+    @Transactional
     public Optional<PantryIngredientEntity> findByIdPantryIngredient(UUID ingredientInPantryId) {
         return find("idIngredientInPantry=?1", ingredientInPantryId).firstResultOptional();
     }
