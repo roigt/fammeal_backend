@@ -276,7 +276,7 @@ public class RecipeResource {
     @Operation(summary = "Delete recipe", description = "Deletes a recipe (soft delete).")
     @Transactional
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public Object deleteRecipe(@PathParam("idRecipe") UUID idRecipe) {
+    public RestResponse<ApiResponse<Object>> deleteRecipe(@PathParam("idRecipe") UUID idRecipe) {
         try{
             recipeService.deleteRecipe(idRecipe);
 
