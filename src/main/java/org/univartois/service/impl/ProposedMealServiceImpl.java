@@ -97,6 +97,27 @@ public class ProposedMealServiceImpl implements ProposedMealService {
         UserEntity proposer = userRepository.findById(userId);
         if(proposer==null) throw new RuntimeException("User not found");
 
+        if (proposedMealRequestDto.getDate().isBefore(LocalDate.now())) {
+            throw new RuntimeException("Proposed Meal  date is before today -> date ");
+        }
+
+
+       // gestion du cas ou l utilisateur a deja proposer un repas pour le dejeuner ou le dinner
+        if(proposedMealRepository.findByProposerId(userId)!=null){
+            //recupère la liste des propositions de l utilisateur
+            List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerIdAndMealDate(userId,proposedMealRequestDto.getDate());
+
+            for(ProposedMealEntity proposedMealEntity : proposedMeal){
+
+                if(proposedMealEntity.getMeal().isMealLunch() && proposedMealRequestDto.getLunch()){
+                    throw new RuntimeException("Vous avez déja proposer un repas pour le dejeuner pour ce jour  . ");
+                }else if(!proposedMealEntity.getMeal().isMealLunch() && !proposedMealRequestDto.getLunch()){
+                    throw new RuntimeException("vous avez déja proposer un repas pour le dinner pour ce jour . ");
+                }
+            }
+
+
+        }
 
         MealEntity meal = mealRepository.findByIdRecipe(proposedMealRequestDto.getRecipeId());
         if(meal==null){//on verifie si le meal existe dans la table meal pour cette proposition et on le crée
@@ -104,7 +125,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
              meal.setMealLunch(proposedMealRequestDto.getLunch());
              meal.setMealDate(proposedMealRequestDto.getDate());
              meal.setHome(home);
-             meal.setRecipe(recipe);
+             meal.setRecipe(null);
             mealRepository.persist(meal);
         }
 
@@ -219,12 +240,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
             throw new ResourceNotFoundException("User not found");
         }
 
-
-        MealEntity meal = mealRepository.findByIdRecipe(proposedMealRequestDto.getRecipeId());
-        if(meal == null) {
-            throw new ResourceNotFoundException("Meal not found");
-        }
-         ProposedMealEntity proposeMealToDelete = proposedMealRepository.findByMealIdAndProposerId(meal.getIdMeal(),userId);
+         ProposedMealEntity proposeMealToDelete = proposedMealRepository.findByIdRecipeLunchDate(proposedMealRequestDto.getRecipeId(),proposedMealRequestDto.getDate(),proposedMealRequestDto.getLunch(),userId);
 
         proposedMealRepository.delete(proposeMealToDelete);
     }

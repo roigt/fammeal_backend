@@ -52,13 +52,13 @@ public class MealServiceImpl implements MealService{
         List<MealEntity> mealEntities = mealRepository.findFromDateToDate(idHome, from, to);
 
 
+
         Map<LocalDate, MealResponseFromDateToDto.DailyMealsDto> mealFromTo = new HashMap<>();
 
         for (MealEntity meal : mealEntities) {
             if(meal.getRecipe()!=null){//si le meal n a pas ete supprimé c a d idRecipe a null
                 LocalDate mealDate = meal.getMealDate();
                 boolean isLunch = meal.isMealLunch();
-
 
                 MealResponseFromDateToDto.DailyMealsDto dayMeals = mealFromTo.computeIfAbsent(mealDate,
                         date -> new MealResponseFromDateToDto.DailyMealsDto());
@@ -113,22 +113,7 @@ public class MealServiceImpl implements MealService{
             throw new RuntimeException("Meal date is before today-> mealDate ");
         }
 
-        //gestion du cas ou l utilisateur a deja proposer un repas pour le dejeuner ou le dinner
-        if(proposedMealRepository.findByProposerId(userId)!=null){
-            //recupère la liste des propositions de l utilisateur
-            List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerIdAndMealDate(userId,mealRequestDto.getMealDate());
 
-            for(ProposedMealEntity proposedMealEntity : proposedMeal){
-
-                if(proposedMealEntity.getMeal().isMealLunch() && mealRequestDto.isMealLunch()){
-                    throw new RuntimeException("Vous avez déja proposer un repas pour le dejeuner pour ce jour  . ");
-                }else if(!proposedMealEntity.getMeal().isMealLunch() && !mealRequestDto.isMealLunch()){
-                    throw new RuntimeException("vous avez déja proposer un repas pour le dinner pour ce jour . ");
-                }
-            }
-
-
-        }
 
         MealEntity mealEntity = mealMapper.toEntity(mealRequestDto);
         mealEntity.setHome(home);
