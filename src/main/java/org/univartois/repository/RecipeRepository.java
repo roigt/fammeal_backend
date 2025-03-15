@@ -82,7 +82,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
                 .toList();
 
 
-        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r WHERE r.recipePublic = false AND r.user.id = :creatorId");
+        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r WHERE r.user.id = :creatorId");
 
         Map<String, Object> params = new HashMap<>();
         params.put("creatorId", creatorId);
@@ -211,7 +211,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
             query.append(" AND (");
 
            for(int i= 0; i < allKeywords.size(); i++) {
-              query.append("( LOWER(r.recipeName) LIKE :keyword").append(i).append(" OR LOWER(r.recipeInstructions) LIKE :keyword").append(i).append(")");
+              query.append("( LOWER(r.recipeName) LIKE :keyword").append(i).append(" OR LOWER(r.recipeInstructions) LIKE :keyword").append(")");
 
               params.put("keyword" + i, "%" + allKeywords.get(i).toLowerCase() + "%");
                if (i < allKeywords.size() - 1) {
