@@ -265,25 +265,8 @@ public class RecipeResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<Object>> deleteRecipe(@PathParam("idRecipe") UUID idRecipe) {
-        try{
-            recipeService.deleteRecipe(idRecipe);
-
-            return RestResponse.status(
-                    RestResponse.Status.NO_CONTENT,
-                    ResponseUtil.success("suppression réussie", "Recette Supprimée avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath())
-            );
-        }catch (ResourceNotFoundException e){
-            return RestResponse.status(
-                    RestResponse.Status.NOT_FOUND,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "idRecipe",
-                            "Erreur lors de la Modification de la recette",
-                            RestResponse.Status.NOT_FOUND,
-                            uriInfo.getPath()
-                    )
-            );
-        }
+        recipeService.deleteRecipe(idRecipe);
+        return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success("suppression réussie", "Recette Supprimée avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));
 
     }
 }

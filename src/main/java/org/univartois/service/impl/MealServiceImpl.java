@@ -200,15 +200,9 @@ public class MealServiceImpl implements MealService{
         MealEntity mealEntity = mealRepository.findByIdOptional(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found"));
 
-        ProposedMealEntity proposeOld = proposedMealRepository.findByMealIdAndProposerId(mealId,userId);
-        if(proposeOld != null) {
-            System.out.println("old not null");
-        }
-        proposedMealRepository.delete(proposeOld);
-
         // Safe delete  on met id_recipe à NULL sans supprimer le repas
         mealEntity.setRecipe(null);
-//        mealRepository.persist(mealEntity);
+
     }
 
 

@@ -174,24 +174,9 @@ public class PantryIngredientResource {
     @Consumes(MediaType.APPLICATION_JSON)
 // @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
     @Path("/{ingredientInPantryId}")
-    public RestResponse<ApiResponse<Void>> deletePantryIngredient(@PathParam("homeId") UUID homeId,@PathParam("ingredientInPantryId") UUID ingredientInPantryId) {
-        try {
-            pantryIngredientService.deletePantryIngredient(ingredientInPantryId);
-            return RestResponse.status(
-                    RestResponse.Status.NO_CONTENT,
-                    ResponseUtil.success(null, "Ingrédient supprimé avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath())
-            );
-        } catch (ResourceNotFoundException e) {
-            return RestResponse.status(
-                    RestResponse.Status.NOT_FOUND,
-                    ResponseUtil.error(
-                            e.getMessage(),
-                            "ingredientInPantryId",
-                            "Erreur lors de la suppression de l'ingrédient du garde-manger",
-                            RestResponse.Status.NOT_FOUND,
-                            uriInfo.getPath()
-                    )
-            );
-        }
+    public RestResponse<ApiResponse<Object>> deletePantryIngredient(@PathParam("homeId") UUID homeId,@PathParam("ingredientInPantryId") UUID ingredientInPantryId) {
+        pantryIngredientService.deletePantryIngredient(ingredientInPantryId);
+        return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success(null, "Ingrédient supprimé avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));
+
     }
 }
