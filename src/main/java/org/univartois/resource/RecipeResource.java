@@ -98,7 +98,7 @@ public class RecipeResource {
             @QueryParam("keywords") List<String> keywords,
             @QueryParam("ingredients") List<String> ingredientIds,
             @QueryParam("vegetarian") Boolean vegetarian,
-            @QueryParam("covers") Integer covers,
+            @QueryParam("covers") String covers,
             @QueryParam("lunch_box") Boolean lunchBox, @QueryParam("allergies") List<String> allergies
             ) {
 
@@ -116,7 +116,7 @@ public class RecipeResource {
             @QueryParam("keywords") List<String> keywords,
             @QueryParam("ingredients") List<String> ingredientIds,
             @QueryParam("vegetarian") Boolean vegetarian,
-            @QueryParam("covers") Integer covers,
+            @QueryParam("covers") String  covers,
             @QueryParam("lunch_box") Boolean lunchBox, @QueryParam("allergies") List<String> allergies
     ) {
 

@@ -274,7 +274,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public List<RecipeResponseDto> searchRecipes(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, Integer covers, Boolean lunchBox,List<String> allergies) {
+    public List<RecipeResponseDto> searchRecipes(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, String covers, Boolean lunchBox,List<String> allergies) {
 
         List<RecipeResponseDto> recipeResponseDto = recipeRepository.searchRecipes(keywords, ingredientIds, vegetarian, covers, lunchBox,allergies)
                 .stream()
@@ -286,7 +286,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public List<RecipeResponseDto> searchRecipesUser(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, Integer covers, Boolean lunchBox, List<String> allergies, UUID creatorId) {
+    public List<RecipeResponseDto> searchRecipesUser(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, String  covers, Boolean lunchBox, List<String> allergies, UUID creatorId) {
 
         List<RecipeResponseDto> recipeResponseDto = recipeRepository.searchRecipesUser(keywords, ingredientIds, vegetarian, covers, lunchBox,allergies,creatorId)
                 .stream()
