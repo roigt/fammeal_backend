@@ -240,8 +240,11 @@ public class ProposedMealServiceImpl implements ProposedMealService {
             throw new ResourceNotFoundException("User not found");
         }
 
-         ProposedMealEntity proposeMealToDelete = proposedMealRepository.findByIdRecipeLunchDate(proposedMealRequestDto.getRecipeId(),proposedMealRequestDto.getDate(),proposedMealRequestDto.getLunch(),userId);
+        ProposedMealEntity proposeMealToDelete = proposedMealRepository.findByIdRecipeLunchDate(proposedMealRequestDto.getRecipeId(),proposedMealRequestDto.getDate(),proposedMealRequestDto.getLunch(),userId);
 
+        if(proposeMealToDelete == null) {
+            throw new ResourceNotFoundException("Proposed meal not found. You can't delete a proposed meal that isn't yours.");
+        }
         proposedMealRepository.delete(proposeMealToDelete);
     }
 }

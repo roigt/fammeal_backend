@@ -14,6 +14,7 @@ import org.univartois.dto.request.ProposedMealRequestDto;
 import org.univartois.dto.response.ApiResponse;
 import org.univartois.dto.response.MealProposalsByDateResponse;
 import org.univartois.dto.response.ProposedMealResponseDto;
+import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.service.ProposedMealService;
 import org.univartois.utils.ResponseUtil;
 
@@ -236,11 +237,9 @@ public class ProposedMealResource {
     @DELETE
     @Authenticated
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public Response deleteProposedMeal(
-            @PathParam("homeId") UUID homeId,
-            ProposedMealRequestDto proposedMealRequestDto){
-
+    public RestResponse<ApiResponse<Object>> deleteProposedMeal(@PathParam("homeId") UUID homeId, ProposedMealRequestDto proposedMealRequestDto){
         proposedMealService.deleteProposedMeal(homeId,proposedMealRequestDto);
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success("suppression réussie", "Repas Proposée Supprimée avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));
+
     }
 }

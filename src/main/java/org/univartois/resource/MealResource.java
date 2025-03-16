@@ -4,12 +4,12 @@ import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import org.univartois.dto.request.MealRequestDto;
 import org.univartois.dto.response.*;
+import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.service.MealService;
 import org.univartois.utils.ResponseUtil;
 
@@ -126,8 +126,8 @@ public class MealResource{
     @Path("/{idMeal}")
     @Transactional
     //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
-    public Response deleteMeal(@PathParam("idHome") UUID idHome, @PathParam("idMeal") UUID idMeal) {
+    public RestResponse<ApiResponse<Object>>  deleteMeal(@PathParam("idHome") UUID idHome, @PathParam("idMeal") UUID idMeal) {
         mealService.deleteMeal(idHome, idMeal);
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success("suppression réussie", "Repas Supprimé avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));
     }
 }
