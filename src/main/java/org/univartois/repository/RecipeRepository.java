@@ -82,7 +82,9 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
                 .toList();
 
 
-        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r WHERE r.user.id = :creatorId");
+
+        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r JOIN r.user u  WHERE r.user.id = :creatorId");
+
 
         Map<String, Object> params = new HashMap<>();
         params.put("creatorId", creatorId);
@@ -92,7 +94,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
             query.append(" AND (");
             for (int i = 0; i < allKeywords.size(); i++) {
                 query.append("(LOWER(r.recipeName) LIKE :keyword").append(i)
-                        .append(" OR LOWER(r.recipeInstructions) LIKE :keyword").append(i).append(")");
+                        .append(" OR LOWER(r.recipeInstructions) LIKE :keyword").append(i).append(" OR LOWER(u.username) LIKE :keyword").append(i).append(")");
                 if (i < allKeywords.size() - 1) query.append(" OR ");
                 params.put("keyword" + i, "%" + allKeywords.get(i).toLowerCase() + "%");
             }
@@ -113,13 +115,20 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
         }
 
         // Gestion du filtre végétarien
-        if (vegetarian != null) {
-            query.append(vegetarian ? " AND NOT EXISTS (" : " AND EXISTS (");
+        if (Boolean.TRUE.equals(vegetarian)) {
+            query.append(" AND NOT EXISTS (");
             query.append("   SELECT 1 FROM RecipesIngredientsEntity ri ");
             query.append("   WHERE ri.recipe.idRecipe = r.idRecipe ");
             query.append("   AND ri.ingredient.ingredientIsVegan = false ");
             query.append(" )");
         }
+//        if (vegetarian != null) {
+//            query.append(vegetarian ? " AND NOT EXISTS (" : " AND EXISTS (");
+//            query.append("   SELECT 1 FROM RecipesIngredientsEntity ri ");
+//            query.append("   WHERE ri.recipe.idRecipe = r.idRecipe ");
+//            query.append("   AND ri.ingredient.ingredientIsVegan = false ");
+//            query.append(" )");
+//        }
 
         // Gestion du nombre de couverts
         if (covers != null) {
@@ -128,10 +137,13 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
         }
 
         // Gestion du lunch box
-        if (lunchBox != null) {
-            query.append(" AND r.recipeLunchBox = :lunchBox");
-            params.put("lunchBox", lunchBox);
+        if (Boolean.TRUE.equals(lunchBox)) {
+            query.append(" AND r.recipeLunchBox = true");
         }
+//        if (lunchBox != null) {
+//            query.append(" AND r.recipeLunchBox = :lunchBox");
+//            params.put("lunchBox", lunchBox);
+//        }
 
         // Gestion des allergies
         List<Long> validAllergyIds = allAllergyIds.stream()
@@ -203,15 +215,18 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
 
 
         //recupérer toutes les recettes dans l alias r
-        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r WHERE r.recipePublic=true and 1=1");
+        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r JOIN r.user u  WHERE r.recipePublic=true and 1=1");
         Map<String, Object> params = new HashMap<>();
+
 
 
         if (!allKeywords.isEmpty()) {
             query.append(" AND (");
 
            for(int i= 0; i < allKeywords.size(); i++) {
-              query.append("( LOWER(r.recipeName) LIKE :keyword").append(i).append(" OR LOWER(r.recipeInstructions) LIKE :keyword").append(")");
+
+              query.append("( LOWER(r.recipeName) LIKE :keyword").append(i).append(" OR LOWER(r.recipeInstructions) LIKE :keyword").append(i).append(" OR LOWER(u.username) LIKE :keyword").append(i).append(")");
+
 
               params.put("keyword" + i, "%" + allKeywords.get(i).toLowerCase() + "%");
                if (i < allKeywords.size() - 1) {
@@ -249,15 +264,16 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
                 query.append("   WHERE ri.recipe.idRecipe = r.idRecipe ");
                 query.append("   AND ri.ingredient.ingredientIsVegan = false ");
                 query.append(" )");
-            } else {
-                //Si il y a parmi les ingredients au moins 1 ingredient non vegan alors cette recette n est pas vegan
-                query.append(" AND EXISTS (");
-                query.append("   SELECT 1 ");
-                query.append("   FROM RecipesIngredientsEntity ri ");
-                query.append("   WHERE ri.recipe.idRecipe = r.idRecipe ");
-                query.append("   AND ri.ingredient.ingredientIsVegan = false ");
-                query.append(" )");
             }
+//            else {
+//                //Si il y a parmi les ingredients au moins 1 ingredient non vegan alors cette recette n est pas vegan
+//                query.append(" AND EXISTS (");
+//                query.append("   SELECT 1 ");
+//                query.append("   FROM RecipesIngredientsEntity ri ");
+//                query.append("   WHERE ri.recipe.idRecipe = r.idRecipe ");
+//                query.append("   AND ri.ingredient.ingredientIsVegan = false ");
+//                query.append(" )");
+//            }
 
         }
 
@@ -266,10 +282,13 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
             params.put("covers", covers);
         }
 
-        if (lunchBox != null) {
-            query.append(" AND r.recipeLunchBox = :lunchBox");
-            params.put("lunchBox", lunchBox);
+        if (Boolean.TRUE.equals(lunchBox)) {
+            query.append(" AND r.recipeLunchBox = true");
         }
+//        if (lunchBox != null) {
+//            query.append(" AND r.recipeLunchBox = :lunchBox");
+//            params.put("lunchBox", lunchBox);
+//        }
 
         // Convertir les allergyIds en Long en filtrant les valeurs invalides
         List<Long> validAllergyIds = allAllergyIds.stream()
