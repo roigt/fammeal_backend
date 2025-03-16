@@ -131,7 +131,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
 //        }
 
         // Gestion du nombre de couverts
-        if (covers != null) {
+        if (covers != null && covers > 0) {
             query.append(" AND r.recipeNbCovers = :covers");
             params.put("covers", covers);
         }
@@ -277,7 +277,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
 
         }
 
-        if (covers != null) {
+        if (covers != null && covers > 0) {
             query.append(" AND r.recipeNbCovers = :covers");
             params.put("covers", covers);
         }
