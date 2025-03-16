@@ -55,8 +55,25 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
     }
 
 
+    /**
+     *
+     *
+     *filtre sur les recettes de l utilisateur
+     * @param keywords
+     * @param ingredientIds
+     * @param vegetarian
+     * @param coversParam
+     * @param lunchBox
+     * @param allergyIds
+     * @param creatorId
+     * @return
+     */
     public List<RecipeEntity> searchRecipesUser(List<String> keywords, List<String> ingredientIds, Boolean vegetarian,
-                                                Integer covers, Boolean lunchBox, List<String> allergyIds, UUID creatorId) {
+                                                String coversParam, Boolean lunchBox, List<String> allergyIds, UUID creatorId) {
+
+        Integer covers = (coversParam == null || coversParam.isEmpty() || "null".equalsIgnoreCase(coversParam))
+                ? null
+                : Integer.valueOf(coversParam);
 
         // Vérifications initiales pour éviter des erreurs
         if (creatorId == null) {
@@ -182,14 +199,16 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
      * @param keywords
      * @param ingredientIds
      * @param vegetarian
-     * @param covers
+     * @param coversParam
      * @param lunchBox
      * @param allergyIds
      * @return
      */
     public List<RecipeEntity> searchRecipes(List<String> keywords, List<String> ingredientIds, Boolean vegetarian,
-                                            Integer covers, Boolean lunchBox,List<String> allergyIds ) {
-
+                                            String coversParam, Boolean lunchBox,List<String> allergyIds ) {
+        Integer covers = (coversParam == null || coversParam.isEmpty() || "null".equalsIgnoreCase(coversParam))
+                ? null
+                : Integer.valueOf(coversParam);
 
         List<String> allKeywords = new ArrayList<>();
         List<String> allIngredientIds = new ArrayList<>();

@@ -25,9 +25,9 @@ public interface RecipeService {
     @Transactional
     void deleteRecipe(UUID recipeId);
 
-    List<RecipeResponseDto> searchRecipes(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, Integer covers, Boolean lunchBox,List<String> allergies);
+    List<RecipeResponseDto> searchRecipes(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, String  covers, Boolean lunchBox,List<String> allergies);
 
-    List<RecipeResponseDto> searchRecipesUser(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, Integer covers, Boolean lunchBox, List<String> allergies, UUID creatorId);
+    List<RecipeResponseDto> searchRecipesUser(List<String> keywords, List<String> ingredientIds, Boolean vegetarian, String  covers, Boolean lunchBox, List<String> allergies, UUID creatorId);
 
     @Transactional
     String uploadRecipeImage(byte[] image);
