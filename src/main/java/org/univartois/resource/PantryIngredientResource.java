@@ -11,6 +11,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestResponse;
 
 
+import org.univartois.annotation.security.HomePermissionsAllowed;
 import org.univartois.dto.request.PantryIngredientRequestDto;
 import org.univartois.dto.response.ApiResponse;
 import org.univartois.dto.response.PantryIngredientResponseDto;
@@ -47,7 +48,7 @@ public class PantryIngredientResource {
     @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-   // @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+//    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<PantryIngredientResponseDto>>> getPantryIngredients(@PathParam("homeId") UUID homeId) {
         try {
             List<PantryIngredientResponseDto> pantryIngredients = pantryIngredientService.getPantryIngredientsByHomeId(homeId);
@@ -77,7 +78,7 @@ public class PantryIngredientResource {
     @Path("/{ingredientInPantryId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    // @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    // @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<PantryIngredientResponseDto>> getPantryIngredientsById(@PathParam("homeId") UUID homeId, @PathParam("ingredientInPantryId") UUID ingredientPantryId) {
         try {
             PantryIngredientResponseDto pantryIngredients = pantryIngredientService.getPantryIngredientByPantryIngredientIdAndHomeId(homeId,ingredientPantryId);
@@ -110,7 +111,7 @@ public class PantryIngredientResource {
     @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<PantryIngredientResponseDto>> addPantryIngredient(@PathParam("homeId") UUID homeId,PantryIngredientRequestDto pantryIngredientRequestDto) {
         try {
 
@@ -140,7 +141,7 @@ public class PantryIngredientResource {
     @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-//    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
+//    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "homeId")
     @Path("/{ingredientInPantryId}")
     public RestResponse<ApiResponse<PantryIngredientResponseDto>> updatePantryIngredient(@PathParam("homeId") UUID homeId, @PathParam("ingredientInPantryId") UUID ingredientInPantryId, PantryIngredientRequestDto pantryIngredientRequestDto) {
         try {
@@ -172,7 +173,7 @@ public class PantryIngredientResource {
     @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-// @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
+// @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "homeId")
     @Path("/{ingredientInPantryId}")
     public RestResponse<ApiResponse<Object>> deletePantryIngredient(@PathParam("homeId") UUID homeId,@PathParam("ingredientInPantryId") UUID ingredientInPantryId) {
         pantryIngredientService.deletePantryIngredient(ingredientInPantryId);

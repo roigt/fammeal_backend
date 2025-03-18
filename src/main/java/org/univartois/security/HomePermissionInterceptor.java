@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
+import org.univartois.annotation.security.ExpressionParser;
 import org.univartois.annotation.security.HomePermissionsAllowed;
 import org.univartois.enums.HomeRoleType;
 import org.univartois.service.RoleService;
@@ -28,11 +29,6 @@ public class HomePermissionInterceptor {
 
     @AroundInvoke
     public Object checkPermissions(InvocationContext invocationContext) throws Exception {
-//        ignore annotation on class
-        Class<?> declaringClass = invocationContext.getMethod().getDeclaringClass();
-        if (declaringClass.isAnnotationPresent(HomePermissionsAllowed.class)) {
-            return invocationContext.proceed();
-        }
 
 
         Method method = invocationContext.getMethod();
@@ -43,13 +39,14 @@ public class HomePermissionInterceptor {
             return invocationContext.proceed();
         }
 
-        String homeIdParamName = homePermissionsAllowed.homeIdParamName();
+        String homeIdExpression = homePermissionsAllowed.homeIdExpression();
         String[] allowedPermissions = homePermissionsAllowed.value();
 
         Object[] params = invocationContext.getParameters();
         Map<String, Object> argsMap = buildArgumentsMap(method, params);
 
-        UUID homeId = UUID.fromString(argsMap.get(homeIdParamName).toString());
+        final Object parsed = ExpressionParser.parseFromParams(homeIdExpression, argsMap);
+        UUID homeId = UUID.fromString(parsed.toString());
 
         HomeRoleType[] homeRoleTypes = new HomeRoleType[allowedPermissions.length];
         for (int i = 0; i < allowedPermissions.length; i++) {

@@ -7,8 +7,10 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.reactive.RestResponse;
 
+import org.univartois.annotation.security.HomePermissionsAllowed;
 import org.univartois.dto.request.MealRequestDto;
 import org.univartois.dto.response.*;
+import org.univartois.enums.HomeRoleType;
 import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.service.MealService;
 import org.univartois.utils.ResponseUtil;
@@ -31,6 +33,7 @@ public class MealResource{
     @Path("/DateTo")
     @Transactional
     @Authenticated
+//    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "idHome")
     public MealResponseFromDateToDto getMealFromDateToDate(@PathParam("idHome") UUID idHome,
                                                            @QueryParam("from") LocalDate from,
                                                            @QueryParam("to") LocalDate to){
@@ -87,7 +90,7 @@ public class MealResource{
     @Authenticated
     @Path("/{idMeal}")
     @Transactional
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    @HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "idHome")
     public  RestResponse<ApiResponse<MealResponseDto>>  updateMeal(@PathParam("idHome") UUID idHome, @PathParam("idMeal") UUID idMeal, MealRequestDto mealRequestDto) {
         try {
 
@@ -125,7 +128,7 @@ public class MealResource{
     @Authenticated
     @Path("/{idMeal}")
     @Transactional
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    @HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "idHome")
     public RestResponse<ApiResponse<Object>>  deleteMeal(@PathParam("idHome") UUID idHome, @PathParam("idMeal") UUID idMeal) {
         mealService.deleteMeal(idHome, idMeal);
         return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success("suppression réussie", "Repas Supprimé avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));
