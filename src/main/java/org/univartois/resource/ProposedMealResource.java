@@ -236,7 +236,7 @@ public class ProposedMealResource {
      */
     @DELETE
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
     public RestResponse<ApiResponse<Object>> deleteProposedMeal(@PathParam("homeId") UUID homeId, ProposedMealRequestDto proposedMealRequestDto){
         proposedMealService.deleteProposedMeal(homeId,proposedMealRequestDto);
         return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success("suppression réussie", "Repas Proposée Supprimée avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));

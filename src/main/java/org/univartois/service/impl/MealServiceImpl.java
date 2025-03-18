@@ -50,9 +50,6 @@ public class MealServiceImpl implements MealService{
     @Override
     public MealResponseFromDateToDto getMealDateTo(UUID idHome, LocalDate from, LocalDate to) {
         List<MealEntity> mealEntities = mealRepository.findFromDateToDate(idHome, from, to);
-
-
-
         Map<LocalDate, MealResponseFromDateToDto.DailyMealsDto> mealFromTo = new HashMap<>();
 
         for (MealEntity meal : mealEntities) {
@@ -79,7 +76,6 @@ public class MealServiceImpl implements MealService{
             }
 
         }
-
 
         MealResponseFromDateToDto mealResponseFromTo = new MealResponseFromDateToDto();
         mealResponseFromTo.setMeals(mealFromTo);
@@ -114,17 +110,11 @@ public class MealServiceImpl implements MealService{
         }
 
 
-
         MealEntity mealEntity = mealMapper.toEntity(mealRequestDto);
         mealEntity.setHome(home);
         mealEntity.setRecipe(recipe);
 
         mealRepository.persist(mealEntity);
-
-        //rajouter la proposition de l utilisateur dans proposedMeal
-        ProposedMealEntity proposedMeal = new ProposedMealEntity(recipe,mealEntity,user.orElse(null));
-        proposedMealRepository.persist(proposedMeal);
-
         return mealMapper.toResponseDto(mealEntity);
     }
 
@@ -156,26 +146,9 @@ public class MealServiceImpl implements MealService{
             throw new RuntimeException("Meal date is before today-> mealDate ");
         }
 
-        if(proposedMealRepository.findByMealIdAndProposerId(mealId,userId).getMeal()!=null) {
-            ProposedMealEntity proposeOld = proposedMealRepository.findByMealIdAndProposerId(mealId,userId);
-
-
-            ProposedMealEntity proposedMeal = new ProposedMealEntity(
-                    recipe,mealEntity,user.orElse(null)
-            );
-
-            if (proposeOld != null) {
-
-                proposedMealRepository.delete(proposeOld);
-
-            }
-            proposedMealRepository.persist(proposedMeal);
-
-        }
 
         // Mettre à jour les informations du repas
         MealEntity mealUpdate =mealMapper.toEntity(mealRequestDto);
-
         mealEntity.setMealDate(mealUpdate.getMealDate());
         mealEntity.setMealLunch(mealUpdate.isMealLunch());
         mealEntity.setRecipe(mealUpdate.getRecipe());
