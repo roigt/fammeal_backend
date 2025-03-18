@@ -40,7 +40,7 @@ public class IngredientResource {
 
     @GET
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<IngredientResponseDto>>> getIngredients() {
         List<IngredientResponseDto> ingredients = ingredientService.getAllIngredients();
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(ingredients, "La liste des ingrédients a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
@@ -49,7 +49,7 @@ public class IngredientResource {
     @GET
     @Authenticated
     @Path("/{ingredientId}")
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<IngredientResponseDto>> getIngredientById(@PathParam("ingredientId") UUID ingredientId) {
 
         try {
@@ -80,7 +80,7 @@ public class IngredientResource {
 //
 //    @POST
 //    @Authenticated
-//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
 //    public RestResponse<ApiResponse<IngredientResponseDto>> createIngredient(IngredientRequestDto IngredientRequestDto) {
 //        try {
 //
@@ -109,7 +109,7 @@ public class IngredientResource {
 //    @PUT
 //    @Authenticated
 //    @Path("/{ingredientId}")
-//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
 //    public RestResponse<ApiResponse<IngredientResponseDto>> updateIngredient(@PathParam("ingredientId") UUID ingredientId,
 //                                                                             IngredientRequestDto ingredientRequestDto) {
 //        try {
@@ -137,7 +137,7 @@ public class IngredientResource {
 //    @DELETE
 //    @Authenticated
 //    @Path("/{ingredientId}")
-//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
 //    public RestResponse<ApiResponse<Void>> deleteIngredient(@PathParam("ingredientId") UUID ingredientId) {
 //        try {
 //

@@ -41,7 +41,7 @@ public class ProposedMealResource {
      */
     @GET
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<ProposedMealResponseDto>>>  getProposedMeals(@PathParam("homeId") UUID homeId) {
 
         try{
@@ -74,7 +74,7 @@ public class ProposedMealResource {
     @GET
     @Path("/{idMeal}")
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<ProposedMealResponseDto>>> getProposedMealByIdMeal(@PathParam("homeId") UUID homeId, @PathParam("idMeal") UUID idMeal) {
 
         try{
@@ -109,7 +109,7 @@ public class ProposedMealResource {
     @Path("/byDate")
     @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<MealProposalsByDateResponse>> getProposedMealsByDate(
             @PathParam("homeId") UUID homeId,
             @QueryParam("date") @NotNull @DateFormat(pattern = "yyyy-MM-dd") LocalDate date
@@ -159,7 +159,7 @@ public class ProposedMealResource {
     @POST
     @Transactional
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<ProposedMealResponseDto>>  proposeMeal(@PathParam("homeId") UUID homeId, ProposedMealRequestDto proposedMealRequestDto) {
 
 
@@ -198,7 +198,7 @@ public class ProposedMealResource {
 //    @PUT
 //    @Authenticated
 //    @Path("/{recipeId}/{mealId}/{proposerId}")
-//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+//    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
 //    public RestResponse<ApiResponse<ProposedMealResponseDto>> updateProposedMeal(
 //            @PathParam("homeId") UUID homeId,
 //            @PathParam("recipeId") UUID recipeId,
@@ -236,7 +236,7 @@ public class ProposedMealResource {
      */
     @DELETE
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<Object>> deleteProposedMeal(@PathParam("homeId") UUID homeId, ProposedMealRequestDto proposedMealRequestDto){
         proposedMealService.deleteProposedMeal(homeId,proposedMealRequestDto);
         return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success("suppression réussie", "Repas Proposée Supprimée avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));

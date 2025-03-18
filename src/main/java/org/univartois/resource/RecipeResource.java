@@ -63,7 +63,7 @@ public class RecipeResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Operation(summary = "Get all public recipes", description = "Returns a list of all public recipes.")
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<RecipeResponseDto>>> getPublicRecipes() {
         try{
             List<RecipeResponseDto> responseDto = recipeService.getAllPublicRecipes();
@@ -92,7 +92,7 @@ public class RecipeResource {
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<RecipeResponseDto>>> searchRecipes(
 
             @QueryParam("keywords") List<String> keywords,
@@ -110,7 +110,7 @@ public class RecipeResource {
     @Path("/search/me")
     @Produces(MediaType.APPLICATION_JSON)
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<RecipeResponseDto>>> searchRecipesUser(
 
             @QueryParam("keywords") List<String> keywords,
@@ -138,7 +138,7 @@ public class RecipeResource {
 //    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<RecipeResponseDto>>  createRecipe(@MultipartForm RecipeMultipartForm form ) {// ,RecipeRequestDto recipeRequestDto  @MultipartForm RecipeMultipartForm form
         try{
 
@@ -184,7 +184,7 @@ public class RecipeResource {
     @Path("/{idRecipe}")
     @Operation(summary = "Get recipe by ID", description = "Returns the details of a recipe.")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<RecipeResponseDto>>  getRecipeById(@PathParam("idRecipe") UUID idRecipe) {
         try{
             RecipeResponseDto responseDto = recipeService.getRecipeById(idRecipe);
@@ -220,7 +220,7 @@ public class RecipeResource {
     @Operation(summary = "Update recipe", description = "Updates an existing recipe.")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<RecipeResponseDto>> updateRecipe(@PathParam("idRecipe") UUID idRecipe,@MultipartForm RecipeMultipartForm form ) {//RecipeRequestDto recipeRequestDto
         try{
             InputStream file = form.file;
@@ -263,7 +263,7 @@ public class RecipeResource {
     @Operation(summary = "Delete recipe", description = "Deletes a recipe (soft delete).")
     @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<Object>> deleteRecipe(@PathParam("idRecipe") UUID idRecipe) {
         recipeService.deleteRecipe(idRecipe);
         return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success("suppression réussie", "Recette Supprimée avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));

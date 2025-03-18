@@ -39,7 +39,7 @@ public class HomeResource {
 
     @GET
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "homeId")
     @Path("/{homeId}")
     public RestResponse<ApiResponse<HomeResponseDto>> getHome(@PathParam("homeId") UUID homeId) {
         final HomeResponseDto home = homeService.getHomeById(homeId);
@@ -57,7 +57,7 @@ public class HomeResource {
     @PUT
     @Path("{homeId}")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<HomeResponseDto>> updateHome(@PathParam("homeId") UUID homeId, @Valid UpdateHomeRequestDto updateHomeRequestDto){
         final HomeResponseDto home = homeService.updateHome(homeId,updateHomeRequestDto);
 
@@ -68,7 +68,7 @@ public class HomeResource {
     @DELETE
     @Path("/{homeId}/leave")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<Object>> leaveHome(@PathParam("homeId") UUID homeId) {
         homeService.leaveHome(homeId);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.HOME_LEFT_MSG, RestResponse.Status.OK, uriInfo.getPath()));
@@ -77,7 +77,7 @@ public class HomeResource {
     @POST
     @Path("/{homeId}/members")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<HomeMemberResponseDto>> addHomeMember(@PathParam("homeId") UUID homeId, @Valid AddHomeMemberRequestDto addHomeMemberRequestDto) {
         final HomeMemberResponseDto homeMemberResponseDto = homeService.addHomeMember(homeId, addHomeMemberRequestDto);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeMemberResponseDto, Constants.USER_ADDED_TO_HOME_MSG, RestResponse.Status.OK, uriInfo.getPath()));
@@ -86,7 +86,7 @@ public class HomeResource {
     @GET
     @Path("/{homeId}/members")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<HomeMemberResponseDto>>> getHomeMembers(@PathParam("homeId") UUID homeId) {
         final List<HomeMemberResponseDto> homeMembers = homeService.getHomeMembers(homeId);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeMembers, Constants.HOME_MEMBERS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
@@ -95,7 +95,7 @@ public class HomeResource {
     @GET
     @Path("/{homeId}/members/{userId}")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<HomeMemberResponseDto>> getHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId) {
         final HomeMemberResponseDto homeMember = homeService.getHomeMember(homeId, userId);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(homeMember, Constants.HOME_MEMBER_DETAILS_RETRIEVED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
@@ -104,7 +104,7 @@ public class HomeResource {
     @PUT
     @Path("/{homeId}/members/{userId}")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<HomeMemberResponseDto>> updateHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto) {
         HomeMemberResponseDto updatedHomeMember = homeService.updateHomeMember(homeId, userId, updateHomeMemberRequestDto);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(updatedHomeMember, Constants.HOME_MEMBER_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
@@ -113,7 +113,7 @@ public class HomeResource {
     @DELETE
     @Path("/{homeId}/members/{userId}")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<Object>> deleteHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId) {
         homeService.deleteHomeMember(homeId, userId);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.HOME_MEMBER_DELETED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
@@ -123,7 +123,7 @@ public class HomeResource {
     @PUT
     @Path("/{homeId}/constraints")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> updateDietaryConstraints(@PathParam("homeId") UUID homeId,UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
         DietaryConstraintsResponseDto responseDto = homeService.updateDietaryConstraints(homeId,updateDietaryConstraintsRequestDto);
 
@@ -133,6 +133,7 @@ public class HomeResource {
     @GET
     @Path("/{homeId}/constraints")
     @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> getDietaryConstraints(@PathParam("homeId") UUID homeId) {
         DietaryConstraintsResponseDto responseDto = homeService.getDietaryConstraints(homeId);
 
@@ -143,7 +144,7 @@ public class HomeResource {
     @PUT
     @Path("/{homeId}/mealGeneration")
     @Authenticated
-    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<Object>> toggleMealGeneration(@PathParam("homeId") UUID homeId, @QueryParam("lunch") boolean lunch){
         homeService.toggleMealGeneration(homeId, lunch);
 

@@ -13,7 +13,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.TYPE})
 public @interface HomePermissionsAllowed {
+    /**
+     * List of allowed permissions
+     */
     @Nonbinding String[] value() default {};
 
-    @Nonbinding String homeIdParamName() default "homeId";
+    /**
+     * expression to retrieve homeId from method params
+     */
+    @Nonbinding String homeIdExpression() default "homeId";
 }
