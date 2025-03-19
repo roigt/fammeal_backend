@@ -10,10 +10,12 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.reactive.DateFormat;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.univartois.annotation.security.HomePermissionsAllowed;
 import org.univartois.dto.request.ProposedMealRequestDto;
 import org.univartois.dto.response.ApiResponse;
 import org.univartois.dto.response.MealProposalsByDateResponse;
 import org.univartois.dto.response.ProposedMealResponseDto;
+import org.univartois.enums.HomeRoleType;
 import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.service.ProposedMealService;
 import org.univartois.utils.ResponseUtil;
@@ -41,7 +43,7 @@ public class ProposedMealResource {
      */
     @GET
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<ProposedMealResponseDto>>>  getProposedMeals(@PathParam("homeId") UUID homeId) {
 
         try{
@@ -74,7 +76,7 @@ public class ProposedMealResource {
     @GET
     @Path("/{idMeal}")
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<ProposedMealResponseDto>>> getProposedMealByIdMeal(@PathParam("homeId") UUID homeId, @PathParam("idMeal") UUID idMeal) {
 
         try{
@@ -109,7 +111,7 @@ public class ProposedMealResource {
     @Path("/byDate")
     @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.MEMBER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<MealProposalsByDateResponse>> getProposedMealsByDate(
             @PathParam("homeId") UUID homeId,
             @QueryParam("date") @NotNull @DateFormat(pattern = "yyyy-MM-dd") LocalDate date
@@ -159,7 +161,7 @@ public class ProposedMealResource {
     @POST
     @Transactional
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.PROPOSITION_REPAS_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<ProposedMealResponseDto>>  proposeMeal(@PathParam("homeId") UUID homeId, ProposedMealRequestDto proposedMealRequestDto) {
 
 
@@ -236,7 +238,7 @@ public class ProposedMealResource {
      */
     @DELETE
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdParamName = "homeId")
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.PROPOSITION_REPAS_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<Object>> deleteProposedMeal(@PathParam("homeId") UUID homeId, ProposedMealRequestDto proposedMealRequestDto){
         proposedMealService.deleteProposedMeal(homeId,proposedMealRequestDto);
         return RestResponse.status(RestResponse.Status.NO_CONTENT, ResponseUtil.success("suppression réussie", "Repas Proposée Supprimée avec succès.", RestResponse.Status.NO_CONTENT, uriInfo.getPath()));

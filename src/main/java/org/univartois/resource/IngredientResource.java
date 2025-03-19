@@ -40,7 +40,6 @@ public class IngredientResource {
 
     @GET
     @Authenticated
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<List<IngredientResponseDto>>> getIngredients() {
         List<IngredientResponseDto> ingredients = ingredientService.getAllIngredients();
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(ingredients, "La liste des ingrédients a été récupérée", RestResponse.Status.OK, uriInfo.getPath()));
@@ -49,7 +48,6 @@ public class IngredientResource {
     @GET
     @Authenticated
     @Path("/{ingredientId}")
-    //@HomePermissionsAllowed(value = {HomeRoleType.Constants.GARDE_MANGER_ROLE}, homeIdExpression = "homeId")
     public RestResponse<ApiResponse<IngredientResponseDto>> getIngredientById(@PathParam("ingredientId") UUID ingredientId) {
 
         try {
