@@ -109,17 +109,19 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
             for(ProposedMealEntity proposedMealEntity : proposedMeal){
 
-                if(proposedMealEntity.getMeal().isMealLunch() && proposedMealRequestDto.getLunch()){
-                    throw new RuntimeException("Vous avez déja proposer un repas pour le dejeuner pour ce jour  . ");
-                }else if(!proposedMealEntity.getMeal().isMealLunch() && !proposedMealRequestDto.getLunch()){
-                    throw new RuntimeException("vous avez déja proposer un repas pour le dinner pour ce jour . ");
+
+                if(proposedMealEntity.getRecipe().getIdRecipe() == proposedMealRequestDto.getRecipeId() && proposedMealEntity.getMeal().isMealLunch() == proposedMealRequestDto.getLunch())
+                {
+                    String lunch = proposedMealRequestDto.getLunch().equals(true)? "déjeuner": "Dinner";
+                    throw new RuntimeException(STR."Vous avez déjà proposer un repas du \{lunch}  avec cette recette.");
                 }
+
             }
 
 
         }
 
-        MealEntity meal = mealRepository.findByIdRecipe(proposedMealRequestDto.getRecipeId());
+        MealEntity meal = mealRepository.findByIdHomeDateAndLunch(homeId,proposedMealRequestDto.getDate(),proposedMealRequestDto.getLunch());
         if(meal==null){//on verifie si le meal existe dans la table meal pour cette proposition et on le crée
              meal= new MealEntity();
              meal.setMealLunch(proposedMealRequestDto.getLunch());
@@ -128,13 +130,6 @@ public class ProposedMealServiceImpl implements ProposedMealService {
              meal.setRecipe(null);
             mealRepository.persist(meal);
         }
-
-        List<ProposedMealEntity> mealExistingAlready =proposedMealRepository.findByMealId(meal.getIdMeal());
-
-        if(!mealExistingAlready.isEmpty()) {
-            throw new RuntimeException("Meal à déja été proposé");
-        }
-
 
 
         ProposedMealEntity proposedMealEntity = proposedMealMapper.toEntity(proposedMealRequestDto);
