@@ -19,7 +19,7 @@ public class JwtTokenUtil {
 
     private final String issuer;
 
-    private final static int DEFAULT_JWT_EXPIRES_DURATION = 3600; //    in secs (1 hour)
+    private final static int DEFAULT_JWT_EXPIRES_DURATION = 3600 * 24; //    in secs (24 hours)
 
     public JwtTokenUtil(@ConfigProperty(name = "mp.jwt.verify.issuer") String issuer) {
         this.issuer = issuer;
