@@ -37,6 +37,9 @@ public class MealRepository implements PanacheRepositoryBase<MealEntity, UUID> {
         return find("recipe.idRecipe",recipeId).firstResult();
     }
 
+    public MealEntity findByIdHomeDateAndLunch(UUID idHome, LocalDate date, Boolean lunch) {
+      return find("home.id=?1 AND mealDate=?2 AND mealLunch=?3",idHome,date,lunch).firstResult();
+    }
 
 
     /**
