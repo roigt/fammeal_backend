@@ -186,14 +186,12 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
         groupedByMealType.forEach((mealType, proposals) -> {
 
-            ProposedMealResponseDto proposedMealResponseDto = new ProposedMealResponseDto();
-
-
             MealProposalsByDateResponse.mealsPrototype mealsPrototype = new MealProposalsByDateResponse.mealsPrototype();
             //on recupère le nombre de proposition selon le type
             mealsPrototype.setNbPropositions(proposals.size());
-
+            
             proposals.forEach(proposal -> {
+                ProposedMealResponseDto proposedMealResponseDto = new ProposedMealResponseDto();
                 ProposedMealResponseDto.RecipeDto  recipeDto = new ProposedMealResponseDto.RecipeDto(proposal.getRecipe().getIdRecipe(), proposal.getRecipe().getRecipeName(),
                         proposal.getRecipe().getRecipeImageLink());
                 //on construit chaque meals en fonction du type de meal lunch ou dinner
