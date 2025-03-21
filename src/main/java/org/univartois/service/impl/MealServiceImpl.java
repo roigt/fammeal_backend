@@ -109,13 +109,16 @@ public class MealServiceImpl implements MealService{
             throw new RuntimeException("Meal date is before today-> mealDate ");
         }
 
-
-        MealEntity mealEntity = mealMapper.toEntity(mealRequestDto);
-        mealEntity.setHome(home);
-        mealEntity.setRecipe(recipe);
-
-        mealRepository.persist(mealEntity);
-        return mealMapper.toResponseDto(mealEntity);
+        //on verifie si le meal existe dans la table meal et on le crée si ce n'est pas le cas
+        MealEntity meal = mealRepository.findByIdHomeDateAndLunch(homeId,mealRequestDto.getMealDate(),mealRequestDto.isMealLunch());
+        if(meal==null){
+            meal = mealMapper.toEntity(mealRequestDto);
+            meal.setHome(home);
+        }
+        
+        meal.setRecipe(recipe);
+        mealRepository.persist(meal);
+        return mealMapper.toResponseDto(meal);
     }
 
     /**
