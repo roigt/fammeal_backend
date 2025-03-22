@@ -193,6 +193,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
                 ProposedMealResponseDto proposedMealResponseDto = new ProposedMealResponseDto();
                 ProposedMealResponseDto.RecipeDto  recipeDto = new ProposedMealResponseDto.RecipeDto(proposal.getRecipe().getIdRecipe(), proposal.getRecipe().getRecipeName(),
                         proposal.getRecipe().getRecipeImageLink());
+
                 //on construit chaque meals en fonction du type de meal lunch ou dinner
                 proposedMealResponseDto.setRecipeId(proposal.getRecipe().getIdRecipe());
                 proposedMealResponseDto.setMealId(proposal.getMeal().getIdMeal());
