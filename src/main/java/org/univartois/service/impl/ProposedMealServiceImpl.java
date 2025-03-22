@@ -102,7 +102,6 @@ public class ProposedMealServiceImpl implements ProposedMealService {
         }
 
 
-       // gestion du cas ou l utilisateur a deja proposer un repas pour le dejeuner ou le dinner
         if(proposedMealRepository.findByProposerId(userId)!=null){
             //recupère la liste des propositions de l utilisateur
             List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerIdAndMealDate(userId,proposedMealRequestDto.getDate());
@@ -123,11 +122,11 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
         MealEntity meal = mealRepository.findByIdHomeDateAndLunch(homeId,proposedMealRequestDto.getDate(),proposedMealRequestDto.getLunch());
         if(meal==null){//on verifie si le meal existe dans la table meal pour cette proposition et on le crée
-             meal= new MealEntity();
-             meal.setMealLunch(proposedMealRequestDto.getLunch());
-             meal.setMealDate(proposedMealRequestDto.getDate());
-             meal.setHome(home);
-             meal.setRecipe(null);
+            meal= new MealEntity();
+            meal.setMealLunch(proposedMealRequestDto.getLunch());
+            meal.setMealDate(proposedMealRequestDto.getDate());
+            meal.setHome(home);
+            meal.setRecipe(null);
             mealRepository.persist(meal);
         }
 
@@ -171,7 +170,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
     @Override
     public MealProposalsByDateResponse searchMealByDate(UUID homeId, LocalDate date){
         //on recupère la liste complet des meals proposés
-        List<ProposedMealEntity> proposedMealEntities = proposedMealRepository.getProposedMealsByDate(date);
+        List<ProposedMealEntity> proposedMealEntities = proposedMealRepository.getProposedMealsByDateAndHome(homeId, date);
 
 
         //on regroupe les meals selon le type lunch ou dinner
@@ -233,7 +232,13 @@ public class ProposedMealServiceImpl implements ProposedMealService {
             throw new ResourceNotFoundException("User not found");
         }
 
-        ProposedMealEntity proposeMealToDelete = proposedMealRepository.findByIdRecipeLunchDate(proposedMealRequestDto.getRecipeId(),proposedMealRequestDto.getDate(),proposedMealRequestDto.getLunch(),userId);
+        ProposedMealEntity proposeMealToDelete = proposedMealRepository.findByIdRecipeLunchDate(
+            proposedMealRequestDto.getRecipeId(),
+            proposedMealRequestDto.getDate(),
+            proposedMealRequestDto.getLunch(),
+            homeId,
+            userId
+        );
 
         if(proposeMealToDelete == null) {
             throw new ResourceNotFoundException("Proposed meal not found. You can't delete a proposed meal that isn't yours.");
