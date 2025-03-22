@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -33,4 +35,8 @@ public class MealEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idRecipe", referencedColumnName = "idRecipe", nullable = true)
     private RecipeEntity recipe;
+
+    @OneToMany(mappedBy = "meal",cascade = CascadeType.REMOVE)
+    @Builder.Default
+    private List<ProposedMealEntity> proposedMeals = new ArrayList<>();
 }

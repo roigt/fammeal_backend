@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum HomeRoleType implements Role {
-    ADMIN("Administrateur"), CHEF_REPAS("Chef des repas"), PROPOSITION_REPAS("Proposition des repas"), GARDE_MANGER("Garde manger"), MEMBER("Membre");
+    SUPER_ADMIN("Créateur"),ADMIN("Administrateur"), CHEF_REPAS("Chef des repas"), PROPOSITION_REPAS("Proposition des repas"), GARDE_MANGER("Garde manger"), MEMBER("Membre");
 
     @Getter
     private final String value;
@@ -15,6 +15,7 @@ public enum HomeRoleType implements Role {
     private final Set<HomeRoleType> children = new HashSet<>();
 
     static {
+        SUPER_ADMIN.children.add(ADMIN);
         ADMIN.children.add(CHEF_REPAS);
         CHEF_REPAS.children.add(GARDE_MANGER);
         GARDE_MANGER.children.add(PROPOSITION_REPAS);
@@ -26,6 +27,7 @@ public enum HomeRoleType implements Role {
     }
 
     public static class Constants {
+        public static final String SUPER_ADMIN_ADMIN_ROLE = "SUPER_ADMIN";
         public static final String ADMIN_ROLE = "ADMIN";
         public static final String CHEF_REPAS_ROLE = "CHEF_REPAS";
         public static final String GARDE_MANGER_ROLE = "GARDE_MANGER";

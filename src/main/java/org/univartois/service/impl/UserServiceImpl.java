@@ -205,7 +205,7 @@ public class UserServiceImpl implements UserService {
     public UserAuthResponseDto getProfile() {
         UUID userId = UUID.fromString(jsonWebToken.getSubject());
         UserEntity user = userRepository.findByIdOptional(userId).orElseThrow(() -> new ResourceNotFoundException(Constants.USER_NOT_FOUND_MSG));
-        return userMapper.toAuthResponseDto(user, null, roleService.getCurrentAuthUserRolesFromJwt());
+        return userMapper.toAuthResponseDto(user, null, roleService.getCurrentAuthUserRolesFromSecurityIdentity());
     }
 
     @Transactional
@@ -219,7 +219,7 @@ public class UserServiceImpl implements UserService {
 
         userMapper.updateEntity(user, updateAuthenticatedUserRequestDto);
 
-        return userMapper.toAuthResponseDto(user, null, roleService.getCurrentAuthUserRolesFromJwt());
+        return userMapper.toAuthResponseDto(user, null, roleService.getCurrentAuthUserRolesFromSecurityIdentity());
     }
 
     @Transactional

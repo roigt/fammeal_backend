@@ -1,6 +1,7 @@
 package org.univartois.resource;
 
 import io.quarkus.security.Authenticated;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
@@ -135,7 +136,7 @@ public class RecipeResource {
 //    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional
-    public RestResponse<ApiResponse<RecipeResponseDto>>  createRecipe(@MultipartForm RecipeMultipartForm form ) {// ,RecipeRequestDto recipeRequestDto  @MultipartForm RecipeMultipartForm form
+    public RestResponse<ApiResponse<RecipeResponseDto>>  createRecipe(@MultipartForm @Valid RecipeMultipartForm form ) {// ,RecipeRequestDto recipeRequestDto  @MultipartForm RecipeMultipartForm form
         try{
 
             InputStream file = form.file;
@@ -215,7 +216,7 @@ public class RecipeResource {
     @Operation(summary = "Update recipe", description = "Updates an existing recipe.")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional
-    public RestResponse<ApiResponse<RecipeResponseDto>> updateRecipe(@PathParam("idRecipe") UUID idRecipe,@MultipartForm RecipeMultipartForm form ) {//RecipeRequestDto recipeRequestDto
+    public RestResponse<ApiResponse<RecipeResponseDto>> updateRecipe(@PathParam("idRecipe") UUID idRecipe,@MultipartForm @Valid RecipeMultipartForm form ) {//RecipeRequestDto recipeRequestDto
         try{
             InputStream file = form.file;
             RecipeRequestDto recipeRequestDto = form.recipeRequest;

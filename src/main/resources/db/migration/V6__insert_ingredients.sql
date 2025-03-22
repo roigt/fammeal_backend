@@ -128,10 +128,10 @@ VALUES
 -- Function to get allergy ID
 CREATE OR REPLACE FUNCTION get_allergy_id(allergy_name VARCHAR) RETURNS BIGINT AS $$
 DECLARE
-    allergy_id BIGINT;
+allergy_id BIGINT;
 BEGIN
-    SELECT id INTO allergy_id FROM allergies WHERE name = allergy_name;
-    RETURN allergy_id;
+SELECT id INTO allergy_id FROM allergies WHERE name = allergy_name;
+RETURN allergy_id;
 END;
 $$ LANGUAGE plpgsql;
 

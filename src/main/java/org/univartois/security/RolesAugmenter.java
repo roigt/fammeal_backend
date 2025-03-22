@@ -9,7 +9,7 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class RolesAugmentor implements SecurityIdentityAugmentor {
+public class RolesAugmenter implements SecurityIdentityAugmentor {
 
     @Inject
     Instance<SecurityIdentitySupplier> identitySupplierInstance;

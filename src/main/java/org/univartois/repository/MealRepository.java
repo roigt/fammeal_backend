@@ -1,14 +1,11 @@
 package org.univartois.repository;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import org.univartois.entity.MealEntity;
-import org.univartois.entity.HomeEntity;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +14,7 @@ public class MealRepository implements PanacheRepositoryBase<MealEntity, UUID> {
 
     /**
      * Trouver les repas associés à une maison spécifique
+     *
      * @param idhome l'entité HomeEntity de la maison
      * @return Liste des MealEntity associés à la maison
      */
@@ -26,6 +24,7 @@ public class MealRepository implements PanacheRepositoryBase<MealEntity, UUID> {
 
     /**
      * Trouver les repas associés à une maison spécifique via l'ID de la maison
+     *
      * @param idHome l'UUID de la maison
      * @return Liste des MealEntity associés à la maison
      */
@@ -34,16 +33,16 @@ public class MealRepository implements PanacheRepositoryBase<MealEntity, UUID> {
     }
 
     public MealEntity findByIdRecipe(UUID recipeId) {
-        return find("recipe.idRecipe",recipeId).firstResult();
+        return find("recipe.idRecipe", recipeId).firstResult();
     }
 
     public MealEntity findByIdHomeDateAndLunch(UUID idHome, LocalDate date, Boolean lunch) {
       return find("home.id=?1 AND mealDate=?2 AND mealLunch=?3",idHome,date,lunch).firstResult();
     }
 
-
     /**
-     *Trouver un repas d'une maison précis
+     * Trouver un repas d'une maison précis
+     *
      * @param idHome
      * @param mealId
      * @return
@@ -57,11 +56,6 @@ public class MealRepository implements PanacheRepositoryBase<MealEntity, UUID> {
     public List<MealEntity> findFromDateToDate(UUID idHome, LocalDate from, LocalDate to) {
         return find("home.id = ?1 AND mealDate BETWEEN ?2 AND ?3 ORDER BY mealDate", idHome, from, to).list();
     }
-
-
-
-
-
 
 
 }

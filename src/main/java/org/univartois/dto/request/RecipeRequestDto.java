@@ -1,13 +1,13 @@
 package org.univartois.dto.request;
 
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.univartois.utils.Constants;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,7 +18,8 @@ import java.util.UUID;
 public class RecipeRequestDto {
 
 
-//    private String recipeImageLink;
+    //    private String recipeImageLink;
+    @Size(min = 2, max = 30, message = Constants.RECIPE_NAME_SIZE)
     private String recipeName;
     private int prepTimeMinutes;
     private String recipeVideoLink;
@@ -27,6 +28,6 @@ public class RecipeRequestDto {
     private boolean recipeLunchBox;
     private int recipeNbCovers;
     private int cookTimeMinutes;
-    private Map<UUID, Float> ingredients ;
+    private Map<UUID, Float> ingredients;
 
 }

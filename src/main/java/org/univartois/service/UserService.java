@@ -30,7 +30,6 @@ public interface UserService {
 
     void updatePassword(@Valid UpdatePasswordRequestDto updatePasswordRequestDto);
 
-
     DietaryConstraintsResponseDto updateDietaryConstraints(UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto);
 
     DietaryConstraintsResponseDto getDietaryConstraints();

@@ -1,9 +1,6 @@
 package org.univartois.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -16,7 +13,9 @@ import lombok.*;
 public class AllergyEntity {
 
     @Id
-    private long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "allergies_generator")
+    @SequenceGenerator(name = "allergies_generator", sequenceName = "allergies_seq", allocationSize = 1)
+    private Long id;
 
     @Column(nullable = false)
     private String name;

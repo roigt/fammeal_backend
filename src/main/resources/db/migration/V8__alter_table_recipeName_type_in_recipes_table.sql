@@ -1,0 +1,2 @@
+ALTER TABLE recipes
+    ALTER COLUMN recipeName TYPE VARCHAR(255) USING (recipeName::VARCHAR(255));
