@@ -82,6 +82,7 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
+    @Transactional
     public void deleteHome(UUID homeId) {
         homeRepository.deleteById(homeId);
     }
