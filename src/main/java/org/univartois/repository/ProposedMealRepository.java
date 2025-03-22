@@ -66,8 +66,9 @@ public class ProposedMealRepository implements PanacheRepositoryBase<ProposedMea
 
     }
 
-    public ProposedMealEntity findByIdRecipeLunchDate(UUID recipeId, LocalDate date, Boolean lunch,UUID proposerId) {
-     return find(" recipe.idRecipe = ?1  AND proposer.id= ?2 AND meal.mealLunch=?3 AND meal.mealDate= ?4", recipeId, proposerId,lunch,date).firstResult();
+    public ProposedMealEntity findByIdRecipeLunchDate(UUID recipeId, LocalDate date, Boolean lunch,UUID homeId, UUID proposerId) {
+     return find(" recipe.idRecipe = ?1  AND proposer.id= ?2 AND meal.mealLunch=?3 AND meal.home.id = ?4 AND meal.mealDate= ?5",
+                recipeId, proposerId, lunch, homeId, date).firstResult();
     }
 
     public List<ProposedMealEntity> findByProposerId(UUID proposerId) {
@@ -77,8 +78,8 @@ public class ProposedMealRepository implements PanacheRepositoryBase<ProposedMea
         return find(" proposer.id = ?1 AND meal.mealDate= ?2 ", proposerId,date).list();
     }
 
-    public List<ProposedMealEntity> getProposedMealsByDate(LocalDate date) {
-        return find("meal.mealDate = ?1", date).list();
+    public List<ProposedMealEntity> getProposedMealsByDateAndHome(UUID homeId, LocalDate date) {
+        return find("meal.home.id = ?1 AND meal.mealDate = ?2", homeId, date).list();
     }
 
 
