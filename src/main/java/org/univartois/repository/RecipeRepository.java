@@ -1,12 +1,12 @@
 package org.univartois.repository;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.*;
+import jakarta.persistence.TypedQuery;
+import org.univartois.entity.AllergyEntity;
 import org.univartois.entity.RecipeEntity;
-import org.univartois.entity.RecipesIngredientsEntity;
-import org.univartois.entity.UserEntity;
+import org.univartois.utils.Constants;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,10 +18,11 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
     public RecipeEntity findByIdRecipe(UUID id) {
         return find("idRecipe= ?1", id).firstResult();
     }
-    
+
 
     /**
      * Recherche toutes les recettes d'un créateur
+     *
      * @param creatorId
      * @return
      */
@@ -31,6 +32,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
 
     /**
      * Recherche toutes les recettes publiques
+     *
      * @return
      */
     public List<RecipeEntity> findPublicRecipes() {
@@ -38,7 +40,8 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
     }
 
     /**
-     *  Recherche toutes les recettes adaptées à une boîte à lunch
+     * Recherche toutes les recettes adaptées à une boîte à lunch
+     *
      * @return
      */
     public List<RecipeEntity> findLunchBoxRecipes() {
@@ -47,6 +50,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
 
     /**
      * Recherche une recette par son nom ou un terme clé dans les instructions
+     *
      * @param keyword
      * @return
      */
@@ -56,9 +60,8 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
 
 
     /**
+     * filtre sur les recettes de l utilisateur
      *
-     *
-     *filtre sur les recettes de l utilisateur
      * @param keywords
      * @param ingredientIds
      * @param vegetarian
@@ -97,7 +100,6 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList();
-
 
 
         StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r JOIN r.user u  WHERE r.user.id = :creatorId");
@@ -189,13 +191,9 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
     }
 
 
-
-
-
-
-
     /**
      * recherche de recette publique avec des filtre sur
+     *
      * @param keywords
      * @param ingredientIds
      * @param vegetarian
@@ -205,7 +203,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
      * @return
      */
     public List<RecipeEntity> searchRecipes(List<String> keywords, List<String> ingredientIds, Boolean vegetarian,
-                                            String coversParam, Boolean lunchBox,List<String> allergyIds ) {
+                                            String coversParam, Boolean lunchBox, List<String> allergyIds) {
         Integer covers = (coversParam == null || coversParam.isEmpty() || "null".equalsIgnoreCase(coversParam))
                 ? null
                 : Integer.valueOf(coversParam);
@@ -213,7 +211,6 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
         List<String> allKeywords = new ArrayList<>();
         List<String> allIngredientIds = new ArrayList<>();
         List<String> allAllergyIds = new ArrayList<>();
-
 
 
         for (String keyword : keywords) {
@@ -226,11 +223,10 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
             allIngredientIds.addAll(Arrays.asList(splitIngredientId));
         }
 
-        for(String allergie : allergyIds) {
+        for (String allergie : allergyIds) {
             String[] splitAllergie = allergie.split(",");
             allAllergyIds.addAll(Arrays.asList(splitAllergie));
         }
-
 
 
         //recupérer toutes les recettes dans l alias r
@@ -238,22 +234,21 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
         Map<String, Object> params = new HashMap<>();
 
 
-
         if (!allKeywords.isEmpty()) {
             query.append(" AND (");
 
-           for(int i= 0; i < allKeywords.size(); i++) {
+            for (int i = 0; i < allKeywords.size(); i++) {
 
-              query.append("( LOWER(r.recipeName) LIKE :keyword").append(i).append(" OR LOWER(r.recipeInstructions) LIKE :keyword").append(i).append(" OR LOWER(u.username) LIKE :keyword").append(i).append(")");
+                query.append("( LOWER(r.recipeName) LIKE :keyword").append(i).append(" OR LOWER(r.recipeInstructions) LIKE :keyword").append(i).append(" OR LOWER(u.username) LIKE :keyword").append(i).append(")");
 
 
-              params.put("keyword" + i, "%" + allKeywords.get(i).toLowerCase() + "%");
-               if (i < allKeywords.size() - 1) {
-                    query.append(" OR ") ;
+                params.put("keyword" + i, "%" + allKeywords.get(i).toLowerCase() + "%");
+                if (i < allKeywords.size() - 1) {
+                    query.append(" OR ");
                 }
 
 
-           }
+            }
             query.append(")");
         }
 
@@ -270,7 +265,6 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
             params.put("ingredientIds", allIngredientIds);
             params.put("ingredientCount", allIngredientIds.size());
         }
-
 
 
         if (vegetarian != null) {
@@ -348,6 +342,11 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
                         "SELECT a.id FROM AllergyEntity a WHERE a.id IN :ids", Long.class)
                 .setParameter("ids", allergyIds)
                 .getResultList();
+    }
+
+
+    public List<RecipeEntity> findByVegetarianAndNotInAllergiesAndPublic(boolean vegetarian, Set<AllergyEntity> allergies, boolean recipePublic) {
+        return list("#" + Constants.QUERY_FIND_RECIPES_BY_VEGETARIAN_AND_NOT_IN_ALLERGIES_AND_PUBLIC, Parameters.with("vegetarian", vegetarian).and("allergies", allergies).and("public", recipePublic));
     }
 
 

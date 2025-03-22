@@ -45,8 +45,8 @@ public class UserCreatedEventHandler {
                         .subject("FamMeal: Activation de votre compte")
                         .send()
                         .subscribe().with(
-                                success -> log.info("Forgot password email sent successfully to {}", userCreatedEvent.getEmail()),
-                                failure -> log.error("Failed to send forgot password email to {}", userCreatedEvent.getEmail(), failure)
+                                success -> log.info("verification email sent successfully to {}", userCreatedEvent.getEmail()),
+                                failure -> log.error("Failed to send verification email to {}", userCreatedEvent.getEmail(), failure)
                         );
             } else {
                 log.error("Failed to load logo.png from resources");

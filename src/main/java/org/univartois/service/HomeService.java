@@ -22,11 +22,11 @@ public interface HomeService {
 
     List<HomeMemberResponseDto> getHomeMembers(UUID homeId);
 
-    HomeMemberResponseDto getHomeMember(UUID homeId, UUID userId);
+    HomeMemberResponseDto getHomeMember(UUID homeId, UUID memberId);
 
-    HomeMemberResponseDto updateHomeMember(UUID homeId, UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto);
+    HomeMemberResponseDto updateHomeMember(UUID homeId, UUID memberId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto);
 
-    void deleteHomeMember(UUID homeId, UUID userId);
+    void deleteHomeMember(UUID homeId, UUID memberId);
 
     DietaryConstraintsResponseDto updateDietaryConstraints(UUID homeId, UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto);
 
@@ -35,4 +35,6 @@ public interface HomeService {
     HomeResponseDto updateHome(UUID homeId, UpdateHomeRequestDto updateHomeRequestDto);
 
     void toggleMealGeneration(UUID homeId, boolean lunch);
+
+    void deleteHome(UUID homeId);
 }

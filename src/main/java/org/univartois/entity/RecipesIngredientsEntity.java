@@ -2,10 +2,15 @@ package org.univartois.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.univartois.entity.id.RecipesIngredientsId;
 
 @Entity
 @Table(name = "recipes_ingredients")
+@AllArgsConstructor
+@Builder
 public class RecipesIngredientsEntity extends PanacheEntityBase {
 
     @EmbeddedId

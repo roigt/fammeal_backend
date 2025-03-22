@@ -1,8 +1,12 @@
 CREATE TABLE allergies
 (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
+
+CREATE SEQUENCE IF NOT EXISTS allergies_seq START WITH 1 INCREMENT BY 1;
+ALTER TABLE allergies ALTER COLUMN id SET DEFAULT nextval('allergies_seq');
+ALTER SEQUENCE allergies_seq OWNED BY users.id;
 
 CREATE TABLE homes_allergies
 (

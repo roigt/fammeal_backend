@@ -5,6 +5,7 @@ public class Constants {
     /**
      * messages for users operations
      */
+
     public static final String EMAIL_ALREADY_EXISTS_MSG = "Un utilisateur avec cet email existe déjà.";
     public static final String USERNAME_ALREADY_EXISTS_MSG = "Un utilisateur avec ce nom d'utilisateur existe déjà.";
     public static final String ACCOUNT_NOT_VERIFIED_MSG = "Votre compte n'a pas encore été vérifié. Veuillez vérifier votre e-mail pour activer votre compte.";
@@ -29,8 +30,6 @@ public class Constants {
     public static final String USER_DIETARY_CONSTRAINTS_UPDATED_MSG = "Votre contraintes alimentaires sont mises à jour.";
     public static final String USER_DIETARY_CONSTRAINTS_RETRIEVED_MSG = "Votre contraintes alimentaires sont récupérées.";
     public static final String USER_HOMES_RETRIEVED_MSG = "La liste de vos maisons est récupérée.";
-
-
     /**
      * messages for roles operations
      */
@@ -46,18 +45,22 @@ public class Constants {
     /**
      * messages for homes operations
      */
+    public static final String OPERATION_FORBIDDEN_MSG = "Vous n'avez pas les droits requises pour faire cette operation.";
     public static final String HOME_NOT_FOUND_MSG = "Cette maison n'existe pas.";
-    public static final String HOME_ADMIN_LEAVE_CONSTRAINT_MSG = "Vous ne pouvez pas quitter la maison tant qu'il n'y a pas au moins un autre administrateur.";
+    public static final String HOME_SUPER_ADMIN_LEAVE_CONSTRAINT_MSG = "Vous ne pouvez pas quitter la maison dont vous êtes créateur .";
     public static final String HOME_DETAILS_RETRIEVED_MSG = "Détails de la maison récupérés.";
     public static final String HOME_CREATED_MSG = "La maison a été créée avec succès.";
-    public static final String HOME_UPDATED_MSG = "La maison a été mise à jour avec succès." ;
+    public static final String HOME_UPDATED_MSG = "La maison a été mise à jour avec succès.";
+    public static final String HOME_DELETED_MSG = "La maison a été supprimée avec succès.";
     public static final String HOME_LEFT_MSG = "Vous avez quitté la maison avec succès.";
     public static final String USER_ALREADY_IN_HOME_MSG = "Cet utilisateur est déjà membre de cette maison.";
     public static final String USER_ADDED_TO_HOME_MSG = "Cet utilisateur est désormais un membre de votre maison";
-    public static final String HOME_MEMBERS_RETRIEVED_MSG = "Membres de la maison récupérés.";public static final String HOME_MEMBER_DETAILS_RETRIEVED_MSG = "Détails du membre de la maison récupérés.";
+    public static final String HOME_MEMBERS_RETRIEVED_MSG = "Membres de la maison récupérés.";
+    public static final String HOME_MEMBER_DETAILS_RETRIEVED_MSG = "Détails du membre de la maison récupérés.";
     public static final String HOME_MEMBER_NOT_FOUND_MSG = "Cet utilisateur ne fait pas partie de cette maison.";
     public static final String HOME_MEMBER_UPDATED_MSG = "Infos de ce membre sont mis à jour.";
-    public static final String HOME_ADMIN_SELF_UPDATE_ROLE_CONSTRAINT_MSG = "Un administrateur ne peut pas modifier son propre rôle dans la maison.";
+    public static final String HOME_ADMIN_MEMBER_SELF_UPDATE_ROLE_CONSTRAINT_MSG = "Un administrateur ne peut pas modifier son propre rôle dans la maison.";
+    public static final String HOME_ADMIN_CANNOT_MODIFY_OR_REMOVE_ANOTHER_ADMIN_MSG = "Un administrateur ne peut pas modifier le rôle ou supprimer un autre administrateur dans une maison.";
     public static final String HOME_ADMIN_SELF_DELETE_FROM_HOME_CONSTRAINT_MSG = "Un administrateur ne peut pas se supprimer lui-même de la maison. Utilisez plutôt l'option 'Quitter une maison'.";
     public static final String HOME_MEMBER_DELETED_MSG = "Ce membre est supprimé de cette maison avec succès.";
     public static final String HOME_DIETARY_CONSTRAINTS_UPDATED_MSG = "Les contraintes alimentaires de votre maison sont mises à jour.";
@@ -65,8 +68,7 @@ public class Constants {
     public static final String HOME_TOGGLE_GENERATION_MSG = "La génération automatique des repas est mise à jour.";
 
 
-
-//    Validation messages
+    //    Validation messages
     public static final String EMAIL_FORMAT_INVALID = "Adresse mail n'est pas valide";
     public static final String EMAIL_NOT_BLANK = "Adresse mail ne doit pas être vide";
     public static final String PASSWORD_NOT_BLANK = "Mot de pass ne doit pas être vide";
@@ -82,7 +84,8 @@ public class Constants {
     public static final String OLD_PASSWORD_NOT_BLANK = "l'ancien mot de pass ne doit pas être vide";
     public static final String NEW_PASSWORD_NOT_BLANK = "le nouveau mot de pass ne peut pas être vide";
     public static final String NEW_PASSWORD_SIZE = "le nouveau mot de pass doit contenir au moins 8 caractères.";
-
+    public static final String HOMEROLETYPE_SUBSET_MSG = "les valeurs possibles pour le role sont: {anyOf}";
+    public static final String RECIPE_NAME_SIZE = "Le nom de la recette doit contenir entre 2 et 30 caractères.";
 
 
     //    EVENTS
@@ -94,6 +97,7 @@ public class Constants {
     public static final String QUERY_FIND_HOMES_BY_USER_ID = "FIND_HOMES_BY_USER_ID";
     public static final String QUERY_FIND_USERS_BY_HOME_ID = "FIND_USERS_BY_HOME_ID";
     public static final String QUERY_FIND_USER_BY_HOME_ID_AND_USER_ID = "FIND_USER_BY_HOME_ID_AND_USER_ID";
+    public static final String QUERY_FIND_RECIPES_BY_VEGETARIAN_AND_NOT_IN_ALLERGIES_AND_PUBLIC = "FIND_RECIPES_BY_VEGETARIAN_AND_NOT_IN_ALLERGIES_AND_PUBLIC";
 
 
 }

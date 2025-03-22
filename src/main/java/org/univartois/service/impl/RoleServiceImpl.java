@@ -29,7 +29,7 @@ public class RoleServiceImpl implements RoleService {
     //    @SuppressWarnings("unchecked")
     @Override
     public boolean hasAnyRoleByHomeId(UUID homeId, Role... roles) {
-        HomeRoleType roleInHome = getCurrentAuthUserRolesFromJwt().getOrDefault(homeId.toString(), null);
+        HomeRoleType roleInHome = getCurrentAuthUserRolesFromSecurityIdentity().getOrDefault(homeId.toString(), null);
 
         if (roleInHome == null) return false;
         for (Role role : roles) {
@@ -56,7 +56,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Map<String, HomeRoleType> getCurrentAuthUserRolesFromJwt() {
+    public Map<String, HomeRoleType> getCurrentAuthUserRolesFromSecurityIdentity() {
         return (Map<String, HomeRoleType>) securityIdentity.getAttributes().getOrDefault("roles", new HashMap<>());
     }
 

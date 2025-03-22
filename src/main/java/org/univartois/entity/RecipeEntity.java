@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import jakarta.ws.rs.Consumes;
 import lombok.*;
+import org.univartois.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,30 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 @Entity
+@NamedQueries({@NamedQuery(
+        name = Constants.QUERY_FIND_RECIPES_BY_VEGETARIAN_AND_NOT_IN_ALLERGIES_AND_PUBLIC,
+        query = """
+                        SELECT r FROM RecipeEntity r
+                        JOIN r.recipesIngredients ri
+                        JOIN ri.ingredient i
+                        LEFT JOIN i.allergies a
+                        WHERE r.recipePublic = :public
+                        AND r.idRecipe NOT IN (
+                                SELECT rSub.idRecipe FROM RecipeEntity rSub
+                                JOIN rSub.recipesIngredients riSub
+                                JOIN riSub.ingredient iSub
+                                JOIN iSub.allergies aSub
+                                WHERE aSub IN :allergies
+                            )
+                        AND (:vegetarian = false OR r.idRecipe NOT IN (
+                                SELECT rV.idRecipe FROM RecipeEntity rV
+                                JOIN rV.recipesIngredients riV
+                                JOIN riV.ingredient iV
+                                WHERE iV.ingredientIsVegan = false
+                            )
+                        )
+                """
+)})
 @Table(name = "recipes")
 @AllArgsConstructor
 @Getter
@@ -33,7 +58,7 @@ public class RecipeEntity {
  //   @NotNull(message = "L'image de la recette est obligatoire.")
     private String recipeImageLink;
 
-    @Size(min = 2, max = 30, message = "Le nom de la recette doit contenir entre 2 et 30 caractères.")
+    
     private String recipeName;
 
     @Column(name = "prep_time_minutes")

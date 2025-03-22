@@ -16,4 +16,8 @@ public class HomeRepository implements PanacheRepositoryBase<HomeEntity, UUID> {
     public List<HomeEntity> findHomesByUserId(UUID userId) {
         return list("#" + Constants.QUERY_FIND_HOMES_BY_USER_ID, Parameters.with("userId", userId));
     }
+
+    public List<HomeEntity> findWithAutomaticMealGeneration() {
+        return list("lunchAutomaticGeneration = true OR  dinerAutomaticGeneration = true");
+    }
 }

@@ -1,4 +1,5 @@
 package org.univartois.dto.request;
+import jakarta.validation.Valid;
 import org.jboss.resteasy.reactive.PartType;
 
 import jakarta.ws.rs.FormParam;
@@ -13,5 +14,6 @@ public class RecipeMultipartForm {
 
     @FormParam("recipeRequest")
     @PartType(MediaType.APPLICATION_JSON)
+    @Valid
     public RecipeRequestDto recipeRequest;
 }

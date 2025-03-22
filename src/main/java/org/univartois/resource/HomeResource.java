@@ -58,12 +58,20 @@ public class HomeResource {
     @Path("{homeId}")
     @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
-    public RestResponse<ApiResponse<HomeResponseDto>> updateHome(@PathParam("homeId") UUID homeId, @Valid UpdateHomeRequestDto updateHomeRequestDto){
-        final HomeResponseDto home = homeService.updateHome(homeId,updateHomeRequestDto);
+    public RestResponse<ApiResponse<HomeResponseDto>> updateHome(@PathParam("homeId") UUID homeId, @Valid UpdateHomeRequestDto updateHomeRequestDto) {
+        final HomeResponseDto home = homeService.updateHome(homeId, updateHomeRequestDto);
 
-        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(home, Constants.HOME_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath() ));
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(home, Constants.HOME_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
 
+    @DELETE
+    @Path("{homeId}")
+    @Authenticated
+    @HomePermissionsAllowed(value = {HomeRoleType.Constants.SUPER_ADMIN_ADMIN_ROLE}, homeIdExpression = "homeId")
+    public RestResponse<ApiResponse<Object>> deleteHome(@PathParam("homeId") UUID homeId) {
+        homeService.deleteHome(homeId);
+        return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success((Object) null, Constants.HOME_DELETED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
+    }
 
     @DELETE
     @Path("/{homeId}/leave")
@@ -105,7 +113,7 @@ public class HomeResource {
     @Path("/{homeId}/members/{userId}")
     @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
-    public RestResponse<ApiResponse<HomeMemberResponseDto>> updateHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId, UpdateHomeMemberRequestDto updateHomeMemberRequestDto) {
+    public RestResponse<ApiResponse<HomeMemberResponseDto>> updateHomeMember(@PathParam("homeId") UUID homeId, @PathParam("userId") UUID userId, @Valid UpdateHomeMemberRequestDto updateHomeMemberRequestDto) {
         HomeMemberResponseDto updatedHomeMember = homeService.updateHomeMember(homeId, userId, updateHomeMemberRequestDto);
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(updatedHomeMember, Constants.HOME_MEMBER_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
@@ -124,8 +132,8 @@ public class HomeResource {
     @Path("/{homeId}/constraints")
     @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
-    public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> updateDietaryConstraints(@PathParam("homeId") UUID homeId,UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
-        DietaryConstraintsResponseDto responseDto = homeService.updateDietaryConstraints(homeId,updateDietaryConstraintsRequestDto);
+    public RestResponse<ApiResponse<DietaryConstraintsResponseDto>> updateDietaryConstraints(@PathParam("homeId") UUID homeId, UpdateDietaryConstraintsRequestDto updateDietaryConstraintsRequestDto) {
+        DietaryConstraintsResponseDto responseDto = homeService.updateDietaryConstraints(homeId, updateDietaryConstraintsRequestDto);
 
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(responseDto, Constants.HOME_DIETARY_CONSTRAINTS_UPDATED_MSG, RestResponse.Status.OK, uriInfo.getPath()));
     }
@@ -145,7 +153,7 @@ public class HomeResource {
     @Path("/{homeId}/mealGeneration")
     @Authenticated
     @HomePermissionsAllowed(value = {HomeRoleType.Constants.ADMIN_ROLE}, homeIdExpression = "homeId")
-    public RestResponse<ApiResponse<Object>> toggleMealGeneration(@PathParam("homeId") UUID homeId, @QueryParam("lunch") boolean lunch){
+    public RestResponse<ApiResponse<Object>> toggleMealGeneration(@PathParam("homeId") UUID homeId, @QueryParam("lunch") boolean lunch) {
         homeService.toggleMealGeneration(homeId, lunch);
 
         return RestResponse.status(RestResponse.Status.OK, ResponseUtil.success(null, Constants.HOME_TOGGLE_GENERATION_MSG, RestResponse.Status.OK, uriInfo.getPath()));

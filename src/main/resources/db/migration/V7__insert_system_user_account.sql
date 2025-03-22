@@ -1,0 +1,2 @@
+INSERT INTO users(id, username, email, firstname, lastname, password, profilepictureurl, vegetarian, verified)
+VALUES (uuid_generate_v4(), 'FAMMEAL_AI', 'admin@fammeal.com', 'FamMeal', 'AI', NULL, 'https://res.cloudinary.com/dhgjfj1ac/image/upload/v1742574914/fevr9x9rpk3vxp8sl20u.jpg', false, true);

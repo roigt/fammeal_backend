@@ -12,4 +12,4 @@ ALTER TABLE ingredients_allergies
     ADD CONSTRAINT fk_ingall_on_ingredient_entity FOREIGN KEY (ingredient_id) REFERENCES ingredients (idIngredient);
 
 ALTER TABLE recipes
-    ALTER COLUMN recipeName TYPE VARCHAR(30) USING (recipeName::VARCHAR(30));
+ALTER COLUMN recipeName TYPE VARCHAR(30) USING (recipeName::VARCHAR(30));
