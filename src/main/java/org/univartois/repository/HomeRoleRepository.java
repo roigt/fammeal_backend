@@ -15,9 +15,8 @@ public class HomeRoleRepository implements PanacheRepositoryBase<HomeRoleEntity,
         return list("user.id = ?1", userId);
     }
 
-
-    public long countAdminRolesByHomeId(UUID homeId) {
-        return count("id.homeId = ?1 AND role = ?2", homeId, HomeRoleType.ADMIN);
+    public long deleteById(UUID homeId, UUID userId){
+        return delete("id.homeId = ?1 AND id.userId = ?2", homeId, userId);
     }
 
     public boolean existsByUserIdAndHomeId(UUID userId, UUID homeId) {
