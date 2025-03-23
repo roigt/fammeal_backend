@@ -4,6 +4,7 @@ import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
 import java.util.Objects;

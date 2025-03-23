@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.ForbiddenException;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.univartois.dto.request.*;
 import org.univartois.dto.response.DietaryConstraintsResponseDto;
@@ -32,6 +33,7 @@ import org.univartois.utils.Constants;
 
 import java.util.*;
 
+@Slf4j
 @ApplicationScoped
 public class HomeServiceImpl implements HomeService {
     @Inject
@@ -200,7 +202,7 @@ public class HomeServiceImpl implements HomeService {
     public void deleteHomeMember(UUID homeId, UUID memberId) {
         UUID currentAuthUserId = UUID.fromString(jsonWebToken.getSubject());
         if (currentAuthUserId.equals(memberId)) {
-            throw new CannotLeaveHomeException("Un administrateur ne peut pas se supprimer lui-même de la maison. Utilisez plutôt l'option 'Quitter une maison'.");
+            throw new CannotLeaveHomeException(Constants.HOME_ADMIN_SELF_DELETE_FROM_HOME_CONSTRAINT_MSG);
         }
 
         HomeRoleType currentAuthUserRoleInHome = roleService.getCurrentAuthUserRolesFromSecurityIdentity().getOrDefault(homeId.toString(), null);
@@ -214,7 +216,7 @@ public class HomeServiceImpl implements HomeService {
             throw new CannotLeaveHomeException(Constants.HOME_ADMIN_CANNOT_MODIFY_OR_REMOVE_ANOTHER_ADMIN_MSG);
         }
 
-        homeRoleRepository.deleteById(new HomeRoleId(homeId, memberId));
+        homeRoleRepository.deleteById(homeId, memberId);
     }
 
     //    @TODO: optimize db queries
