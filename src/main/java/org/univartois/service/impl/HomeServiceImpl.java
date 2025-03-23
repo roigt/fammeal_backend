@@ -216,7 +216,9 @@ public class HomeServiceImpl implements HomeService {
             throw new CannotLeaveHomeException(Constants.HOME_ADMIN_CANNOT_MODIFY_OR_REMOVE_ANOTHER_ADMIN_MSG);
         }
 
+
         homeRoleRepository.deleteById(homeId, memberId);
+
     }
 
     //    @TODO: optimize db queries

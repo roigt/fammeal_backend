@@ -230,7 +230,7 @@ public class RecipeRepository implements PanacheRepositoryBase<RecipeEntity, UUI
 
 
         //recupérer toutes les recettes dans l alias r
-        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r LEFT JOIN r.user u  WHERE r.recipePublic=true and 1=1");
+        StringBuilder query = new StringBuilder("SELECT r FROM RecipeEntity r JOIN r.user u  WHERE r.recipePublic=true and 1=1");
         Map<String, Object> params = new HashMap<>();
 
 
