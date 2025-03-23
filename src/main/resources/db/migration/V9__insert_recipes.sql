@@ -5,7 +5,7 @@ INSERT INTO recipes (
 ) VALUES
       (
           gen_random_uuid(), NULL,
-          'https://asset.cloudinary.com/dz5xkou3q/77f57a15f6eafc4292d50db5e038da1a',
+          'https://res.cloudinary.com/dz5xkou3q/image/upload/v1742697552/42c72c64-1b54-4642-8b97-90a26f1310a1.jpg',
           'Blanquette de Veau',
           30, 'https://www.youtube.com/watch?v=xn1BTnRmEb8',
           '1. Couper la viande et la faire revenir...\n2. Ajouter les légumes...\n3. Laisser mijoter 1h30...',
@@ -13,7 +13,7 @@ INSERT INTO recipes (
       ),
       (
           gen_random_uuid(), NULL,
-          'https://asset.cloudinary.com/dz5xkou3q/e0d34ebee1bd06e41f8862350e7de2b4',
+          'https://res.cloudinary.com/dz5xkou3q/image/upload/v1742697620/0669373d-7ed3-448a-bbcd-8ccf7fca744a.jpg',
           'Ratatouille',
           20, 'https://www.youtube.com/watch?v=1cHP_-AMquQ',
           '1. Couper les légumes en rondelles...\n2. Faire revenir dans l''huile d''olive...\n3. Cuire au four à 180°C pendant 45 min...',
@@ -21,7 +21,7 @@ INSERT INTO recipes (
       ),
       (
           gen_random_uuid(), NULL,
-          'https://asset.cloudinary.com/dz5xkou3q/daced94a3f6e7c50867fa4a0d484bc30',
+          'https://res.cloudinary.com/dz5xkou3q/image/upload/v1742697662/e8acf353-58a5-4c72-ab55-9dd19fda5f8b.jpg',
           'Coq au Vin',
           40, 'https://www.youtube.com/watch?v=V1mWbdejSuk',
           '1. Faire mariner le coq dans du vin rouge...\n2. Faire revenir les morceaux avec des lardons et des oignons...\n3. Laisser mijoter 2h...',
@@ -29,7 +29,7 @@ INSERT INTO recipes (
       ),
       (
           gen_random_uuid(), NULL,
-          'https://asset.cloudinary.com/dz5xkou3q/9911e70410c7b8ff7e7bc1bd27b50488',
+          'https://res.cloudinary.com/dz5xkou3q/image/upload/v1742697710/020ca566-ff97-46c1-a6a8-89c86b7d6e8b.jpg',
           'Tarte Tatin',
           15, 'https://www.youtube.com/watch?v=JQb9nFIcufs',
           '1. Caraméliser le sucre et le beurre dans un moule...\n2. Ajouter les pommes coupées en quartiers...\n3. Recouvrir de pâte et cuire au four à 180°C pendant 35 min...',
