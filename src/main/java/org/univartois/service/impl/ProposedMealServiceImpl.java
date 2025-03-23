@@ -5,10 +5,8 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.univartois.dto.request.ProposedMealRequestDto;
-
 import org.univartois.dto.response.MealProposalsByDateResponse;
 import org.univartois.dto.response.ProposedMealResponseDto;
-
 import org.univartois.entity.*;
 import org.univartois.exception.ResourceNotFoundException;
 import org.univartois.mapper.ProposedMealMapper;
@@ -16,7 +14,10 @@ import org.univartois.repository.*;
 import org.univartois.service.ProposedMealService;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -46,11 +47,12 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
     /**
      * Afficher tous les repas proposés
+     *
      * @return
      */
     @Override
     public List<ProposedMealResponseDto> getAllProposedMeals(UUID homeId) {
-        HomeEntity  home = homeRepository.findByIdOptional(homeId)
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
         return proposedMealMapper.toResponseDtoList(proposedMealRepository.findByAllPropositions());
@@ -59,12 +61,13 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
     /**
      * Récupérer les propositions de repas par ID de repas
+     *
      * @param mealId
      * @return Liste des ProposedMealResponseDto
      */
     @Override
-    public List<ProposedMealResponseDto> getProposedMealsByMealId(UUID homeId,UUID mealId) {
-        HomeEntity  home = homeRepository.findByIdOptional(homeId)
+    public List<ProposedMealResponseDto> getProposedMealsByMealId(UUID homeId, UUID mealId) {
+        HomeEntity home = homeRepository.findByIdOptional(homeId)
                 .orElseThrow(() -> new RuntimeException("Home not found"));
 
         List<ProposedMealEntity> proposedMeals = proposedMealRepository.findByMealId(mealId);
@@ -77,42 +80,42 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
     /**
      * Ajouter une proposition de repas
+     *
      * @param proposedMealRequestDto
      * @return ProposedMealResponseDto
      */
     @Transactional
     @Override
-    public ProposedMealResponseDto proposeMeal(UUID homeId,ProposedMealRequestDto proposedMealRequestDto) {
+    public ProposedMealResponseDto proposeMeal(UUID homeId, ProposedMealRequestDto proposedMealRequestDto) {
 
 
         UUID userId = UUID.fromString(jwt.getSubject());
 
-        HomeEntity  home = homeRepository.findById(homeId);
-        if(home==null) throw new RuntimeException("Home not found");
+        HomeEntity home = homeRepository.findById(homeId);
+        if (home == null) throw new RuntimeException("Home not found");
 
         RecipeEntity recipe = recipeRepository.findByIdOptional(proposedMealRequestDto.getRecipeId())
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
 
         UserEntity proposer = userRepository.findById(userId);
-        if(proposer==null) throw new RuntimeException("User not found");
+        if (proposer == null) throw new RuntimeException("User not found");
 
         if (proposedMealRequestDto.getDate().isBefore(LocalDate.now())) {
             throw new RuntimeException("Proposed Meal  date is before today -> date ");
         }
 
 
-        if(proposedMealRepository.findByProposerId(userId)!=null){
+        if (proposedMealRepository.findByProposerId(userId) != null) {
             //recupère la liste des propositions de l utilisateur
-            List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerIdAndMealDate(userId,proposedMealRequestDto.getDate());
+            List<ProposedMealEntity> proposedMeal = proposedMealRepository.findByProposerIdAndMealDate(userId, proposedMealRequestDto.getDate());
 
-            for(ProposedMealEntity proposedMealEntity : proposedMeal){
+            for (ProposedMealEntity proposedMealEntity : proposedMeal) {
 
 
-                if(proposedMealEntity.getRecipe().getIdRecipe() == proposedMealRequestDto.getRecipeId() && proposedMealEntity.getMeal().isMealLunch() == proposedMealRequestDto.getLunch())
-                {
-                    String lunch = proposedMealRequestDto.getLunch().equals(true)? "déjeuner": "Dinner";
-                    throw new RuntimeException(STR."Vous avez déjà proposer un repas du \{lunch}  avec cette recette.");
+                if (proposedMealEntity.getRecipe().getIdRecipe() == proposedMealRequestDto.getRecipeId() && proposedMealEntity.getMeal().isMealLunch() == proposedMealRequestDto.getLunch()) {
+                    String lunch = proposedMealRequestDto.getLunch().equals(true) ? "déjeuner" : "Dinner";
+                    throw new RuntimeException(String.format("Vous avez déjà proposer un repas du %s avec cette recette.", lunch));
                 }
 
             }
@@ -120,9 +123,9 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
         }
 
-        MealEntity meal = mealRepository.findByIdHomeDateAndLunch(homeId,proposedMealRequestDto.getDate(),proposedMealRequestDto.getLunch());
-        if(meal==null){//on verifie si le meal existe dans la table meal pour cette proposition et on le crée
-            meal= new MealEntity();
+        MealEntity meal = mealRepository.findByIdHomeDateAndLunch(homeId, proposedMealRequestDto.getDate(), proposedMealRequestDto.getLunch());
+        if (meal == null) {//on verifie si le meal existe dans la table meal pour cette proposition et on le crée
+            meal = new MealEntity();
             meal.setMealLunch(proposedMealRequestDto.getLunch());
             meal.setMealDate(proposedMealRequestDto.getDate());
             meal.setHome(home);
@@ -142,9 +145,9 @@ public class ProposedMealServiceImpl implements ProposedMealService {
     }
 
 
-
     /**
      * Mettre à jour une proposition de repas
+     *
      * @param recipeId
      * @param mealId
      * @param proposerId
@@ -168,7 +171,7 @@ public class ProposedMealServiceImpl implements ProposedMealService {
 
     @Transactional
     @Override
-    public MealProposalsByDateResponse searchMealByDate(UUID homeId, LocalDate date){
+    public MealProposalsByDateResponse searchMealByDate(UUID homeId, LocalDate date) {
         //on recupère la liste complet des meals proposés
         List<ProposedMealEntity> proposedMealEntities = proposedMealRepository.getProposedMealsByDateAndHome(homeId, date);
 
@@ -188,10 +191,10 @@ public class ProposedMealServiceImpl implements ProposedMealService {
             MealProposalsByDateResponse.mealsPrototype mealsPrototype = new MealProposalsByDateResponse.mealsPrototype();
             //on recupère le nombre de proposition selon le type
             mealsPrototype.setNbPropositions(proposals.size());
-            
+
             proposals.forEach(proposal -> {
                 ProposedMealResponseDto proposedMealResponseDto = new ProposedMealResponseDto();
-                ProposedMealResponseDto.RecipeDto  recipeDto = new ProposedMealResponseDto.RecipeDto(proposal.getRecipe().getIdRecipe(), proposal.getRecipe().getRecipeName(),
+                ProposedMealResponseDto.RecipeDto recipeDto = new ProposedMealResponseDto.RecipeDto(proposal.getRecipe().getIdRecipe(), proposal.getRecipe().getRecipeName(),
                         proposal.getRecipe().getRecipeImageLink());
 
                 //on construit chaque meals en fonction du type de meal lunch ou dinner
@@ -205,43 +208,42 @@ public class ProposedMealServiceImpl implements ProposedMealService {
                 //on ajoute le meal creer au prototype selon le lunch ou le dinner
                 mealsPrototype.getMealList().add(proposedMealResponseDto);
 
-                 //si le repas es de type lunch on le met dans le lunch de la reponse
-                if(Objects.equals(mealType, "lunch")){
+                //si le repas es de type lunch on le met dans le lunch de la reponse
+                if (Objects.equals(mealType, "lunch")) {
                     proposalsByDate.setLunch(mealsPrototype);
-                }else{// si non le met dans le dinner de la reponse
+                } else {// si non le met dans le dinner de la reponse
                     proposalsByDate.setDiner(mealsPrototype);
                 }
             });
         });
 
 
-    return proposalsByDate;
+        return proposalsByDate;
 
     }
 
     /**
      * Supprimer une proposition de repas
-
      */
     @Transactional
     @Override
-    public void deleteProposedMeal(UUID homeId,ProposedMealRequestDto proposedMealRequestDto) {
+    public void deleteProposedMeal(UUID homeId, ProposedMealRequestDto proposedMealRequestDto) {
         UUID userId = UUID.fromString(jwt.getSubject());
 
         UserEntity proposer = userRepository.findById(userId);
-        if(proposer == null) {
+        if (proposer == null) {
             throw new ResourceNotFoundException("User not found");
         }
 
         ProposedMealEntity proposeMealToDelete = proposedMealRepository.findByIdRecipeLunchDate(
-            proposedMealRequestDto.getRecipeId(),
-            proposedMealRequestDto.getDate(),
-            proposedMealRequestDto.getLunch(),
-            homeId,
-            userId
+                proposedMealRequestDto.getRecipeId(),
+                proposedMealRequestDto.getDate(),
+                proposedMealRequestDto.getLunch(),
+                homeId,
+                userId
         );
 
-        if(proposeMealToDelete == null) {
+        if (proposeMealToDelete == null) {
             throw new ResourceNotFoundException("Proposed meal not found. You can't delete a proposed meal that isn't yours.");
         }
         proposedMealRepository.delete(proposeMealToDelete);
