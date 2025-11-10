@@ -22,9 +22,8 @@ Créez-en un si ce n’est pas déjà fait dans la [section Domaine](https://das
 ### Ethereal
 
 **Connectez-vous avec les identifiants suivants sur [Ethereal Mail](https://ethereal.email/login) :**
-- **Email :** elmore.brown@ethereal.email
-- **Password :** 4Fp2BqvvN9gZeQreDH
-
+- **Email :**
+- **Password :** 
 ## Lancement de l'application :
 
 1. Copier le fichier d'exemple `.env` :
